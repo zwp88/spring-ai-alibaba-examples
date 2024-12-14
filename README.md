@@ -18,7 +18,7 @@ We welcome contributions of any kind, including but not limited to:
 
 The project warehouse is under construction, please read [Roadmap.md](./Roadmap-zh.md) for more information.
 
-## Project Structure of Spring AI Alibaba Example
+## Project Structure
 
 In this example project, we combine modules according to the way of function, and strive to modularize the functions of each example to make it easier for everyone to find and use. An example of a basic module is as follows:
 
