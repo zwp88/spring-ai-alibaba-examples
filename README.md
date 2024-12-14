@@ -5,7 +5,7 @@
 ## introduce
 
 This repository contains many examples to introduce various uses of Spring AI Alibaba from basic to advanced and best practices for AI projects.
-For a more detailed introduction, please refer to the README.md in each sub-project and [Spring AI Alibaba official website] (https://java2ai.com).
+For a more detailed introduction, please refer to the README.md in each sub-project and [Spring AI Alibaba official website](https://java2ai.com).
 
 ## How to participate
 
