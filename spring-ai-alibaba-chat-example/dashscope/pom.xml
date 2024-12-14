@@ -34,10 +34,6 @@
 	<description>Spring AI Alibaba Dashscope Chat Example</description>
 	<name>Spring AI Alibaba Dashscope Chat Examples</name>
 
-	<properties>
-		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-	</properties>
-
 	<modules>
 		<module>chat-model</module>
 		<module>chat-client</module>

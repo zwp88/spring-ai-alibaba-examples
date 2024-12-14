@@ -20,17 +20,20 @@
 		 xmlns="http://maven.apache.org/POM/4.0.0"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.alibaba.cloud.ai</groupId>
+
+	<parent>
+		<groupId>com.alibaba.cloud.ai</groupId>
+		<artifactId>dashscope</artifactId>
+		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
 	<artifactId>chat-model</artifactId>
-	<version>1.0.0</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 
 	<description>Spring AI Alibaba Dashscope Chat Model Example</description>
 	<name>Spring AI Alibaba Dashscope Chat Model Examples</name>
-
-	<properties>
-		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-	</properties>
 
 	<build>
 		<plugins>
