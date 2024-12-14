@@ -6,10 +6,10 @@ permissions:
   contents: read
 
 jobs:
-#  license:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
+  license:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 #      - name: Check License
 #        uses: apache/skywalking-eyes@main
 #        env:
