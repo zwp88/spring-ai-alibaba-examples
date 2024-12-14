@@ -18,7 +18,7 @@
 
 此项目仓库正在建设中，请阅读 [Roadmap.md](./Roadmap-zh.md) 了解更多信息。
 
-## Spring AI Alibaba Example 的项目结构
+## 项目结构
 
 在此 Example 项目中，我们按照功能的方式组合模块，力求将每个 Example 的功能模块化，方便大家查找和使用。
 一个基本的模块示例如下：

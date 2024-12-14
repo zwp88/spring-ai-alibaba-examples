@@ -4,7 +4,8 @@
 
 1. 提交的 Example 必须是完整的，包含必要的 README.md 和注释说明；
 2. 在提交 PR 之后，自己阅览所提的 PR 确保没有基础问题，例如代码格式，错别字等；
-3. 给每个 Example 选择合适的 module。
+3. 如果提交的 Example 需要使用到本地模型，可以使用 Docker/Docker Compose 等工具提供；
+4. 给每个 Example 选择合适的 module。
 
 ## Spring AI Alibaba Example 的项目结构
 
