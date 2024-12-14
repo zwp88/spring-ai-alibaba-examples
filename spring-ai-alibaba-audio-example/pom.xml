@@ -20,20 +20,23 @@
 		 xmlns="http://maven.apache.org/POM/4.0.0"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.alibaba.cloud.ai</groupId>
+
+	<parent>
+		<groupId>com.alibaba.cloud.ai</groupId>
+		<artifactId>spring-ai-alibaba-examples</artifactId>
+		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<version>${revision}</version>
 	<artifactId>spring-ai-alibaba-audio-example</artifactId>
-	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<description>Spring AI Alibaba Audio Example</description>
-	<name>Spring AI Alibaba Audio Example</name>
-
-	<properties>
-		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-	</properties>
+	<name>Spring AI Alibaba Audio Examples</name>
 
 	<modules>
-
+		<!--<module>dashscope</module>-->
 	</modules>
 
 	<build>
