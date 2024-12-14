@@ -1,11 +1,47 @@
-This directory contains examples demonstrating basic and advanced usages of Spring AI Alibaba.
+# Spring AI Alibaba Example
 
-All the examples here are designed to be independent maven projects that can be copied and imported independently. So it's recommended to import the whole example directory or each specific example sub-directory as a separate maven project.
+> Spring AI Alibaba example.
 
-* Hello World
-* Chat Model
-* Function Calling
-* Structured Output
-* Prompt
-* RAG
-* Flight Booking Playground, an advanced example showcasing usage of prompt template, function calling, chat memory and rag at the same time.
+## introduce
+
+This repository contains many examples to introduce various uses of Spring AI Alibaba from basic to advanced and best practices for AI projects.
+For a more detailed introduction, please refer to the README.md in each sub-project and [Spring AI Alibaba official website] (https://java2ai.com).
+
+## How to participate
+
+We welcome contributions of any kind, including but not limited to:
+
+- Spring AI Alibaba usage examples;
+- Use of Spring AI Alibaba API;
+- Spring AI usage examples;
+- Best practices for AI projects, etc.
+
+The project warehouse is under construction, please read [Roadmap.md](./Roadmap-zh.md) for more information.
+
+## Project Structure of Spring AI Alibaba Example
+
+In this example project, we combine modules according to the way of function, and strive to modularize the functions of each example to make it easier for everyone to find and use. An example of a basic module is as follows:
+
+```text
+|-spring-ai-alibaba-chat-example
+|-- dashscope
+|----chat-model
+|------ src
+|------ README.md
+|------ pom.xml
+|----chat-client
+|------ src
+|------ README.md
+|------ pom.xml
+|-- ollama
+|----chat-model
+|------ src
+|------ README.md
+|------ pom.xml
+|----chat-client
+|------ src
+|------ README.md
+|------ pom.xml
+|-- ...... (other LLMs)
+|- ......(other Examples)
+```
