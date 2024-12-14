@@ -23,13 +23,12 @@
 
 	<parent>
 		<groupId>com.alibaba.cloud.ai</groupId>
-		<artifactId>spring-ai-alibaba-chat-examples</artifactId>
+		<artifactId>spring-ai-alibaba-chat-example</artifactId>
 		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>dashscope</artifactId>
-	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<description>Spring AI Alibaba Dashscope Chat Example</description>

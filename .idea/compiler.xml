@@ -2,6 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="dashscope-chat-client" target="1.5" />
+      <module name="dashscope-chat-model" target="1.5" />
       <module name="spring-ai-alibaba-dashscope-chat-example" target="1.5" />
     </bytecodeTargetLevel>
   </component>

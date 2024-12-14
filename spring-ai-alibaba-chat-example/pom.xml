@@ -29,15 +29,10 @@
 	</parent>
 
 	<artifactId>spring-ai-alibaba-chat-example</artifactId>
-	<version>${revision}</version>
 	<packaging>pom</packaging>
 
 	<description>Spring AI Alibaba Chat Example</description>
 	<name>Spring AI Alibaba Chat Examples</name>
-
-	<properties>
-		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-	</properties>
 
 	<modules>
 		<module>dashscope</module>
