@@ -115,5 +115,4 @@ public class FunctionCallingController {
 				.call()
 				.content();
 	}
-
 }
