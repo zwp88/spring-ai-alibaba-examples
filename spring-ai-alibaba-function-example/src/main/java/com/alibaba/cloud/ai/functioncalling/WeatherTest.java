@@ -25,28 +25,26 @@ import org.springframework.ai.chat.client.ChatClient;
 /**
  * @author 北极星
  */
-public class MicroSoftTranslateTest {
-
+public class WeatherTest {
     private static final Logger log = LoggerFactory.getLogger(MicroSoftTranslateTest.class);
 
     private final ChatClient chatClient;
 
-    public MicroSoftTranslateTest (@NotNull ChatClient.Builder chatClientBuilder) {
+    public WeatherTest (@NotNull ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
     }
 
     /**
-     * 微软翻译
+     * 天气服务
      *
-     * @link <a href="https://api.cognitive.microsofttranslator.com"/a>
-     * 版本号 version 3.0
-     * ApplicationYml spring.ai.alibaba.plugin.translate 传入 api-key
+     * @link <a href="https://api.weatherapi.com/v1/forecast.json"/a>
+     * ApplicationYml spring.ai.alibaba.functioncalling.weather 传入 api-key
      */
     @Test
     protected void microSoftTranslateFunctionCallingTest () {
         String text = "你好，spring-ai-alibaba!";
 
-        String ans = chatClient.prompt().functions("translateService").user(text).call().content();
-        log.info("translated text -> : ${}", ans);
+        String ans = chatClient.prompt().functions("getWeatherService").user(text).call().content();
+        log.info("weather text -> : ${}", ans);
     }
 }
