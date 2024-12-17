@@ -46,7 +46,7 @@ public class MicroSoftTranslateTest {
     protected void microSoftTranslateFunctionCallingTest () {
         String text = "你好，spring-ai-alibaba!";
 
-        String ans = chatClient.prompt().functions("microSoftTranslateService").user(text).call().content();
+        String ans = chatClient.prompt().functions("microSoftTranslateFunction").user(text).call().content();
         log.info("translated text -> : ${}", ans);
     }
 }
