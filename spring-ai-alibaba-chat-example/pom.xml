@@ -36,8 +36,9 @@
 	<name>Spring AI Alibaba Chat Examples</name>
 
 	<modules>
-		<module>dashscope</module>
-		<module>openai</module>
+		<module>dashscope-chat</module>
+		<module>openai-chat</module>
+		<module>ollama-chat</module>
 	</modules>
 
 	<build>
