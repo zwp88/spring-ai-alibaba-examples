@@ -36,7 +36,8 @@
 	<name>Spring AI Alibaba Observability Examples</name>
 
 	<modules>
-		<!--<module>dashscope</module>-->
+		<module>observability-example</module>
+		<module>observationhandler-example</module>
 	</modules>
 
 	<build>
@@ -51,5 +52,14 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+	</dependencies>
 
 </project>
