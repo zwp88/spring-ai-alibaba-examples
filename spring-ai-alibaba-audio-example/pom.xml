@@ -36,7 +36,7 @@
 	<name>Spring AI Alibaba Audio Examples</name>
 
 	<modules>
-		<!--<module>dashscope</module>-->
+		<module>dashscope-audio</module>
 	</modules>
 
 	<build>

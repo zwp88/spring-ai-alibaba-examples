@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-   Copyright 2023-2024 the original author or authors.
+   Copyright 2025 the original author or authors.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@
 	<name>Spring AI Alibaba Observability Examples</name>
 
 	<modules>
-		<!--<module>dashscope</module>-->
+		<module>observability-example</module>
+		<module>observationhandler-example</module>
 	</modules>
 
 	<build>
@@ -51,5 +52,14 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+	</dependencies>
 
 </project>

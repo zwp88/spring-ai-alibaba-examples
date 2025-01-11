@@ -36,7 +36,8 @@
 	<name>Spring AI Alibaba Image Examples</name>
 
 	<modules>
-		<!--<module>dashscope</module>-->
+		<module>dashscope-image</module>
+		<module>openai-image</module>
 	</modules>
 
 	<build>
