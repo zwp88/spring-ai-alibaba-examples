@@ -48,39 +48,27 @@ public class HelloworldController {
 
 	private final ChatClient dashScopeChatClient;
 
-	private final ChatModel chatModel;
-
-	public HelloworldController(ChatModel chatModel) {
-
-		this.chatModel = chatModel;
-
-		// 构造时，可以设置 ChatClient 的参数
-		// {@link org.springframework.ai.chat.client.ChatClient};
-		this.dashScopeChatClient = ChatClient.builder(chatModel)
-				.defaultSystem(DEFAULT_PROMPT)
-				// 实现 Chat Memory 的 Advisor
-				// 在使用 Chat Memory 时，需要指定对话 ID，以便 Spring AI 处理上下文。
-				.defaultAdvisors(
-						new MessageChatMemoryAdvisor(new InMemoryChatMemory())
-				)
-				// 实现 Logger 的 Advisor
-				.defaultAdvisors(
-						new SimpleLoggerAdvisor()
-				)
-				// 设置 ChatClient 中 ChatModel 的 Options 参数
-				.defaultOptions(
-						DashScopeChatOptions.builder()
-								.withTopP(0.7)
-								.build()
-				)
-				.build();
-	}
-
 	// 也可以使用如下的方式注入 ChatClient
-	// public DashScopeChatClientController(ChatClient.Builder chatClientBuilder) {
-	//
-	//  	this.dashScopeChatClient = chatClientBuilder.build();
-	// }
+	 public HelloworldController(ChatClient.Builder chatClientBuilder) {
+	  	this.dashScopeChatClient = chatClientBuilder
+				.defaultSystem(DEFAULT_PROMPT)
+				 // 实现 Chat Memory 的 Advisor
+				 // 在使用 Chat Memory 时，需要指定对话 ID，以便 Spring AI 处理上下文。
+				 .defaultAdvisors(
+						 new MessageChatMemoryAdvisor(new InMemoryChatMemory())
+				 )
+				 // 实现 Logger 的 Advisor
+				 .defaultAdvisors(
+						 new SimpleLoggerAdvisor()
+				 )
+				 // 设置 ChatClient 中 ChatModel 的 Options 参数
+				 .defaultOptions(
+						 DashScopeChatOptions.builder()
+								 .withTopP(0.7)
+								 .build()
+				 )
+				 .build();
+	 }
 
 	/**
 	 * ChatClient 简单调用
@@ -104,20 +92,20 @@ public class HelloworldController {
 	/**
 	 * ChatClient 使用自定义的 Advisor 实现功能增强.
 	 * eg:
-	 * http://127.0.0.1:10001/dashscope/chat-client/advisor/chat/123?prompt=你好，我叫牧生，之后的会话中都带上我的名字
+	 * http://127.0.0.1:18080/helloworld/advisor/chat/123?query=你好，我叫牧生，之后的会话中都带上我的名字
 	 * 你好，牧生！很高兴认识你。在接下来的对话中，我会记得带上你的名字。有什么想聊的吗？
-	 * http://127.0.0.1:10001/dashscope/chat-client/advisor/chat/123?prompt=我叫什么名字？
+	 * http://127.0.0.1:18080/helloworld/advisor/chat/123?query=我叫什么名字？
 	 * 你叫牧生呀。有什么事情想要分享或者讨论吗，牧生？
 	 */
 	@GetMapping("/advisor/chat/{id}")
 	public Flux<String> advisorChat(
 			HttpServletResponse response,
 			@PathVariable String id,
-			@RequestParam String prompt) {
+			@RequestParam String query) {
 
 		response.setCharacterEncoding("UTF-8");
 
-		return this.dashScopeChatClient.prompt(prompt)
+		return this.dashScopeChatClient.prompt(query)
 				.advisors(
 						a -> a
 								.param(CHAT_MEMORY_CONVERSATION_ID_KEY, id)
