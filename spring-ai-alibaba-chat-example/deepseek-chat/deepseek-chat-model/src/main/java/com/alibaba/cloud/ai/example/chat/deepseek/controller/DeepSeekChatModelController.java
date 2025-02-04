@@ -46,7 +46,6 @@ public class DeepSeekChatModelController {
      */
     @GetMapping("/simple/chat")
     public String simpleChat () {
-
         return DeepSeekChatModel.call(new Prompt(DEFAULT_PROMPT)).getResult().getOutput().getContent();
     }
 
@@ -57,10 +56,7 @@ public class DeepSeekChatModelController {
      */
     @GetMapping("/stream/chat")
     public Flux<String> streamChat (HttpServletResponse response) {
-
-        // 避免返回乱码
         response.setCharacterEncoding("UTF-8");
-
         Flux<ChatResponse> stream = DeepSeekChatModel.stream(new Prompt(DEFAULT_PROMPT));
         return stream.map(resp -> resp.getResult().getOutput().getContent());
     }
@@ -72,9 +68,7 @@ public class DeepSeekChatModelController {
      */
     @GetMapping("/custom/chat")
     public String customChat () {
-
         OpenAiChatOptions customOptions = OpenAiChatOptions.builder().temperature(0.8d).build();
-
         return DeepSeekChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getContent();
     }
 }
