@@ -22,19 +22,21 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 /**
  * @author 北极星
  */
+@RestController
 public class DeepSeekChatModelController {
 
     private static final String DEFAULT_PROMPT = "你好，介绍下你自己吧。";
 
-    private final ChatModel dashScopeChatModel;
+    private final ChatModel DeepSeekChatModel;
 
     public DeepSeekChatModelController (ChatModel chatModel) {
-        this.dashScopeChatModel = chatModel;
+        this.DeepSeekChatModel = chatModel;
     }
 
     /**
@@ -45,7 +47,7 @@ public class DeepSeekChatModelController {
     @GetMapping("/simple/chat")
     public String simpleChat () {
 
-        return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT)).getResult().getOutput().getContent();
+        return DeepSeekChatModel.call(new Prompt(DEFAULT_PROMPT)).getResult().getOutput().getContent();
     }
 
     /**
@@ -59,7 +61,7 @@ public class DeepSeekChatModelController {
         // 避免返回乱码
         response.setCharacterEncoding("UTF-8");
 
-        Flux<ChatResponse> stream = dashScopeChatModel.stream(new Prompt(DEFAULT_PROMPT));
+        Flux<ChatResponse> stream = DeepSeekChatModel.stream(new Prompt(DEFAULT_PROMPT));
         return stream.map(resp -> resp.getResult().getOutput().getContent());
     }
 
@@ -73,6 +75,6 @@ public class DeepSeekChatModelController {
 
         OpenAiChatOptions customOptions = OpenAiChatOptions.builder().temperature(0.8d).build();
 
-        return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getContent();
+        return DeepSeekChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getContent();
     }
 }
