@@ -18,8 +18,10 @@
 package com.alibaba.cloud.ai.example.chat.ark.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.Media;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -28,6 +30,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Ark Chat Model Controller
@@ -91,18 +98,51 @@ public class ArkChatModelController {
         return arkChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getContent();
     }
 
-
     /**
+     * Visual comprehension example using Ark LLM
      * @link <a href="https://www.volcengine.com/docs/82379/1362913">...</a>
-     * @return
+     * @return String response from the model
      */
     @GetMapping("/visual/comprehension")
     public String visualComprehension() {
-        String promt = "图片主要讲了什么?";
-        SystemMessage systemMessage = new SystemMessage("图片主要讲了什么?");
-        UserMessage userMessage = new UserMessage();
+        // 创建消息内容
+        Map<String, Object> messageContent = new HashMap<>();
+        messageContent.put("role", "user");
+        
+        List<Map<String, Object>> contents = new ArrayList<>();
+        
+        // 添加文本内容
+        Map<String, Object> textContent = new HashMap<>();
+        textContent.put("type", "text");
+        textContent.put("text", "请描述这张图片的主要内容是什么？");
+        contents.add(textContent);
+        
+        // 添加图片内容
+        Map<String, Object> imageContent = new HashMap<>();
+        imageContent.put("type", "image_url");
+        Map<String, String> imageUrl = new HashMap<>();
+        imageUrl.put("url", "https://portal.volccdn.com/obj/volcfe/cloud-universal-doc/upload_a81e3cdd3e30617ecd524a132fdb2736.png");
+        imageContent.put("image_url", imageUrl);
+        contents.add(imageContent);
+        
+        messageContent.put("content", contents);
 
-        return arkChatModel.call(systemMessage,).getResult().getOutput().getContent();
+        // 创建用户消息
+        UserMessage message = new UserMessage(messageContent);
+        
+        // 打印生成的消息内容
+        System.out.println("Generated Message JSON:");
+        System.out.println(messageContent);
 
+        // 打印完整的 Prompt 内容
+        Prompt prompt = new Prompt(message);
+        System.out.println("\nFull Prompt JSON:");
+        System.out.println(prompt.toString());
+
+        // 调用模型并返回结果
+        return arkChatModel.call(prompt)
+                .getResult()
+                .getOutput()
+                .getContent();
     }
 } 

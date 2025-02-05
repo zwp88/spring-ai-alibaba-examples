@@ -6,13 +6,13 @@ spring:
     name: spring-ai-alibaba-ark-chat-model-example
   ai:
     openai:
-      # API Key Configuration
-      api-key: ${OPENAI_API_KEY}
+      # API Key Configuration。ARK_API_KEY=e4d6b947-11d4-407c-b38d-8bceb88eceff;ARK_MODEL_ID=ep-20250129234414-q9ppv
+      api-key: ${ARK_API_KEY:your-api-key}
       # Ark LLM API Base URL
       base-url: https://ark.cn-beijing.volces.com/api/
       chat:
         options:
           # Model ID, replace with actual access point ID
-          model: ${OPENAI_MODEL_ID}
+          model: ${ARK_MODEL_ID:your-model-id}
         # Chat API path, consistent with OpenAI interface
         completions-path: /v3/chat/completions 
