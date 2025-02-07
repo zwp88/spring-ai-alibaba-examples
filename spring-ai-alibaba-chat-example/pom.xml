@@ -39,7 +39,6 @@
 		<module>dashscope-chat</module>
 		<module>openai-chat</module>
 		<module>ollama-chat</module>
-		<module>ark-chat</module>
 	</modules>
 
 	<build>
