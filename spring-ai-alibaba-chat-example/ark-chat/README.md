@@ -1,41 +1,28 @@
 # Spring AI Alibaba Ark Chat Example
 
-This is an example project demonstrating how to use Spring AI Alibaba to interact with ByteDance Volcano Engine's Ark LLM.
+这是一个示例项目，演示如何使用 Spring AI Alibaba 与字节跳动火山引擎的 Ark LLM 进行交互。由于 Ark LLM 完全兼容 OpenAI API，因此代码实现可以直接参考 openai-chat 示例项目。
 
-## Modules
+## 模块说明
 
-- ark-chat-client: Demonstrates how to use ChatClient to interact with Ark LLM
-- ark-chat-model: Demonstrates how to use ChatModel to interact with Ark LLM
+- ark-chat-client: 演示如何使用 ChatClient 与 Ark LLM 交互
+- ark-chat-model: 演示如何使用 ChatModel 与 Ark LLM 交互
 
-## Requirements
+## 环境要求
 
 - Java 17+
 - Maven 3.6+
 - Spring Boot 3.2.0+
 - Spring AI 0.8.0+
 
-## Configuration
+## 配置说明
 
-Before running the examples, you need to configure the following environment variables:
+运行示例之前，需要在 application.yml 中配置以下参数：
 
-- OPENAI_API_KEY: API key for Ark LLM
-- OPENAI_MODEL_ID: Model ID (Access Point ID) for Ark LLM
+```yaml
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}  # Ark LLM 的 API Key
+      model-id: ${OPENAI_MODEL_ID}  # Ark LLM 的模型 ID（Access Point ID）
+```
 
-## Running the Examples
-
-1. Configure environment variables
-2. Navigate to the respective module directory
-3. Execute `mvn spring-boot:run` command
-
-## API Endpoints
-
-### ChatClient Examples
-
-- GET /ark/chat-client/simple/chat - Simple chat example
-- GET /ark/chat-client/stream/chat - Streaming chat example
-
-### ChatModel Examples
-
-- GET /ark/chat-model/simple/chat - Simple chat example
-- GET /ark/chat-model/stream/chat - Streaming chat example
-- GET /ark/chat-model/custom/chat - Custom parameters chat example 
