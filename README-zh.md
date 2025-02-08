@@ -27,6 +27,7 @@
 | 多模态    | ark（火山方舟）, Dashscope              |
 | Image    | Dashscope, OpenAI                      |
 | Audio    | DashScope                              |
+| 开发生态  | MCP，Nacos，Higress，Kong，可观测，Ptompt 模版，函数调用，集成示例 |
 
 ## 项目结构
 
