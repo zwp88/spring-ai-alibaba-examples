@@ -18,6 +18,16 @@
 
 此项目仓库正在建设中，请阅读 [Roadmap.md](./Roadmap-zh.md) 了解更多信息。
 
+## 已集成的功能模型
+
+| Category | Options                                |
+|----------|----------------------------------------|
+| Chat     | DashScope, OpenAI, ark（火山方舟）, ollama, ZhiPuAI, moonshot（月之暗面） |
+| RAG      | ES, milvus, pgvector                   |
+| 多模态    | ark（火山方舟）, Dashscope              |
+| Image    | Dashscope, OpenAI                      |
+| Audio    | DashScope                              |
+
 ## 项目结构
 
 在此 Example 项目中，我们按照功能的方式组合模块，力求将每个 Example 的功能模块化，方便大家查找和使用。
