@@ -37,6 +37,8 @@
 
 	<modules>
 		<module>rag-example</module>
+		<module>rag-milvus-example</module>
+		<module>rag-pgvector-example</module>
 	</modules>
 
 	<build>
