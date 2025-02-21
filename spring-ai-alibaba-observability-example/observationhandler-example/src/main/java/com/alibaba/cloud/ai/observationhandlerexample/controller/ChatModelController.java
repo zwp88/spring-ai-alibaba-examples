@@ -42,7 +42,8 @@ public class ChatModelController {
                 new OllamaOptions().withModel("qwen2.5"),
                 null,
                 null,
-                registry);
+                registry,
+                null);
         return ollamaChatModel.call(message);
     }
 }
