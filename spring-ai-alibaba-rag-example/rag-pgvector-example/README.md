@@ -27,4 +27,4 @@ curl -X GET http://127.0.0.1:8080/ai/rag/importDocument
 curl -G 'http://127.0.0.1:8080/ai/rag' --data-urlencode 'message=如何快速开始spring ai alibaba'
 ```
 ### Pgvector DockerFile
-to [README.md](../docker-compose/pgvector/README.md)
+to [README.md](../../docker-compose/pgvector/README.md)
