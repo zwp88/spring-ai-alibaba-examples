@@ -30,7 +30,6 @@
 
     <version>${revision}</version>
     <artifactId>spring-ai-alibaba-function-calling-example</artifactId>
-    <packaging>pom</packaging>
 
     <description>Spring AI Alibaba Function Calling Example</description>
     <name>Spring AI Alibaba Function Calling Examples</name>
