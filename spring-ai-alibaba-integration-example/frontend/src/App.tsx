@@ -40,47 +40,47 @@ const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
     label: renderTitle(
-      <FireOutlined style={{ color: "#FF4D4F" }} />,
-      "Hot Topics"
+        <ReadOutlined style={{ color: "#1890FF" }} />,
+        "User Guide"
     ),
-    description: "What are you interested in?",
+    description: "",
     children: [
       {
-        key: "1-1",
-        description: `What are the latest features of Spring Ai Alibaba?`,
+        key: "2-1",
+        icon: <HeartOutlined />,
+        description: `Build a chatbot using Spring Ai Alibaba?`,
       },
       {
-        key: "1-2",
-        description: `How does Spring Ai Alibaba handle data privacy?`,
+        key: "2-2",
+        icon: <SmileOutlined />,
+        description: `How to use RAG in Spring Ai Alibaba?`,
       },
       {
-        key: "1-3",
-        description: `Where can I find the documentation for Spring Ai Alibaba?`,
+        key: "2-3",
+        icon: <CommentOutlined />,
+        description: `What are best practices for using Spring Ai Alibaba?`,
       },
     ],
   },
   {
     key: "2",
     label: renderTitle(
-      <ReadOutlined style={{ color: "#1890FF" }} />,
-      "Design Guide"
+      <FireOutlined style={{ color: "#FF4D4F" }} />,
+      "Q&A"
     ),
-    description: "How to design a good product?",
+    description: "",
     children: [
       {
-        key: "2-1",
-        icon: <HeartOutlined />,
-        description: `What are best practices for using Spring Ai Alibaba?`,
+        key: "1-1",
+        description: `Does Spring AI Alibaba support workflow and multi-agent?`,
       },
       {
-        key: "2-2",
-        icon: <SmileOutlined />,
-        description: `How to set up AI roles in Spring Ai Alibaba?`,
+        key: "1-2",
+        description: `The relation between Spring AI and Spring AI Alibaba?`,
       },
       {
-        key: "2-3",
-        icon: <CommentOutlined />,
-        description: `How to express user feedback effectively?`,
+        key: "1-3",
+        description: `Where can I contribute?`,
       },
     ],
   },
@@ -173,12 +173,12 @@ const useStyle = createStyles(({ token, css }) => {
 const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
-    description: "Hot Topics",
+    description: "No, thanks.",
     icon: <FireOutlined style={{ color: "#FF4D4F" }} />,
   },
   {
     key: "2",
-    description: "Design Guide",
+    description: "Ok, please.",
     icon: <ReadOutlined style={{ color: "#1890FF" }} />,
   },
 ];
@@ -298,7 +298,7 @@ const Independent: React.FC = () => {
         variant="borderless"
         icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
         title="Hello, I'm Spring Ai Alibaba"
-        description="Based on Ant Design and Spring AI Alibaba, independent example demonstrates how to integrate capabilities such as chat, audio, and image, designed to provide developers with a portable solution."
+        description="An AI assistant built with Spring AI Alibaba framework, with embedded Spring AI Alibaba domain knowledge using RAG. Supports text and image user input, audio generation, and image generation."
         extra={
           <Space>
             <Button icon={<ShareAltOutlined />} />
@@ -307,7 +307,7 @@ const Independent: React.FC = () => {
         }
       />
       <Prompts
-        title="Do you want?"
+        title="What do you want?"
         items={placeholderPromptsItems}
         styles={{
           list: {
@@ -376,7 +376,7 @@ const Independent: React.FC = () => {
         draggable={false}
         alt="logo"
       />
-      <span>Spring Ai Alibaba</span>
+      <span>Spring AI Alibaba</span>
     </div>
   );
 
