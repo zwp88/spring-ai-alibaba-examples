@@ -23,52 +23,33 @@
 
     <parent>
         <groupId>com.alibaba.cloud.ai</groupId>
-        <artifactId>spring-ai-alibaba-examples</artifactId>
+        <artifactId>spring-ai-alibaba-chat-example</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <version>${revision}</version>
-    <artifactId>spring-ai-alibaba-function-calling-example</artifactId>
+    <artifactId>deepseek-chat</artifactId>
+    <packaging>pom</packaging>
 
-    <description>Spring AI Alibaba Function Calling Example</description>
-    <name>Spring AI Alibaba Function Calling Examples</name>
-
-    <properties>
-
-        <junit-jupiter.version>5.10.0</junit-jupiter.version>
-
-        <!-- Spring AI Alibaba -->
-        <spring-ai-alibaba.version>1.0.0-M3.3</spring-ai-alibaba.version>
-    </properties>
+    <description>Spring AI Alibaba DeepSeek Chat Example</description>
+    <name>Spring AI Alibaba DeepSeek Chat Examples</name>
 
     <dependencies>
-
         <dependency>
-            <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter</artifactId>
-            <version>${spring-ai-alibaba.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter-function-calling-microsofttranslate</artifactId>
-            <version>${spring-ai-alibaba.version}</version>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter-function-calling-weather</artifactId>
-            <version>${spring-ai-alibaba.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit-jupiter.version}</version>
-        </dependency>
-
     </dependencies>
+
+<!--    <modules>-->
+<!--        <module>deepseek-chat-model</module>-->
+<!--        <module>deepseek-chat-client</module>-->
+<!--    </modules>-->
 
     <build>
         <plugins>
@@ -82,5 +63,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

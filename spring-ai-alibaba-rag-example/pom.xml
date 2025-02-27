@@ -39,6 +39,8 @@
 		<module>bailian-rag-knowledge</module>
 		<module>bailian-agent</module>
 		<module>rag-example</module>
+		<module>rag-milvus-example</module>
+		<module>rag-pgvector-example</module>
 	</modules>
 
 	<build>

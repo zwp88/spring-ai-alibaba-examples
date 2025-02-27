@@ -70,6 +70,7 @@
 		<module>spring-ai-alibaba-mcp-example</module>
 		<module>spring-ai-alibaba-nacos-example</module>
 		<module>spring-ai-alibaba-integration-example</module>
+		<module>spring-ai-alibaba-more-platform-and-model-example</module>
 	</modules>
 
 	<dependencyManagement>
