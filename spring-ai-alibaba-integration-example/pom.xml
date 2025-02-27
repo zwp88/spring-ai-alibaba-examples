@@ -29,16 +29,14 @@
 	</parent>
 
 	<version>${revision}</version>
-	<artifactId>spring-ai-alibaba-rag-example</artifactId>
+	<artifactId>spring-ai-alibaba-integration-example</artifactId>
 	<packaging>pom</packaging>
 
-	<description>Spring AI Alibaba RAG Example</description>
-	<name>Spring AI Alibaba RAG Examples</name>
+	<description>Spring AI Alibaba Playground Example</description>
+	<name>Spring AI Alibaba Playground Examples</name>
 
 	<modules>
-		<module>bailian-rag-knowledge</module>
-		<module>bailian-agent</module>
-		<module>rag-example</module>
+		<module>backend</module>
 	</modules>
 
 	<build>
