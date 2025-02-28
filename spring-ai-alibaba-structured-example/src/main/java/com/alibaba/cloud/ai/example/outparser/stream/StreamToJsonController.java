@@ -20,8 +20,6 @@ package com.alibaba.cloud.ai.example.outparser.stream;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -39,17 +37,13 @@ public class StreamToJsonController {
 
     private static final String DEFAULT_PROMPT = "你好，请以JSON格式介绍你自己！";
 
-    private final ChatModel chatModel;
     private final ChatClient dashScopeChatClient;
-
-    private static final Logger log = LoggerFactory.getLogger(StreamToJsonController.class);
 
     public StreamToJsonController(ChatModel chatModel) {
 
         DashScopeResponseFormat responseFormat = new DashScopeResponseFormat();
         responseFormat.setType(DashScopeResponseFormat.Type.JSON_OBJECT);
 
-        this.chatModel = chatModel;
         this.dashScopeChatClient = ChatClient.builder(chatModel)
                 .defaultOptions(
                         DashScopeChatOptions.builder()
