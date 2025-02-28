@@ -81,6 +81,7 @@ public class DashScopeChatModelController {
 				.withTopP(0.7)
 				.withTopK(50)
 				.withTemperature(0.8)
+				.withModel("xxx")
 				.build();
 
 		return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getContent();
