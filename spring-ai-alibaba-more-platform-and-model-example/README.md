@@ -7,6 +7,13 @@
 > 此示例项目已经完成代码编写，不需要任何改动！
 > 关于如何部署 ollama 及模型，请参考 [Ollama Docker 部署](../docker-compose/ollama/README.md)
 
+## 名词解释
+
+> 注意区分开概念。
+
+* 平台：DashScope，OpenAI，Ollama 等
+* 模型：DashScope 上的 Deepseek-r1 qwen-plug 等
+
 ## 多平台示例
 
 在 pom.xml 中引入 Spring AI 和 Spring AI Alibaba Starter 依赖。
@@ -167,3 +174,13 @@ Hello! How can I assist you today?
 ```
 
 至此，我们便完成了如何在 Spring AI Alibaba 中使用多个不同的模型平台和平台上的不同模型的示例。
+
+## ChatClient 多模型和多平台示例
+
+### 多模型
+
+```shell
+curl -G "http://localhost:10014/more-model-chat-client" \
+     --data-urlencode "prompt=你好" \
+     --header "models=deepseek-r1"
+```
