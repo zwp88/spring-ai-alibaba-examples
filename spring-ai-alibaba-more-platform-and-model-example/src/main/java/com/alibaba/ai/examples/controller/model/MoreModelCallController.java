@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.ai.examples.controller;
+package com.alibaba.ai.examples.controller.model;
 
 import java.util.Set;
 
