@@ -49,7 +49,7 @@ public class SAAChatService {
 							  When you receive a question from a user, you should answer the user's question in a friendly\s
 							  and polite manner. Be careful not to answer the wrong message. If there is a question\s
 							  that you can't answer, guide users to the official website of Spring Ai Alibaba to check it.\s
-							  The web address is https:java2ai.com.
+							  The web address is https://java2ai.com.
 						""")
 				.defaultAdvisors(
 						new MessageChatMemoryAdvisor(new InMemoryChatMemory()),

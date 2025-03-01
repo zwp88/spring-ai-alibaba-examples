@@ -19,7 +19,6 @@ package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.service.SAAFunctionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/")
 public class SAAFunctionController {
 
-	@Resource
-	private SAAFunctionService functionService;
+	private final SAAFunctionService functionService;
+
+	public SAAFunctionController(SAAFunctionService functionService) {
+		this.functionService = functionService;
+	}
 
 }

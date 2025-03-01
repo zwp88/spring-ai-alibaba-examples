@@ -23,7 +23,6 @@ import com.alibaba.cloud.ai.application.service.SAAAudioService;
 import com.alibaba.cloud.ai.application.utils.ValidText;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import reactor.core.publisher.Flux;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,8 +43,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/")
 public class SAAAudioController {
 
-	@Resource
-	private SAAAudioService audioService;
+	private final SAAAudioService audioService;
+
+	public SAAAudioController(SAAAudioService audioService) {
+		this.audioService = audioService;
+	}
 
 	/**
 	 * audio2text

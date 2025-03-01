@@ -64,10 +64,10 @@ public class SAAImageService {
 				.build();
 	}
 
-	public Flux<String> image2Text(MultipartFile file) {
+	public Flux<String> image2Text(String prompt, MultipartFile file) {
 
 		UserMessage message = new UserMessage(
-				"解释图片中的内容",
+				prompt,
 				new Media(
 						MimeTypeUtils.IMAGE_PNG,
 						new FileSystemResource(Objects.requireNonNull(file.getOriginalFilename()))
