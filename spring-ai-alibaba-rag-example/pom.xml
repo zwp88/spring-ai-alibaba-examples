@@ -41,6 +41,7 @@
 		<module>rag-example</module>
 		<module>rag-milvus-example</module>
 		<module>rag-pgvector-example</module>
+		<module>web-search</module>
 	</modules>
 
 	<build>

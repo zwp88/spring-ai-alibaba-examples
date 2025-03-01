@@ -58,7 +58,7 @@ public class SAAImageController {
 	@PostMapping("/image2text")
 	@Operation(summary = "DashScope Image Recognition")
 	public Flux<Result<String>> image2text(
-			@RequestParam("prompt") String prompt,
+			@RequestParam(value = "prompt", required = false) String prompt,
 			@RequestParam("image") MultipartFile image
 	) {
 
@@ -70,11 +70,18 @@ public class SAAImageController {
 			prompt = "请你用一句话描述这张图片";
 		}
 
-		return imageService.image2Text(prompt, image).map(Result::success);
+		Flux<Result<String>> res;
+		try {
+			 res = imageService.image2Text(prompt, image).map(Result::success);
+		} catch (Exception e) {
+			return Flux.just(Result.failed(e.getMessage()));
+		}
+
+		return res;
 	}
 
 	@UserIp
-	@GetMapping("/text2Image")
+	@GetMapping("/text2image")
 	@Operation(summary = "DashScope Image Generation")
 	public Result<Void> text2Image(
 			@RequestParam("prompt") String prompt,

@@ -18,8 +18,13 @@
 package com.alibaba.cloud.ai.application.utils;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.alibaba.cloud.ai.application.exception.SAAAppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author yuluo
@@ -27,6 +32,8 @@ import com.alibaba.cloud.ai.application.exception.SAAAppException;
  */
 
 public final class FilesUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger(FilesUtils.class);
 
 	private FilesUtils() {
 	}
@@ -41,10 +48,38 @@ public final class FilesUtils {
 			throw new SAAAppException("path is null or empty");
 		}
 
-		File imageTmpFolder = new File(path);
-		if (!imageTmpFolder.exists()) {
-			imageTmpFolder.mkdirs();
+		File tmpFolder = new File(path);
+		if (!tmpFolder.exists()) {
+			tmpFolder.mkdirs();
 		}
+
+		logger.info("Init tmp folder: {}", tmpFolder.getAbsolutePath());
+	}
+
+	public static void deleteDirectory(File directory) {
+
+		if (directory.exists()) {
+			File[] files = directory.listFiles();
+			if (files != null) {
+				for (File file : files) {
+					if (file.isDirectory()) {
+						deleteDirectory(file);
+					} else {
+						file.delete();
+					}
+				}
+			}
+
+			directory.delete();
+		}
+	}
+
+	/**
+	 * save file to tmp folder
+	 */
+	public static void saveTempImage(MultipartFile file, String path) throws IOException {
+
+		file.transferTo(new File(path));
 	}
 
 }
