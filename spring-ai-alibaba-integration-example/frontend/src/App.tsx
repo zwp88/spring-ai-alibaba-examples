@@ -7,7 +7,7 @@ import {
   Sender,
   Welcome,
   useXAgent,
-  useXChat,
+  useXChat
 } from "@ant-design/x";
 import { createStyles } from "antd-style";
 import React, { useEffect } from "react";
@@ -24,10 +24,12 @@ import {
   ReadOutlined,
   SmileOutlined,
   EditOutlined,
-  StopOutlined,
-  ShareAltOutlined,
+  ShareAltOutlined
 } from "@ant-design/icons";
 import { App, Badge, Button, type GetProp, message, Space, theme } from "antd";
+import { getModels, getChat } from "./request";
+
+const decoder = new TextDecoder("utf-8");
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
   <Space align="start">
@@ -40,56 +42,54 @@ const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
     label: renderTitle(
-        <ReadOutlined style={{ color: "#1890FF" }} />,
-        "User Guide"
+      <ReadOutlined style={{ color: "#1890FF" }} />,
+      "User Guide"
     ),
     description: "",
     children: [
       {
         key: "2-1",
         icon: <HeartOutlined />,
-        description: `Build a chatbot using Spring Ai Alibaba?`,
+        description: `Build a chatbot using Spring Ai Alibaba?`
       },
       {
         key: "2-2",
         icon: <SmileOutlined />,
-        description: `How to use RAG in Spring Ai Alibaba?`,
+        description: `How to use RAG in Spring Ai Alibaba?`
       },
       {
         key: "2-3",
         icon: <CommentOutlined />,
-        description: `What are best practices for using Spring Ai Alibaba?`,
-      },
-    ],
+        description: `What are best practices for using Spring Ai Alibaba?`
+      }
+    ]
   },
   {
     key: "2",
-    label: renderTitle(
-      <FireOutlined style={{ color: "#FF4D4F" }} />,
-      "Q&A"
-    ),
+    label: renderTitle(<FireOutlined style={{ color: "#FF4D4F" }} />, "Q&A"),
     description: "",
     children: [
       {
         key: "1-1",
-        description: `Does Spring AI Alibaba support workflow and multi-agent?`,
+        description: `Does Spring AI Alibaba support workflow and multi-agent?`
       },
       {
         key: "1-2",
-        description: `The relation between Spring AI and Spring AI Alibaba?`,
+        description: `The relation between Spring AI and Spring AI Alibaba?`
       },
       {
         key: "1-3",
-        description: `Where can I contribute?`,
-      },
-    ],
-  },
+        description: `Where can I contribute?`
+      }
+    ]
+  }
 ];
+
 const defaultConversationsItems = [
   {
     key: "0",
-    label: "What is Spring Ai Alibaba?",
-  },
+    label: "What is Spring Ai Alibaba?"
+  }
 ];
 
 const useStyle = createStyles(({ token, css }) => {
@@ -166,7 +166,7 @@ const useStyle = createStyles(({ token, css }) => {
       border: 1px solid #1677ff34;
       width: calc(100% - 24px);
       margin: 0 12px 24px 12px;
-    `,
+    `
   };
 });
 
@@ -174,13 +174,13 @@ const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
     description: "No, thanks.",
-    icon: <FireOutlined style={{ color: "#FF4D4F" }} />,
+    icon: <FireOutlined style={{ color: "#FF4D4F" }} />
   },
   {
     key: "2",
     description: "Ok, please.",
-    icon: <ReadOutlined style={{ color: "#1890FF" }} />,
-  },
+    icon: <ReadOutlined style={{ color: "#1890FF" }} />
+  }
 ];
 
 const roles: GetProp<typeof Bubble.List, "roles"> = {
@@ -189,14 +189,14 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
     typing: { step: 5, interval: 20 },
     styles: {
       content: {
-        borderRadius: 16,
-      },
-    },
+        borderRadius: 16
+      }
+    }
   },
   local: {
     placement: "end",
-    variant: "shadow",
-  },
+    variant: "shadow"
+  }
 };
 
 const Independent: React.FC = () => {
@@ -227,13 +227,32 @@ const Independent: React.FC = () => {
   // ==================== Runtime ====================
   const [agent] = useXAgent({
     request: async ({ message }, { onSuccess }) => {
-      onSuccess(`Mock success return. You said: ${message}`);
-    },
+      let buffer = "";
+      // 读取数据
+      await getChat((value) => {
+        const res = JSON.parse(decoder.decode(value)) as {
+          code: number;
+          message: string;
+          data: string;
+        };
+        if (res.message === "success") {
+          buffer = buffer + res.data;
+        }
+      }, message);
+      onSuccess(JSON.stringify(buffer));
+    }
   });
 
   const { onRequest, messages, setMessages } = useXChat({
-    agent,
+    agent
   });
+
+  useEffect(() => {
+    (async () => {
+      const models = await getModels();
+      console.log("models", models);
+    })();
+  }, []);
 
   useEffect(() => {
     if (activeKey !== undefined) {
@@ -252,13 +271,13 @@ const Independent: React.FC = () => {
     onRequest(info.data.description as string);
   };
 
-  const onAddConversation = () => {
+  const onAddConversation = async () => {
     setConversationsItems([
       ...conversationsItems,
       {
         key: `${conversationsItems.length}`,
-        label: `New Conversation ${conversationsItems.length}`,
-      },
+        label: `New Conversation ${conversationsItems.length}`
+      }
     ]);
     setActiveKey(`${conversationsItems.length}`);
   };
@@ -269,26 +288,28 @@ const Independent: React.FC = () => {
     setActiveKey(key);
   };
 
-  const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) =>
+  const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) => {
     setAttachedFiles(info.fileList);
+    console.log("info.fileList", info.fileList);
+  };
 
-   const menuConfig: ConversationsProps["menu"] = (conversation) => ({
+  const menuConfig: ConversationsProps["menu"] = (conversation) => ({
     items: [
       {
         label: "Edit",
         key: "edit",
-        icon: <EditOutlined />,
+        icon: <EditOutlined />
       },
       {
         label: "Delete",
         key: "delete",
         icon: <DeleteOutlined />,
-        danger: true,
-      },
+        danger: true
+      }
     ],
     onClick: (menuInfo) => {
       message.info(`Click ${conversation.key} - ${menuInfo.key}`);
-    },
+    }
   });
 
   // ==================== Nodes ====================
@@ -311,11 +332,11 @@ const Independent: React.FC = () => {
         items={placeholderPromptsItems}
         styles={{
           list: {
-            width: "100%",
+            width: "100%"
           },
           item: {
-            flex: 1,
-          },
+            flex: 1
+          }
         }}
         onItemClick={onPromptsItemClick}
       />
@@ -327,7 +348,7 @@ const Independent: React.FC = () => {
       key: id,
       loading: status === "loading",
       role: status === "local" ? "local" : "ai",
-      content: message,
+      content: message
     })
   );
 
@@ -348,8 +369,8 @@ const Independent: React.FC = () => {
       onOpenChange={setHeaderOpen}
       styles={{
         content: {
-          padding: 0,
-        },
+          padding: 0
+        }
       }}
     >
       <Attachments
@@ -362,7 +383,7 @@ const Independent: React.FC = () => {
             : {
                 icon: <CloudUploadOutlined />,
                 title: "Upload files",
-                description: "Click or drag files to this area to upload",
+                description: "Click or drag files to this area to upload"
               }
         }
       />
@@ -428,7 +449,7 @@ const Independent: React.FC = () => {
             onRecordingChange: (nextRecording) => {
               message.info(`Mock Customize Recording: ${nextRecording}`);
               setRecording(nextRecording);
-            },
+            }
           }}
           onChange={setContent}
           prefix={attachmentsNode}
