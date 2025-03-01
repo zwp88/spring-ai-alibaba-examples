@@ -1,5 +1,3 @@
-import { XRequest } from "@ant-design/x";
-
 const BASE_URL = "/api/v1";
 
 const decoder = new TextDecoder("utf-8");

@@ -37,6 +37,7 @@ const renderTitle = (icon: React.ReactElement, title: string) => (
   </Space>
 );
 
+// 用于临时保存会话记录
 const messagesMap = {} as Record<string, Array<any>>;
 
 const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
