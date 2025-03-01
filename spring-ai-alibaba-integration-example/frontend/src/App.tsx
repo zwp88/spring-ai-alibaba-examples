@@ -228,19 +228,30 @@ const Independent: React.FC = () => {
   const [agent] = useXAgent({
     request: async ({ message }, { onSuccess }) => {
       let buffer = "";
-      // 读取数据
-      await getChat((value) => {
-        const res = JSON.parse(decoder.decode(value)) as {
-          code: number;
-          message: string;
-          data: string;
-        };
-        if (res.message === "success") {
-          buffer = buffer + res.data;
+
+      await getChat(
+        message || "",
+        (value) => {
+          const res = JSON.parse(decoder.decode(value)) as Array<{
+            code: number;
+            message: string;
+            data: string;
+          }>;
+          if (res?.length > 0) {
+            res.forEach((item) => {
+              if (item.message === "success") {
+                buffer = buffer + item.data;
+              }
+            });
+          }
+        },
+        {
+          image: attachedFiles?.[0]?.originFileObj
         }
-      }, message);
+      );
       onSuccess(JSON.stringify(buffer));
-    }
+    },
+    customParams: [attachedFiles]
   });
 
   const { onRequest, messages, setMessages } = useXChat({
@@ -290,7 +301,6 @@ const Independent: React.FC = () => {
 
   const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) => {
     setAttachedFiles(info.fileList);
-    console.log("info.fileList", info.fileList);
   };
 
   const menuConfig: ConversationsProps["menu"] = (conversation) => ({
@@ -374,6 +384,7 @@ const Independent: React.FC = () => {
       }}
     >
       <Attachments
+        maxCount={1}
         beforeUpload={() => false}
         items={attachedFiles}
         onChange={handleFileChange}

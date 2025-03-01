@@ -1,13 +1,12 @@
+import { XRequest } from "@ant-design/x";
+
 const BASE_URL = "/api/v1";
 
 const decoder = new TextDecoder("utf-8");
 
 export const getModels = async () => {
   const res = (await fetch(BASE_URL + "/dashscope/getModels", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    }
+    method: "GET"
   })) as any;
 
   const reader = res.body.getReader();
@@ -25,18 +24,34 @@ export const getModels = async () => {
 };
 
 export const getChat = async (
+  message: string,
   callback: (value: Uint8Array) => void,
-  message?: string,
-  model?: string,
-  chatId?: string
+  params: {
+    image?: File;
+    model?: string;
+    chatId?: string;
+  }
 ) => {
-  const res = (await fetch(BASE_URL + "/chat?prompt=" + message, {
-    method: "GET",
-    headers: {
-      model: model ? model : "",
-      chatId: chatId ? chatId : ""
-    }
-  })) as any;
+  const { image, model, chatId } = params;
+  let res: any;
+  if (image === undefined) {
+    res = (await fetch(BASE_URL + "/chat?prompt=" + message, {
+      method: "GET",
+      headers: {
+        model: model ? model : "",
+        chatId: chatId ? chatId : ""
+      }
+    })) as any;
+  } else {
+    const formData = new FormData();
+    formData.append("prompt", message || "");
+    formData.append("image", image);
+    res = (await fetch(BASE_URL + "/image2text", {
+      method: "POST",
+      body: formData
+    })) as any;
+  }
+
   const reader = res.body.getReader();
   await reader.read().then(function process({ done, value }) {
     if (done) return;
