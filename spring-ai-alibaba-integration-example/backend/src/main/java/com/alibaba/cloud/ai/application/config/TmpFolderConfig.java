@@ -17,6 +17,8 @@
 
 package com.alibaba.cloud.ai.application.config;
 
+import java.io.File;
+
 import com.alibaba.cloud.ai.application.utils.FilesUtils;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -24,12 +26,14 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 
 /**
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
+@Component
 public class TmpFolderConfig implements ApplicationRunner {
 
 	private static final String ImageTmpFolder = "tmp/image";
@@ -43,8 +47,8 @@ public class TmpFolderConfig implements ApplicationRunner {
 
 		logger.info("Init tmp folder");
 
-		FilesUtils.initTmpFolder(ImageTmpFolder);
-		FilesUtils.initTmpFolder(AudioTmpFolder);
+		FilesUtils.initTmpFolder(System.getProperty("user.dir") + "/" + ImageTmpFolder);
+		FilesUtils.initTmpFolder(System.getProperty("user.dir") + "/" +AudioTmpFolder);
 
 		logger.info("Init tmp folder");
 	}
@@ -52,7 +56,11 @@ public class TmpFolderConfig implements ApplicationRunner {
 	@PreDestroy
 	public void destroy() {
 
-		// todo: delete tmp folder
+		FilesUtils.deleteDirectory(new File(System.getProperty("user.dir") + "/" +ImageTmpFolder));
+		FilesUtils.deleteDirectory(new File(System.getProperty("user.dir") + "/" +AudioTmpFolder));
+		FilesUtils.deleteDirectory(new File(System.getProperty("user.dir") + "/" +"tmp"));
+
+		logger.info("Delete tmp folder");
 	}
 
 }
