@@ -11,7 +11,6 @@ import {
 } from "@ant-design/x";
 import { createStyles } from "antd-style";
 import React, { useEffect } from "react";
-
 import {
   CloudUploadOutlined,
   CommentOutlined,
@@ -27,7 +26,7 @@ import {
   ShareAltOutlined
 } from "@ant-design/icons";
 import { App, Badge, Button, type GetProp, message, Space, theme } from "antd";
-import { getModels, getChat } from "./request";
+import { getChat } from "./request";
 
 const decoder = new TextDecoder("utf-8");
 
@@ -37,6 +36,8 @@ const renderTitle = (icon: React.ReactElement, title: string) => (
     <span>{title}</span>
   </Space>
 );
+
+const messagesMap = {} as Record<string, Array<any>>;
 
 const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
@@ -85,9 +86,11 @@ const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   }
 ];
 
+const defaultKey = Date.now().toString();
+
 const defaultConversationsItems = [
   {
-    key: "0",
+    key: defaultKey,
     label: "What is Spring Ai Alibaba?"
   }
 ];
@@ -249,6 +252,7 @@ const Independent: React.FC = () => {
           image: attachedFiles?.[0]?.originFileObj
         }
       );
+
       onSuccess(JSON.stringify(buffer));
     },
     customParams: [attachedFiles]
@@ -257,19 +261,6 @@ const Independent: React.FC = () => {
   const { onRequest, messages, setMessages } = useXChat({
     agent
   });
-
-  useEffect(() => {
-    (async () => {
-      const models = await getModels();
-      console.log("models", models);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (activeKey !== undefined) {
-      setMessages([]);
-    }
-  }, [activeKey]);
 
   // ==================== Event ====================
   const onSubmit = (nextContent: string) => {
@@ -283,19 +274,24 @@ const Independent: React.FC = () => {
   };
 
   const onAddConversation = async () => {
+    const newKey = Date.now().toString();
     setConversationsItems([
       ...conversationsItems,
       {
-        key: `${conversationsItems.length}`,
+        key: newKey,
         label: `New Conversation ${conversationsItems.length}`
       }
     ]);
-    setActiveKey(`${conversationsItems.length}`);
+    messagesMap[activeKey] = messages;
+    setMessages([]);
+    setActiveKey(newKey);
   };
 
   const onConversationClick: GetProp<typeof Conversations, "onActiveChange"> = (
     key
   ) => {
+    messagesMap[activeKey] = messages;
+    setMessages(messagesMap[key] || []);
     setActiveKey(key);
   };
 
@@ -353,14 +349,21 @@ const Independent: React.FC = () => {
     </Space>
   );
 
-  const items: GetProp<typeof Bubble.List, "items"> = messages.map(
-    ({ id, message, status }) => ({
-      key: id,
-      loading: status === "loading",
-      role: status === "local" ? "local" : "ai",
-      content: message
-    })
-  );
+  const [items, setItems] = React.useState<
+    GetProp<typeof Bubble.List, "items">
+  >([]);
+
+  useEffect(() => {
+    console.log("setItems", JSON.stringify(messages));
+    setItems(
+      messages.map(({ id, message, status }) => ({
+        key: id,
+        loading: status === "loading",
+        role: status === "local" ? "local" : "ai",
+        content: message
+      }))
+    );
+  }, [messages]);
 
   const attachmentsNode = (
     <Badge dot={attachedFiles.length > 0 && !headerOpen}>
