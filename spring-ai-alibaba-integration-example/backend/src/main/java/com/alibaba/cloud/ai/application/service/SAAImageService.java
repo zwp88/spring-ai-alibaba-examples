@@ -22,9 +22,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 
+import com.alibaba.cloud.ai.application.utils.FilesUtils;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.dashscope.chat.MessageFormat;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
@@ -52,11 +53,22 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class SAAImageService {
 
+	private static final String DEFAULT_MODEL = "qwen-vl-max-latest";
+
+	/**
+	 * 图片生成文字
+	 */
 	private final ImageModel imageModel;
 
+	/**
+	 * 多模态支持，用来解析图片
+	 */
 	private final ChatClient daschScopeChatClient;
 
-	public SAAImageService(ImageModel imageModel, ChatModel chatModel) {
+	public SAAImageService(
+			ImageModel imageModel,
+			ChatModel chatModel
+	) {
 
 		this.imageModel = imageModel;
 		this.daschScopeChatClient = ChatClient
@@ -64,20 +76,31 @@ public class SAAImageService {
 				.build();
 	}
 
-	public Flux<String> image2Text(String prompt, MultipartFile file) {
+	public Flux<String> image2Text(String prompt, MultipartFile file) throws IOException {
+
+		String filePath = System.getProperty("user.dir") + "/" + "tmp/image/" + file.getOriginalFilename();
+		FilesUtils.saveTempImage(file, filePath);
 
 		UserMessage message = new UserMessage(
 				prompt,
 				new Media(
 						MimeTypeUtils.IMAGE_PNG,
-						new FileSystemResource(Objects.requireNonNull(file.getOriginalFilename()))
+						new FileSystemResource(filePath)
 				)
 		);
 		message.getMetadata().put(DashScopeChatModel.MESSAGE_FORMAT, MessageFormat.IMAGE);
 
 		List<ChatResponse> response = daschScopeChatClient.prompt(
-				new Prompt(message)
-		).stream().chatResponse().collectList().block();
+						new Prompt(
+								message,
+								DashScopeChatOptions.builder()
+										.withModel(DEFAULT_MODEL)
+										.withMultiModel(true)
+										.build())
+				).stream()
+				.chatResponse()
+				.collectList()
+				.block();
 
 		StringBuilder result = new StringBuilder();
 		if (response != null) {
