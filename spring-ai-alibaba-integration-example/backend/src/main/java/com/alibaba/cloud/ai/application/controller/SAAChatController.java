@@ -74,6 +74,8 @@ public class SAAChatController {
 			@RequestHeader(value = "chatId", required = false) String chatId
 	) {
 
+		// 接口限流在审计平台中配置
+
 		if (!ValidText.isValidate(prompt)) {
 
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

@@ -17,6 +17,9 @@
 
 package com.alibaba.cloud.ai.application.aop;
 
+import com.alibaba.cloud.ai.application.entity.User;
+import com.alibaba.cloud.ai.application.repository.UserRepository;
+import com.alibaba.cloud.ai.application.utils.TimeUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -39,21 +42,46 @@ public class UserIpAspect {
 
 	private final HttpServletRequest request;
 
-	public UserIpAspect(HttpServletRequest request) {
+	private final UserRepository userRepository;
+
+	public UserIpAspect(
+			HttpServletRequest request,
+			UserRepository userRepository
+	) {
 		this.request = request;
+		this.userRepository = userRepository;
 	}
 
-	/**
-	 * Todo: 获取用户 ip 用于统计 apikey 调用次数
-	 */
 	@Pointcut("@annotation(com.alibaba.cloud.ai.application.annotation.UserIp)")
 	public void logUserIp() {
 	}
 
 	@After("logUserIp()")
-	public void after(){
+	public void after() {
 
-		logger.info("User IP: {}", request.getRemoteAddr());
+		String userIp = request.getRemoteAddr();
+		String requestUri = request.getRequestURI();
+		String requestTime = TimeUtils.getCurrentTime();
+
+		logger.info("User IP: {}, Time: {}, Uri: {}", userIp, requestTime, requestUri);
+
+		userRepository.findByRequestIp(userIp)
+				.ifPresentOrElse(
+						user -> {
+							user.setRequestCount(user.getRequestCount() + 1);
+							user.setRequestUri(user.getRequestUri() + ", " + requestUri);
+							userRepository.save(user);
+						},
+						() -> {
+							User newUser = new User.Builder()
+									.setRequestUri(requestUri)
+									.setRequestTime(requestTime)
+									.setRequestIp(userIp)
+									.setRequestCount(1)
+									.build();
+							userRepository.save(newUser);
+						}
+				);
 	}
 
 }
