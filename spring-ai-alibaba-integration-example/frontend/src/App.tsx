@@ -25,7 +25,8 @@ import {
   EditOutlined,
   ShareAltOutlined
 } from "@ant-design/icons";
-import { App, Badge, Button, type GetProp, message, Space, theme } from "antd";
+import { App, Badge, Button, type GetProp, Space, theme } from "antd";
+import ReactMarkdown from "react-markdown";
 import { getChat } from "./request";
 
 const decoder = new TextDecoder("utf-8");
@@ -355,13 +356,12 @@ const Independent: React.FC = () => {
   >([]);
 
   useEffect(() => {
-    console.log("setItems", JSON.stringify(messages));
     setItems(
       messages.map(({ id, message, status }) => ({
         key: id,
         loading: status === "loading",
         role: status === "local" ? "local" : "ai",
-        content: message
+        content: <ReactMarkdown>{message.replace(/\\n/g, "\n")}</ReactMarkdown>
       }))
     );
   }, [messages]);
