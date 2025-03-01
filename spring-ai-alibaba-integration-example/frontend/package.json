@@ -29,5 +29,10 @@
     "globals": "^15.14.0",
     "typescript": "^5.7.3",
     "vite": "^6.0.5"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@ant-design/x@1.0.4": "patches/@ant-design__x@1.0.4.patch"
+    }
   }
 }
