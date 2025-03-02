@@ -255,8 +255,8 @@ const Independent: React.FC = () => {
           }>;
           if (res?.length > 0) {
             res.forEach((item) => {
-              if (item.message === "success") {
-                buffer = buffer + item.data;
+              if (item?.message === "success") {
+                buffer = buffer + item?.data;
               }
             });
           }
@@ -268,11 +268,11 @@ const Independent: React.FC = () => {
       );
 
       let value: string;
-      if (res.status === 200) {
+      if (res?.status === 200) {
         value = buffer;
       } else {
         value =
-          "Request failed." + (res.statusText ? " " + res.statusText : "");
+          "Request failed." + (res?.statusText ? " " + res?.statusText : "");
       }
       onSuccess(JSON.stringify({ role: "ai", value }));
     },
@@ -409,9 +409,9 @@ const Independent: React.FC = () => {
   useEffect(() => {
     setItems(
       messages.map(({ id, message, status }) => {
-        const item = JSON.parse(message);
-        if (item.role === "file") {
-          const value = item.value;
+        const item = JSON.parse(message || "{}");
+        if (item?.role === "file") {
+          const value = item?.value;
           return {
             key: id,
             loading: status === "loading",
