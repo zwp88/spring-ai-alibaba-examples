@@ -246,7 +246,7 @@ const Independent: React.FC = () => {
       let buffer = "";
 
       const res = await getChat(
-        JSON.parse(message || "{}").value || "",
+        JSON.parse(message || "{}")?.value || "",
         (value) => {
           const res = JSON.parse(decoder.decode(value)) as Array<{
             code: number;
