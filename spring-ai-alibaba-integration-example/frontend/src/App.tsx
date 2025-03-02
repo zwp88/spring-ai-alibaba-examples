@@ -283,11 +283,7 @@ const Independent: React.FC = () => {
     GetProp<typeof Bubble.List, "items">
   >([]);
 
-  const {
-    onRequest,
-    parsedMessages: messages,
-    setMessages
-  } = useXChat({
+  const { onRequest, messages, setMessages } = useXChat({
     agent
   });
 
