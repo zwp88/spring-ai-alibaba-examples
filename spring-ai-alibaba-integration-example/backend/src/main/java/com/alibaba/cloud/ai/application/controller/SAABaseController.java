@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@Tag(name = "Audio APIs")
+@Tag(name = "Base APIs")
 @RequestMapping("/api/v1/")
 public class SAABaseController {
 
@@ -54,6 +54,12 @@ public class SAABaseController {
 		}
 
 		return Result.success(dashScope);
+	}
+
+	@GetMapping("/health")
+	public Result<String> health() {
+
+		return Result.success("Spring AI Aliabba Playground is running......");
 	}
 
 }
