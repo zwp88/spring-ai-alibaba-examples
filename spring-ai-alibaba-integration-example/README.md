@@ -30,3 +30,12 @@ pnpm dev
 
 ## 其他信息
 // 可以在这里添加关于项目的其他信息，如贡献指南、许可证等。
+
+## 本地 docker compose 部署启动
+
+打包：make all
+构建镜像：make image
+
+> 修改 docker/docker-compose.yml 文件的 backend image tag 为本地 build 的镜像 tag
+
+启动：make run

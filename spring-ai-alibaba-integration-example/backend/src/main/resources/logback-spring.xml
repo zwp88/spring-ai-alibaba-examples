@@ -121,6 +121,14 @@
         </root>
     </springProfile>
 
+        <springProfile name="docker">
+        <root level="INFO">
+            <appender-ref ref="ConsoleAppender"/>
+            <appender-ref ref="SystemOutFileAppender"/>
+            <appender-ref ref="ErrOutFileAppender"/>
+        </root>
+    </springProfile>
+
     <!-- Development environment configuration -->
     <springProfile name="mysql">
         <root level="INFO">
