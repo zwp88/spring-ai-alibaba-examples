@@ -23,9 +23,10 @@ import {
   ReadOutlined,
   SmileOutlined,
   EditOutlined,
-  ShareAltOutlined
+  ShareAltOutlined,
+  UserOutlined
 } from "@ant-design/icons";
-import { App, Badge, Button, type GetProp, Space, theme } from "antd";
+import { Flex, App, Badge, Button, type GetProp, Space, theme } from "antd";
 import ReactMarkdown from "react-markdown";
 import { getChat } from "./request";
 
@@ -37,6 +38,23 @@ const renderTitle = (icon: React.ReactElement, title: string) => (
     <span>{title}</span>
   </Space>
 );
+
+function generateRandomString(length: number) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+  return result;
+}
+
+const FILE_PREFIX = generateRandomString(8);
+
+const specialPrefix = {
+  [FILE_PREFIX]: "file"
+};
 
 // 用于临时保存会话记录
 const messagesMap = {} as Record<string, Array<any>>;
@@ -201,6 +219,17 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
   local: {
     placement: "end",
     variant: "shadow"
+  },
+  file: {
+    placement: "end",
+    variant: "borderless",
+    messageRender: (items: any) => (
+      <Flex vertical gap="middle">
+        {(items as any[]).map((item) => (
+          <Attachments.FileCard key={item.uid} item={item} />
+        ))}
+      </Flex>
+    )
   }
 };
 
@@ -260,13 +289,39 @@ const Independent: React.FC = () => {
     customParams: [attachedFiles]
   });
 
-  const { onRequest, messages, setMessages } = useXChat({
+  const [items, setItems] = React.useState<
+    GetProp<typeof Bubble.List, "items">
+  >([]);
+
+  const {
+    onRequest,
+    parsedMessages: messages,
+    setMessages
+  } = useXChat({
     agent
   });
 
   // ==================== Event ====================
   const onSubmit = (nextContent: string) => {
     if (!nextContent) return;
+    setHeaderOpen(false);
+    setAttachedFiles([]);
+    if (attachedFiles.length > 0) {
+      setMessages([
+        ...messages,
+        {
+          id: messages.length,
+          message:
+            FILE_PREFIX +
+            JSON.stringify({
+              uid: attachedFiles?.[0]?.originFileObj?.uid,
+              name: attachedFiles?.[0]?.originFileObj?.name,
+              size: attachedFiles?.[0]?.originFileObj?.size
+            }),
+          status: "success"
+        }
+      ]);
+    }
     onRequest(nextContent);
     setContent("");
   };
@@ -285,6 +340,8 @@ const Independent: React.FC = () => {
       }
     ]);
     messagesMap[activeKey] = messages;
+    setHeaderOpen(false);
+    setAttachedFiles([]);
     setMessages([]);
     setActiveKey(newKey);
   };
@@ -293,6 +350,8 @@ const Independent: React.FC = () => {
     key
   ) => {
     messagesMap[activeKey] = messages;
+    setHeaderOpen(false);
+    setAttachedFiles([]);
     setMessages(messagesMap[key] || []);
     setActiveKey(key);
   };
@@ -351,18 +410,36 @@ const Independent: React.FC = () => {
     </Space>
   );
 
-  const [items, setItems] = React.useState<
-    GetProp<typeof Bubble.List, "items">
-  >([]);
-
   useEffect(() => {
     setItems(
-      messages.map(({ id, message, status }) => ({
-        key: id,
-        loading: status === "loading",
-        role: status === "local" ? "local" : "ai",
-        content: <ReactMarkdown>{message.replace(/\\n/g, "\n")}</ReactMarkdown>
-      }))
+      messages.map(({ id, message, status }) => {
+        const prefix = message.slice(0, 8);
+        if (specialPrefix[prefix] === "file") {
+          message = message.slice(8);
+          const value = JSON.parse(message);
+          return {
+            key: id,
+            loading: status === "loading",
+            role: "file",
+            content: [
+              {
+                uid: value?.uid,
+                name: value?.name,
+                size: value?.size
+              }
+            ]
+          };
+        } else {
+          return {
+            key: id,
+            loading: status === "loading",
+            role: status === "local" ? "local" : "ai",
+            content: (
+              <ReactMarkdown>{message?.replace(/\\n/g, "\n")}</ReactMarkdown>
+            )
+          };
+        }
+      })
     );
   }, [messages]);
 
