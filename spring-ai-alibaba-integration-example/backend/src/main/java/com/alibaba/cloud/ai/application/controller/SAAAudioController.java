@@ -23,11 +23,9 @@ import com.alibaba.cloud.ai.application.service.SAAAudioService;
 import com.alibaba.cloud.ai.application.utils.ValidText;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import reactor.core.publisher.Flux;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,8 +42,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/")
 public class SAAAudioController {
 
-	@Resource
-	private SAAAudioService audioService;
+	private final SAAAudioService audioService;
+
+	public SAAAudioController(SAAAudioService audioService) {
+		this.audioService = audioService;
+	}
 
 	/**
 	 * audio2text
@@ -54,13 +55,22 @@ public class SAAAudioController {
 	@UserIp
 	@PostMapping("/audio2text")
 	@Operation(summary = "DashScope Audio Transcription")
-	public Flux<Result<String>> audioToText(@RequestParam("audio") MultipartFile audio) {
+	public Flux<Result<String>> audioToText(
+			@RequestParam("audio") MultipartFile audio
+	) {
 
 		if (audio.isEmpty()) {
 			return Flux.just(Result.failed("No audio file provided"));
 		}
 
-		return audioService.audio2text(audio).map(Result::success);
+		Flux<Result<String>> res;
+		try {
+			res = audioService.audio2text(audio).map(Result::success);
+		} catch (Exception e) {
+			return Flux.just(Result.failed("Failed to transcribe audio: " + e.getMessage()));
+		}
+
+		return res;
 	}
 
 	/**
@@ -68,9 +78,11 @@ public class SAAAudioController {
 	 * 用于将文本转换为语音输出
 	 */
 	@UserIp
-	@GetMapping("/text2audio/{prompt}")
+	@GetMapping("/text2audio")
 	@Operation(summary = "DashScope Speech Synthesis")
-	public Result<byte[]> textToAudio(@PathVariable("prompt") String prompt) {
+	public Result<byte[]> textToAudio(
+			@RequestParam("prompt") String prompt
+	) {
 
 		if (!ValidText.isValidate(prompt)) {
 			return Result.failed("No chat prompt provided");
@@ -78,11 +90,11 @@ public class SAAAudioController {
 
 		byte[] audioData = audioService.text2audio(prompt);
 
-//		测试验证音频数据是否为空
-//		try (FileOutputStream fos = new FileOutputStream("audio.wav")) {
+		// 测试验证音频数据是否为空
+//		try (FileOutputStream fos = new FileOutputStream("tmp/audio/test-audio.wav")) {
 //			fos.write(audioData);
 //		} catch (IOException e) {
-//			return Result.failed("Failed to save audio file: " + e.getMessage());
+//			return Result.failed("Test save audio file: " + e.getMessage());
 //		}
 
 		return Result.success(audioData);

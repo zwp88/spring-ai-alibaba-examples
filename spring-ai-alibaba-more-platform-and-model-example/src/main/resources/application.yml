@@ -14,3 +14,6 @@ spring:
       base-url: http://localhost:11434
       chat:
         model: deepseek-r1:8b
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      base-url: https://api.openai-hk.com

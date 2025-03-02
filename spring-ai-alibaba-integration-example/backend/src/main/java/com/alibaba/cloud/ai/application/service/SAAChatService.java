@@ -17,12 +17,19 @@
 
 package com.alibaba.cloud.ai.application.service;
 
+import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
+
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 /**
  * @author yuluo
@@ -32,18 +39,40 @@ import org.springframework.stereotype.Service;
 @Service
 public class SAAChatService {
 
-	private final ChatClient daschScopeChatClient;
+	private final ChatClient defaultChatClient;
 
 	public SAAChatService(ChatModel chatModel) {
 
-		this.daschScopeChatClient = ChatClient
-				.builder(chatModel)
-				.build();
+		this.defaultChatClient = ChatClient.builder(chatModel)
+				.defaultSystem("""
+							  You're a bot in the Spring AI Alibaba project, answering input questions from users.\s
+							  When you receive a question from a user, you should answer the user's question in a friendly\s
+							  and polite manner. Be careful not to answer the wrong message. If there is a question\s
+							  that you can't answer, guide users to the official website of Spring Ai Alibaba to check it.\s
+							  The web address is https://java2ai.com.
+						""")
+				.defaultAdvisors(
+						new MessageChatMemoryAdvisor(new InMemoryChatMemory()),
+						new SimpleLoggerAdvisor()
+				).build();
 	}
 
-	public Flux<String> chat(String chatPrompt) {
+	public Flux<String> chat(String chatId, String model, String chatPrompt) {
 
-		return daschScopeChatClient.prompt(new Prompt(chatPrompt)).stream().content();
+		return defaultChatClient.prompt(
+				).options(DashScopeChatOptions.builder()
+						.withModel(model)
+						.withTemperature(0.8)
+						.withResponseFormat(DashScopeResponseFormat.builder()
+								.type(DashScopeResponseFormat.Type.TEXT)
+								.build()
+						).build()
+				).user(chatPrompt)
+				.advisors(memoryAdvisor -> memoryAdvisor
+						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+				).stream()
+				.content();
 	}
 
 }

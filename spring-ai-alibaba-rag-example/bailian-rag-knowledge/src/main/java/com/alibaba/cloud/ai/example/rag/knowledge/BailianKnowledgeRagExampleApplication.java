@@ -14,24 +14,16 @@
 * limitations under the License.
 */
 
-package com.alibaba.cloud.ai.example.rag;
+package com.alibaba.cloud.ai.example.rag.knowledge;
 
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
-import org.springframework.ai.transformer.splitter.TextSplitter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
-* Title Rag configuration.<br>
-* Description Rag configuration.<br>
-*
-* @author yuanci.ytb
-* @since 1.0.0-M2
-*/
+@SpringBootApplication
+public class BailianKnowledgeRagExampleApplication {
 
-@Configuration
-public class RagConfiguration {
-
+	public static void main(String[] args) {
+		SpringApplication.run(BailianKnowledgeRagExampleApplication.class, args);
+	}
 
 }

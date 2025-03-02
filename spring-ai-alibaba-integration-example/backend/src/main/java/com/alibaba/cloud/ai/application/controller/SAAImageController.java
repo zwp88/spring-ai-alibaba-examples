@@ -23,12 +23,11 @@ import com.alibaba.cloud.ai.application.service.SAAImageService;
 import com.alibaba.cloud.ai.application.utils.ValidText;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,26 +44,47 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/")
 public class SAAImageController {
 
-	@Resource
-	private SAAImageService imageService;
+	private final SAAImageService imageService;
 
+	public SAAImageController(SAAImageService imageService) {
+		this.imageService = imageService;
+	}
+
+	/**
+	 * Image Recognition
+	 * prompt 可以为空
+	 */
 	@UserIp
 	@PostMapping("/image2text")
 	@Operation(summary = "DashScope Image Recognition")
-	public Flux<Result<String>> image2text(@RequestParam("image") MultipartFile image) {
+	public Flux<Result<String>> image2text(
+			@RequestParam(value = "prompt", required = false) String prompt,
+			@RequestParam("image") MultipartFile image
+	) {
 
 		if (image.isEmpty()) {
 			return Flux.just(Result.failed("No image file provided"));
 		}
 
-		return imageService.image2Text(image).map(Result::success);
+		if (!StringUtils.hasText(prompt)) {
+			prompt = "请你用一句话描述这张图片";
+		}
+
+		Flux<Result<String>> res;
+		try {
+			 res = imageService.image2Text(prompt, image).map(Result::success);
+		} catch (Exception e) {
+			return Flux.just(Result.failed(e.getMessage()));
+		}
+
+		return res;
 	}
 
 	@UserIp
-	@GetMapping("/text2Image/{prompt}")
+	@GetMapping("/text2image")
 	@Operation(summary = "DashScope Image Generation")
 	public Result<Void> text2Image(
-			@PathVariable("prompt") String prompt,
+			@RequestParam("prompt") String prompt,
 			HttpServletResponse response
 	) {
 

@@ -17,19 +17,25 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.result.Result;
+import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAChatService;
 import com.alibaba.cloud.ai.application.utils.ValidText;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -42,16 +48,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/")
 public class SAAChatController {
 
-	@Resource
-	private SAAChatService chatService;
+	private final SAAChatService chatService;
 
+	private final SAABaseService baseService;
+
+	public SAAChatController(SAAChatService chatService, SAABaseService baseService) {
+		this.chatService = chatService;
+		this.baseService = baseService;
+	}
+
+	/**
+	 * 发送指定参数获得模型响应。
+	 * 1. 发送 prompt 为空时，返回错误信息。
+	 * 2. 发送模型时，允许为空，当参数有值且在模型配置列表中，调用对应模型。如不存在返回错误。
+	 * 	  模型参数为空时，设置默认模型。qwen-plus
+	 * 3. chatId 聊天记忆，由前端传递，为 Object 类型，不能重复
+	 */
 	@UserIp
-	@GetMapping("/chat/{prompt}")
+	@GetMapping("/chat")
 	@Operation(summary = "DashScope Flux Chat")
 	public Flux<Result<String>> chat(
-			@PathVariable("prompt") String prompt,
-			HttpServletResponse response
+			@RequestParam("prompt") String prompt,
+			HttpServletResponse response,
+			@RequestHeader(value = "models", required = false) String models,
+			@RequestHeader(value = "chatId", required = false) String chatId
 	) {
+
+		// 接口限流在审计平台中配置
 
 		if (!ValidText.isValidate(prompt)) {
 
@@ -59,8 +82,28 @@ public class SAAChatController {
 			return Flux.just(Result.failed("No chat prompt provided"));
 		}
 
+		Set<Map<String, String>> dashScope = baseService.getDashScope();
+		List<String> modelName = dashScope.stream()
+				.flatMap(map -> map.keySet().stream().map(map::get))
+				.distinct()
+				.toList();
+
+		if (StringUtils.hasText(models)) {
+			if (!modelName.contains(models)) {
+				return Flux.just(Result.failed("Input models not support."));
+			}
+		}
+		else {
+			models = "qwen-plus";
+		}
+
 		response.setCharacterEncoding("UTF-8");
 
-		return chatService.chat(prompt).map(Result::success);
+		if (!StringUtils.hasText(chatId)) {
+			chatId = "spring-ai-alibaba-playground";
+		}
+
+		return chatService.chat(chatId, models, prompt).map(Result::success);
 	}
+
 }

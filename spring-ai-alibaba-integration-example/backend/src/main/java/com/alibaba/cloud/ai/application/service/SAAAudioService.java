@@ -25,6 +25,7 @@ import java.util.concurrent.CountDownLatch;
 
 import com.alibaba.cloud.ai.application.exception.SAAAIException;
 import com.alibaba.cloud.ai.application.exception.SAAAppException;
+import com.alibaba.cloud.ai.application.utils.FilesUtils;
 import com.alibaba.cloud.ai.dashscope.audio.DashScopeAudioTranscriptionOptions;
 import com.alibaba.cloud.ai.dashscope.audio.synthesis.SpeechSynthesisModel;
 import com.alibaba.cloud.ai.dashscope.audio.synthesis.SpeechSynthesisPrompt;
@@ -49,6 +50,8 @@ public class SAAAudioService {
 	private final AudioTranscriptionModel transcriptionModel;
 
 	private final SpeechSynthesisModel speechSynthesisModel;
+
+	private final String DEFAULT_MODEL = "paraformer-realtime-v2";
 
 	public SAAAudioService(AudioTranscriptionModel transcriptionModel, SpeechSynthesisModel speechSynthesisModel) {
 
@@ -97,25 +100,19 @@ public class SAAAudioService {
 	/**
 	 * 将语音转为文本
 	 */
-	public Flux<String> audio2text(MultipartFile audio) {
+	public Flux<String> audio2text(MultipartFile file) throws IOException {
 
 		CountDownLatch latch = new CountDownLatch(1);
 		StringBuilder stringBuilder = new StringBuilder();
 
-		File tempFile;
-		try {
-			tempFile = File.createTempFile("audio", ".pcm");
-			audio.transferTo(tempFile);
-		}
-		catch (IOException e) {
-			throw new SAAAppException("Failed to create temporary file " + e.getMessage());
-		}
+		String filePath = System.getProperty("user.dir") + "/" + "tmp/audio/" + file.getOriginalFilename();
+		FilesUtils.saveTempImage(file, filePath);
 
 		Flux<AudioTranscriptionResponse> response = transcriptionModel.stream(
 				new AudioTranscriptionPrompt(
-						new FileSystemResource(tempFile),
+						new FileSystemResource(filePath),
 						DashScopeAudioTranscriptionOptions.builder()
-								.withModel("paraformer-realtime-v2")
+								.withModel(DEFAULT_MODEL)
 								.withSampleRate(16000)
 								.withFormat(DashScopeAudioTranscriptionOptions.AudioFormat.PCM)
 								.withDisfluencyRemovalEnabled(false)
@@ -133,7 +130,7 @@ public class SAAAudioService {
 			throw new SAAAIException("Transcription was interrupted " + e.getMessage());
 		}
 		finally {
-			tempFile.delete();
+			new File(filePath).delete();
 		}
 
 		return Flux.just(stringBuilder.toString());

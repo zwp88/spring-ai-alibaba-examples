@@ -86,14 +86,4 @@ public class DashScopeChatModelController {
 		return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getContent();
 	}
 
-	/**
-	 * JSON mode：通过设置 response_format 参数为 JSON 类型，使大模型返回标准的 JSON 格式数据。
-	 * @return JSON String.
-	 */
-	public String jsonChat() {
-
-		// TODO: add json mode example.
-		return "包含此功能的版本暂未发布！";
-	}
-
 }
