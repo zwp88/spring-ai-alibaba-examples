@@ -23,8 +23,7 @@ import {
   ReadOutlined,
   SmileOutlined,
   EditOutlined,
-  ShareAltOutlined,
-  UserOutlined
+  ShareAltOutlined
 } from "@ant-design/icons";
 import { Flex, App, Badge, Button, type GetProp, Space, theme } from "antd";
 import ReactMarkdown from "react-markdown";
@@ -38,23 +37,6 @@ const renderTitle = (icon: React.ReactElement, title: string) => (
     <span>{title}</span>
   </Space>
 );
-
-function generateRandomString(length: number) {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters.charAt(randomIndex);
-  }
-  return result;
-}
-
-const FILE_PREFIX = generateRandomString(8);
-
-const specialPrefix = {
-  [FILE_PREFIX]: "file"
-};
 
 // 用于临时保存会话记录
 const messagesMap = {} as Record<string, Array<any>>;
@@ -263,8 +245,8 @@ const Independent: React.FC = () => {
     request: async ({ message }, { onSuccess }) => {
       let buffer = "";
 
-      await getChat(
-        message || "",
+      const res = await getChat(
+        JSON.parse(message || "{}").value || "",
         (value) => {
           const res = JSON.parse(decoder.decode(value)) as Array<{
             code: number;
@@ -280,11 +262,19 @@ const Independent: React.FC = () => {
           }
         },
         {
-          image: attachedFiles?.[0]?.originFileObj
+          image: attachedFiles?.[0]?.originFileObj,
+          chatId: activeKey
         }
       );
 
-      onSuccess(JSON.stringify(buffer));
+      let value: string;
+      if (res.status === 200) {
+        value = buffer;
+      } else {
+        value =
+          "Request failed." + (res.statusText ? " " + res.statusText : "");
+      }
+      onSuccess(JSON.stringify({ role: "ai", value }));
     },
     customParams: [attachedFiles]
   });
@@ -311,18 +301,24 @@ const Independent: React.FC = () => {
         ...messages,
         {
           id: messages.length,
-          message:
-            FILE_PREFIX +
-            JSON.stringify({
+          message: JSON.stringify({
+            role: "file",
+            value: {
               uid: attachedFiles?.[0]?.originFileObj?.uid,
               name: attachedFiles?.[0]?.originFileObj?.name,
               size: attachedFiles?.[0]?.originFileObj?.size
-            }),
+            }
+          }),
           status: "success"
         }
       ]);
     }
-    onRequest(nextContent);
+    onRequest(
+      JSON.stringify({
+        role: "local",
+        value: nextContent
+      })
+    );
     setContent("");
   };
 
@@ -413,10 +409,9 @@ const Independent: React.FC = () => {
   useEffect(() => {
     setItems(
       messages.map(({ id, message, status }) => {
-        const prefix = message.slice(0, 8);
-        if (specialPrefix[prefix] === "file") {
-          message = message.slice(8);
-          const value = JSON.parse(message);
+        const item = JSON.parse(message);
+        if (item.role === "file") {
+          const value = item.value;
           return {
             key: id,
             loading: status === "loading",
@@ -434,9 +429,7 @@ const Independent: React.FC = () => {
             key: id,
             loading: status === "loading",
             role: status === "local" ? "local" : "ai",
-            content: (
-              <ReactMarkdown>{message?.replace(/\\n/g, "\n")}</ReactMarkdown>
-            )
+            content: <ReactMarkdown>{item.value}</ReactMarkdown>
           };
         }
       })

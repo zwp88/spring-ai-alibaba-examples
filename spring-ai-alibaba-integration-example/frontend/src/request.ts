@@ -58,4 +58,6 @@ export const getChat = async (
 
     return reader.read().then(process);
   });
+
+  return res;
 };
