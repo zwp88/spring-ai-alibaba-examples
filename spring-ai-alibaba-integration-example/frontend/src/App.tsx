@@ -25,7 +25,16 @@ import {
   EditOutlined,
   ShareAltOutlined
 } from "@ant-design/icons";
-import { Flex, App, Badge, Button, type GetProp, Space, theme } from "antd";
+import {
+  Flex,
+  App,
+  Badge,
+  Button,
+  type GetProp,
+  Space,
+  theme,
+  Typography
+} from "antd";
 import ReactMarkdown from "react-markdown";
 import { getChat } from "./request";
 
@@ -196,7 +205,12 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
       content: {
         borderRadius: 16
       }
-    }
+    },
+    messageRender: (content) => (
+      <Typography>
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </Typography>
+    )
   },
   local: {
     placement: "end",
@@ -425,7 +439,7 @@ const Independent: React.FC = () => {
             key: id,
             loading: status === "loading",
             role: status === "local" ? "local" : "ai",
-            content: <ReactMarkdown>{item.value}</ReactMarkdown>
+            content: item.value
           };
         }
       })
