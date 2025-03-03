@@ -256,8 +256,9 @@ const Independent: React.FC = () => {
 
   // ==================== Runtime ====================
   const [agent] = useXAgent({
-    request: async ({ message }, { onSuccess }) => {
+    request: async ({ message }, { onSuccess, onUpdate }) => {
       let buffer = "";
+      onUpdate(JSON.stringify({ role: "ai", value: "" }));
 
       const res = await getChat(
         JSON.parse(message || "{}")?.value || "",
@@ -271,6 +272,7 @@ const Independent: React.FC = () => {
             res.forEach((item) => {
               if (item?.message === "success") {
                 buffer = buffer + item?.data;
+                onUpdate(JSON.stringify({ role: "ai", value: buffer }));
               }
             });
           }
@@ -288,6 +290,7 @@ const Independent: React.FC = () => {
         value =
           "Request failed." + (res?.statusText ? " " + res?.statusText : "");
       }
+
       onSuccess(JSON.stringify({ role: "ai", value }));
     },
     customParams: [attachedFiles]
@@ -424,8 +427,8 @@ const Independent: React.FC = () => {
           const value = item?.value;
           return {
             key: id,
-            loading: status === "loading",
             role: "file",
+            loading: !value,
             content: [
               {
                 uid: value?.uid,
@@ -435,11 +438,12 @@ const Independent: React.FC = () => {
             ]
           };
         } else {
+          const value = item?.value;
           return {
             key: id,
-            loading: status === "loading",
             role: status === "local" ? "local" : "ai",
-            content: item.value
+            loading: !value,
+            content: value
           };
         }
       })
