@@ -1,5 +1,12 @@
 package com.alibaba.cloud.ai.application.service;
 
+import java.util.List;
+
+import com.alibaba.cloud.ai.application.websearch.core.IQSSearchEngine;
+import com.alibaba.cloud.ai.application.websearch.data.DataClean;
+import com.alibaba.cloud.ai.application.websearch.entity.GenericSearchResult;
+
+import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,16 +17,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class SAAWebSearch {
 
-	// private final GoogleSearchEngine googleSearchEngine;
+	 private final IQSSearchEngine searchEngine;
 
-	// public SAAWebSearch(GoogleSearchEngine googleSearchEngine) {
-	// 	this.googleSearchEngine = googleSearchEngine;
-	// }
+	 private final DataClean dataClean;
 
-	public Object search(String query) {
+	 public SAAWebSearch(IQSSearchEngine searchEngine, DataClean dataClean) {
+	 	this.searchEngine = searchEngine;
+		 this.dataClean = dataClean;
+	 }
 
-		// return googleSearchEngine.search(query);
-		return null;
+	public List<Document> search(String query) {
+
+		 // 获取搜索结果
+		GenericSearchResult search = searchEngine.search(query);
+
+		// 数据清洗
+		List<Document> data = dataClean.getData(search);
+
+		// 返回结果
+		return data;
 	}
 
 }

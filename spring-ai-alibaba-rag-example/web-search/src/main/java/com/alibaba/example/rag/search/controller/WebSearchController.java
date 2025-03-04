@@ -1,6 +1,6 @@
 package com.alibaba.example.rag.internet.controller;
 
-import com.alibaba.example.rag.internet.service.InternetSearchService;
+import com.alibaba.example.rag.internet.service.WebSearchService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,8 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/internet")
-public class InterNetSearchController {
+public class WebSearchController {
 
-	private final InternetSearchService internetSearchService;
+	private final WebSearchService internetSearchService;
+
+	public WebSearchController(WebSearchService internetSearchService) {
+		this.internetSearchService = internetSearchService;
+	}
+
+
 
 }
