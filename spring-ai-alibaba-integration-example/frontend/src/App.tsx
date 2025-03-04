@@ -148,6 +148,19 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
       </Typography>
     )
   },
+  aiHistory: {
+    placement: "start",
+    styles: {
+      content: {
+        borderRadius: 16
+      }
+    },
+    messageRender: (content) => (
+      <Typography>
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </Typography>
+    )
+  },
   local: {
     placement: "end",
     variant: "shadow"
@@ -298,6 +311,20 @@ const Independent: React.FC = () => {
     onRequest(info.data.description as string);
   };
 
+  // 将模型返回的消息的 role 转换成历史记录，避免切换会话触发渲染动效
+  const getMessageHistory = () => {
+    return messages.map((item) => {
+      const value = JSON.parse(item.message);
+      if (value.role === "ai") {
+        value.role = "aiHistory";
+        item.message = JSON.stringify(value);
+        return item;
+      } else {
+        return item;
+      }
+    });
+  };
+
   // 新增会话
   const onAddConversation = async () => {
     const newKey = Date.now().toString();
@@ -317,7 +344,7 @@ const Independent: React.FC = () => {
     ]);
     messagesMap[activeKey] = {
       model,
-      messages
+      messages: getMessageHistory()
     };
     setHeaderOpen(false);
     setAttachedFiles([]);
@@ -332,7 +359,7 @@ const Independent: React.FC = () => {
   ) => {
     messagesMap[activeKey] = {
       model,
-      messages
+      messages: getMessageHistory()
     };
     setHeaderOpen(false);
     setAttachedFiles([]);
@@ -395,6 +422,7 @@ const Independent: React.FC = () => {
     </Space>
   );
 
+  // messages 转 items
   useEffect(() => {
     setItems(
       messages.map(({ id, message, status }) => {
@@ -403,7 +431,7 @@ const Independent: React.FC = () => {
           const value = item?.value;
           return {
             key: id,
-            role: "file",
+            role: item?.role,
             loading: !value,
             content: [
               {
@@ -417,7 +445,7 @@ const Independent: React.FC = () => {
           const value = item?.value;
           return {
             key: id,
-            role: status === "local" ? "local" : "ai",
+            role: item?.role,
             loading: !value,
             content: value
           };
