@@ -9,7 +9,6 @@ import {
   useXAgent,
   useXChat
 } from "@ant-design/x";
-import { createStyles } from "antd-style";
 import React, { useEffect } from "react";
 import {
   CloudUploadOutlined,
@@ -30,13 +29,19 @@ import {
   App,
   Badge,
   Button,
-  type GetProp,
   Space,
   theme,
-  Typography
+  Typography,
+  Tag,
+  type GetProp,
+  Tooltip,
+  Select
 } from "antd";
 import ReactMarkdown from "react-markdown";
-import { getChat } from "./request";
+import { getChat, getModels } from "./request";
+import { useStyle } from "./style";
+
+const DEFAULT_MODEL = "qwen-plus";
 
 const decoder = new TextDecoder("utf-8");
 
@@ -47,9 +52,7 @@ const renderTitle = (icon: React.ReactElement, title: string) => (
   </Space>
 );
 
-// 用于临时保存会话记录
-const messagesMap = {} as Record<string, Array<any>>;
-
+// 新会话默认展示
 const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
@@ -97,92 +100,24 @@ const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   }
 ];
 
+// 默认会话
 const defaultKey = Date.now().toString();
-
 const defaultConversationsItems = [
   {
     key: defaultKey,
-    label: "What is Spring Ai Alibaba?"
+    label: (
+      <span>
+        Conversation 1
+        <Tag style={{ marginLeft: 8 }} color="green">
+          {DEFAULT_MODEL}
+        </Tag>
+      </span>
+    )
   }
 ];
 
-const useStyle = createStyles(({ token, css }) => {
-  return {
-    layout: css`
-      width: 100%;
-      min-width: 1000px;
-      height: 722px;
-      border-radius: ${token.borderRadius}px;
-      display: flex;
-      background: ${token.colorBgContainer};
-      font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
-
-      .ant-prompts {
-        color: ${token.colorText};
-      }
-    `,
-    menu: css`
-      background: ${token.colorBgLayout}80;
-      width: 280px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    `,
-    conversations: css`
-      padding: 0 12px;
-      flex: 1;
-      overflow-y: auto;
-    `,
-    chat: css`
-      height: 100%;
-      width: 100%;
-      max-width: 700px;
-      margin: 0 auto;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      padding: ${token.paddingLG}px;
-      gap: 16px;
-    `,
-    messages: css`
-      flex: 1;
-    `,
-    placeholder: css`
-      padding-top: 32px;
-    `,
-    sender: css`
-      box-shadow: ${token.boxShadow};
-    `,
-    logo: css`
-      display: flex;
-      height: 72px;
-      align-items: center;
-      justify-content: start;
-      padding: 0 24px;
-      box-sizing: border-box;
-
-      img {
-        width: 24px;
-        height: 24px;
-        display: inline-block;
-      }
-
-      span {
-        display: inline-block;
-        margin: 0 8px;
-        font-weight: bold;
-        color: ${token.colorText};
-        font-size: 16px;
-      }
-    `,
-    addBtn: css`
-      background: #1677ff0f;
-      border: 1px solid #1677ff34;
-      width: calc(100% - 24px);
-      margin: 0 12px 24px 12px;
-    `
-  };
-});
+// 用于临时保存会话记录
+const messagesMap = {} as Record<string, { model: string; messages: any[] }>;
 
 const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
@@ -197,6 +132,7 @@ const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
   }
 ];
 
+// 会话中角色列表
 const roles: GetProp<typeof Bubble.List, "roles"> = {
   ai: {
     placement: "start",
@@ -254,6 +190,11 @@ const Independent: React.FC = () => {
   const [recording, setRecording] = React.useState(false);
   const { token } = theme.useToken();
 
+  // 当前会话的模型
+  const [model, setModel] = React.useState(DEFAULT_MODEL);
+  // 将要新增会话的模型
+  const [nextModel, setNextModel] = React.useState(DEFAULT_MODEL);
+
   // ==================== Runtime ====================
   const [agent] = useXAgent({
     request: async ({ message }, { onSuccess, onUpdate }) => {
@@ -279,7 +220,8 @@ const Independent: React.FC = () => {
         },
         {
           image: attachedFiles?.[0]?.originFileObj,
-          chatId: activeKey
+          chatId: activeKey,
+          model
         }
       );
 
@@ -295,6 +237,23 @@ const Independent: React.FC = () => {
     },
     customParams: [attachedFiles]
   });
+
+  // 获取模型列表
+  const [modelItems, setModelItems] = React.useState([]);
+  useEffect(() => {
+    getModels().then((res) => {
+      setModelItems(
+        res.map(({ model, desc }) => ({
+          value: model,
+          label: (
+            <Tooltip title={desc} placement="right">
+              {model}
+            </Tooltip>
+          )
+        }))
+      );
+    });
+  }, []);
 
   const [items, setItems] = React.useState<
     GetProp<typeof Bubble.List, "items">
@@ -339,30 +298,47 @@ const Independent: React.FC = () => {
     onRequest(info.data.description as string);
   };
 
+  // 新增会话
   const onAddConversation = async () => {
     const newKey = Date.now().toString();
     setConversationsItems([
       ...conversationsItems,
       {
         key: newKey,
-        label: `New Conversation ${conversationsItems.length}`
+        label: (
+          <span>
+            {`Conversation ${conversationsItems.length + 1}`}
+            <Tag style={{ marginLeft: 8 }} color="green">
+              {nextModel}
+            </Tag>
+          </span>
+        )
       }
     ]);
-    messagesMap[activeKey] = messages;
+    messagesMap[activeKey] = {
+      model,
+      messages
+    };
     setHeaderOpen(false);
     setAttachedFiles([]);
-    setMessages([]);
     setActiveKey(newKey);
+    setMessages([]);
+    setModel(nextModel);
   };
 
+  // 切换会话
   const onConversationClick: GetProp<typeof Conversations, "onActiveChange"> = (
     key
   ) => {
-    messagesMap[activeKey] = messages;
+    messagesMap[activeKey] = {
+      model,
+      messages
+    };
     setHeaderOpen(false);
     setAttachedFiles([]);
-    setMessages(messagesMap[key] || []);
     setActiveKey(key);
+    setMessages(messagesMap[key].messages || []);
+    setModel(messagesMap[key].model || DEFAULT_MODEL);
   };
 
   const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) => {
@@ -506,6 +482,16 @@ const Independent: React.FC = () => {
       <div className={styles.menu}>
         {/* 🌟 Logo */}
         {logoNode}
+        {/* 🌟 模型选择 */}
+        <div className={styles.chooseModel}>
+          选择模型类型
+          <Select
+            onChange={setNextModel}
+            options={modelItems}
+            style={{ width: 120 }}
+            value={nextModel}
+          />
+        </div>
         {/* 🌟 添加会话 */}
         <Button
           onClick={onAddConversation}
