@@ -30,7 +30,6 @@ import {
   Badge,
   Button,
   Space,
-  theme,
   Typography,
   Tag,
   type GetProp,
