@@ -29,18 +29,18 @@ public class MultiQueryExpander implements QueryExpander {
 
 	private static final PromptTemplate DEFAULT_PROMPT_TEMPLATE = new PromptTemplate(
 			"""
-					你是一位信息检索与搜索优化的专家。
-					请生成 {number} 个不同版本的给定查询。
-								
-					每个变体应涵盖主题的不同视角或方面，同时保持原始查询的核心意图。目标是扩展搜索范围，提高找到相关信息的机会。
-								
-					请勿解释选择或添加其他文本。
-					提供查询变体，并以换行符分隔。
-								
-					原始查询：{query}
-								
-					查询变体：
-					"""
+			你是一位信息检索与搜索优化的专家。
+			请生成 {number} 个不同版本的给定查询。
+						
+			每个变体应涵盖主题的不同视角或方面，同时保持原始查询的核心意图。目标是扩展搜索范围，提高找到相关信息的机会。
+						
+			请勿解释选择或添加其他文本。
+			提供查询变体，并以换行符分隔。
+						
+			原始查询：{query}
+						
+			查询变体：
+			"""
 	);
 
 	private static final Boolean DEFAULT_INCLUDE_ORIGINAL = true;

@@ -17,11 +17,11 @@ import org.springframework.util.StringUtils;
  * 将 deepseek-r1 的 reasoning content 整合到输出中
  */
 
-public class ReasonContentAdvisor implements BaseAdvisor {
+public class ReasoningContentAdvisor implements BaseAdvisor {
 
 	private final int order;
 
-	public ReasonContentAdvisor(Integer order) {
+	public ReasoningContentAdvisor(Integer order) {
 		this.order = order != null ? order : 0;
 	}
 

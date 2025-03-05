@@ -1,13 +1,11 @@
 package com.alibaba.cloud.ai.application.controller;
 
-import java.util.List;
-
-import com.alibaba.cloud.ai.application.entity.result.Result;
-import com.alibaba.cloud.ai.application.service.SAAWebSearch;
+import com.alibaba.cloud.ai.application.service.SAAWebSearchService;
 import com.alibaba.cloud.ai.application.utils.ValidText;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import reactor.core.publisher.Flux;
 
-import org.springframework.ai.document.Document;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,22 +21,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/")
 public class SAAWebSearchController {
 
-	private final SAAWebSearch webSearch;
+	private final SAAWebSearchService webSearch;
 
-	public SAAWebSearchController(SAAWebSearch webSearch) {
+	public SAAWebSearchController(SAAWebSearchService webSearch) {
 		this.webSearch = webSearch;
 	}
 
 	@GetMapping("/search")
-	public Result<List<Document>> search(
-			@RequestParam(value = "query") String query
+	public Flux<String> search(
+			@RequestParam(value = "query") String query,
+			HttpServletResponse response
 	) {
 
 		if (!ValidText.isValidate(query)) {
-			return Result.failed("Invalid query");
+			return Flux.just("Invalid query");
 		}
 
-		return Result.success(webSearch.search(query));
+		response.setCharacterEncoding("UTF-8");
+
+		return webSearch.chat(query);
 	}
 
 }

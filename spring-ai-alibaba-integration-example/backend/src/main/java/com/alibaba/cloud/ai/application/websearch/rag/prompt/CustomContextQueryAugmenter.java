@@ -1,6 +1,9 @@
 package com.alibaba.cloud.ai.application.websearch.rag.prompt;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +14,7 @@ import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.generation.augmentation.QueryAugmenter;
 import org.springframework.ai.util.PromptAssert;
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 /**
  * @author yuluo
@@ -23,13 +27,27 @@ public class CustomContextQueryAugmenter implements QueryAugmenter {
 
 	private static final PromptTemplate DEFAULT_PROMPT_TEMPLATE = new PromptTemplate(
 			"""
-   
+			Context information is below:
+
+			{{context}}
+
+			Given the context information and no prior knowledge, answer the query.
+
+			Follow these rules:
+
+			1. If the answer is not in the context, just say that you don't know.
+			2. Avoid statements like "Based on the context...." or "The provided information...".
+
+			Query: {query}
+
+			Answer:
 			"""
 	);
 
 	private static final PromptTemplate DEFAULT_EMPTY_PROMPT_TEMPLATE = new PromptTemplate(
 			"""
-   
+			The user query is outside your knowledge base.
+			Politely inform the user that you cannot answer the query.
 			"""
 	);
 
@@ -55,7 +73,44 @@ public class CustomContextQueryAugmenter implements QueryAugmenter {
 
 	@Override
 	public Query augment(Query query, List<Document> documents) {
-		return null;
+
+		Assert.notNull(query, "Query must not be null");
+		Assert.notNull(documents, "Documents must not be null");
+
+		logger.debug("Augmenting query: {}", query);
+
+		if (documents.isEmpty()) {
+			return augmentQueryWhenEmptyContext(query);
+		}
+
+		// 1. collect content from documents.
+		AtomicInteger idCounter = new AtomicInteger(1);
+		String documentContext = documents.stream()
+				.map(document -> {
+					String text = document.getText();
+					return "[[" + (idCounter.getAndIncrement()) + "]]" + text;
+				})
+				.collect(Collectors.joining("\n-----------------------------------------------\n"));
+
+		// 2. Define prompt parameters.
+		Map<String, Object> promptParameters = Map.of(
+				"query", query.text(),
+				"context", documentContext
+		);
+
+		// 3. Augment user prompt with document context.
+		return new Query(this.promptTemplate.render(promptParameters));
+	}
+
+	private Query augmentQueryWhenEmptyContext(Query query) {
+
+		if (this.allowEmptyContext) {
+			logger.debug("Empty context is allowed. Returning the original query.");
+			return query;
+		}
+
+		logger.debug("Empty context is not allowed. Returning a specific query for empty context.");
+		return new Query(this.emptyPromptTemplate.render());
 	}
 
 	public static final class Builder {

@@ -1,15 +1,17 @@
 package com.alibaba.cloud.ai.application.websearch.rag;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.cloud.ai.application.websearch.core.IQSSearchEngine;
 import com.alibaba.cloud.ai.application.websearch.data.DataClean;
 import com.alibaba.cloud.ai.application.websearch.entity.GenericSearchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
+import org.springframework.lang.Nullable;
 
 /**
  * @author yuluo
@@ -17,6 +19,8 @@ import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
  */
 
 public class WebSearchRetriever implements DocumentRetriever {
+
+	private static final Logger logger = LoggerFactory.getLogger(WebSearchRetriever.class);
 
 	private final IQSSearchEngine searchEngine;
 
@@ -32,18 +36,20 @@ public class WebSearchRetriever implements DocumentRetriever {
 	}
 
 	@Override
-	public List<Document> retrieve(Query query) {
-
-		List<Document> documents = new ArrayList<>();
+	public List<Document> retrieve(
+			@Nullable Query query
+	) {
 
 		// 搜索
 		GenericSearchResult searchResp = searchEngine.search(query.text());
+		logger.debug("search response: {}", searchResp);
 
 		// 清洗数据
-		dataCleaner.getData(searchResp);
+		List<Document> cleanerData = dataCleaner.getData(searchResp);
+		logger.debug("cleaner data: {}", cleanerData);
 
 		// 返回结果
-		return dataCleaner.limitResults(documents, maxResults);
+		return dataCleaner.limitResults(cleanerData, maxResults);
 	}
 
 	public static WebSearchRetriever.Builder builder() {
