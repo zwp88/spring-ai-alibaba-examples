@@ -200,8 +200,6 @@ const Independent: React.FC = () => {
   >([]);
 
   const { message } = App.useApp();
-  const [recording, setRecording] = React.useState(false);
-  const { token } = theme.useToken();
 
   // 当前会话的模型
   const [model, setModel] = React.useState(DEFAULT_MODEL);
@@ -556,14 +554,7 @@ const Independent: React.FC = () => {
           value={content}
           header={senderHeader}
           onSubmit={onSubmit}
-          allowSpeech={{
-            // When setting `recording`, the built-in speech recognition feature will be disabled
-            recording,
-            onRecordingChange: (nextRecording) => {
-              message.info(`Mock Customize Recording: ${nextRecording}`);
-              setRecording(nextRecording);
-            }
-          }}
+          allowSpeech
           onChange={setContent}
           prefix={attachmentsNode}
           loading={agent.isRequesting()}
