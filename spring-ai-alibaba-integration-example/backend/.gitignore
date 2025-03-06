@@ -41,3 +41,6 @@ logs/
 *.wav
 *.png
 *.jpg
+
+# ignore db files
+/src/main/resources/db/user.db

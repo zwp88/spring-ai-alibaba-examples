@@ -36,9 +36,12 @@
 	<name>Spring AI Alibaba RAG Examples</name>
 
 	<modules>
+		<module>bailian-rag-knowledge</module>
+		<module>bailian-agent</module>
 		<module>rag-example</module>
 		<module>rag-milvus-example</module>
 		<module>rag-pgvector-example</module>
+		<module>web-search</module>
 	</modules>
 
 	<build>
