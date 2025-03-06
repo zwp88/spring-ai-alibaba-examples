@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,7 @@ public class MultiQueryExpander implements QueryExpander {
 
 	private static final Boolean DEFAULT_INCLUDE_ORIGINAL = true;
 
-	private static final Integer DEFAULT_NUMBER_OF_QUERIES = 5;
+	private static final Integer DEFAULT_NUMBER_OF_QUERIES = 3;
 
 	private final ChatClient chatClient;
 
@@ -61,6 +62,7 @@ public class MultiQueryExpander implements QueryExpander {
 			@Nullable Boolean includeOriginal,
 			@Nullable Integer numberOfQueries
 	) {
+
 		Assert.notNull(chatClientBuilder, "ChatClient.Builder must not be null");
 
 		this.chatClient = chatClientBuilder.build();
@@ -71,8 +73,9 @@ public class MultiQueryExpander implements QueryExpander {
 		PromptAssert.templateHasRequiredPlaceholders(this.promptTemplate, "number", "query");
 	}
 
+	@NotNull
 	@Override
-	public List<Query> expand(Query query) {
+	public List<Query> expand(@Nullable Query query) {
 
 		Assert.notNull(query, "Query must not be null");
 
@@ -95,7 +98,9 @@ public class MultiQueryExpander implements QueryExpander {
 
 		if (CollectionUtils.isEmpty(queryVariants) || this.numberOfQueries != queryVariants.size()) {
 
-			logger.warn("Query expansion result dose not contain the requested {} variants for query: {}. is return.", this.numberOfQueries, query.text());
+			logger.warn("Query expansion result dose not contain the requested {} variants for query: {}. is return.",
+					this.numberOfQueries, query.text());
+
 			return List.of(query);
 		}
 
@@ -109,8 +114,14 @@ public class MultiQueryExpander implements QueryExpander {
 			logger.debug("Including original query in the expanded queries for query: {}", query.text());
 			queries.add(0, query);
 		}
+		
+		logger.debug("Rewrite queries: {}", queries);
 
 		return queries;
+	}
+
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	public static final class Builder {

@@ -1,6 +1,6 @@
-package com.alibaba.example.rag.internet.controller;
+package com.alibaba.example.rag.search.controller;
 
-import com.alibaba.example.rag.internet.service.WebSearchService;
+import com.alibaba.example.rag.search.service.WebSearchService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

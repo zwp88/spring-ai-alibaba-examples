@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +72,12 @@ public class CustomContextQueryAugmenter implements QueryAugmenter {
 		PromptAssert.templateHasRequiredPlaceholders(this.promptTemplate, "query", "context");
 	}
 
+	@NotNull
 	@Override
-	public Query augment(Query query, List<Document> documents) {
+	public Query augment(
+			@Nullable Query query,
+			@Nullable List<Document> documents
+	) {
 
 		Assert.notNull(query, "Query must not be null");
 		Assert.notNull(documents, "Documents must not be null");
@@ -80,8 +85,11 @@ public class CustomContextQueryAugmenter implements QueryAugmenter {
 		logger.debug("Augmenting query: {}", query);
 
 		if (documents.isEmpty()) {
+			logger.debug("No documents found. Augmenting query with empty context.");
 			return augmentQueryWhenEmptyContext(query);
 		}
+
+		logger.debug("Documents found. Augmenting query with context.");
 
 		// 1. collect content from documents.
 		AtomicInteger idCounter = new AtomicInteger(1);

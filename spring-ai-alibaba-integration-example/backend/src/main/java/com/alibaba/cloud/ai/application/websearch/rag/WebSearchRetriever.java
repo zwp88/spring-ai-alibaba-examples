@@ -42,7 +42,6 @@ public class WebSearchRetriever implements DocumentRetriever {
 
 		// 搜索
 		GenericSearchResult searchResp = searchEngine.search(query.text());
-		logger.debug("search response: {}", searchResp);
 
 		// 清洗数据
 		List<Document> cleanerData = dataCleaner.getData(searchResp);

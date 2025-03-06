@@ -29,19 +29,27 @@ public class DataClean {
 
 		List<Document> documents = new ArrayList<>();
 
-		// 1. 获取 QueryContext 的 metadata
 		Map<String, Object> metadata = getQueryMetadata(respData);
 
 		for (ScorePageItem pageItem : respData.getPageItems()) {
 
-			// 获取每个 pages 的 metadata
 			Map<String, Object> pageItemMetadata = getPageItemMetadata(pageItem);
-			// 获取 text
-			String text = getText(pageItem);
-			// 获取 media Document 限制，media 和 text 只能有一个
-			// Media media = getMedia(pageItem);
-			// 获取浏览器 score
 			Double score = getScore(pageItem);
+			String text = getText(pageItem);
+
+			if (Objects.equals("", text)) {
+
+				Media media = getMedia(pageItem);
+				Document document = new Document.Builder()
+						.metadata(metadata)
+						.metadata(pageItemMetadata)
+						.media(media)
+						.score(score)
+						.build();
+
+				documents.add(document);
+				break;
+			}
 
 			Document document = new Document.Builder()
 					.metadata(metadata)
@@ -126,7 +134,18 @@ public class DataClean {
 
 	private String getText(ScorePageItem pageItem) {
 
-		return pageItem.getMainText();
+		if (Objects.nonNull(pageItem.getMainText())) {
+
+			String mainText = pageItem.getMainText();
+
+			mainText = mainText.replaceAll("<[^>]+>", "");
+			mainText = mainText.replaceAll("[\\n\\t\\r]+", " ");
+			mainText = mainText.replaceAll("[\\u200B-\\u200D\\uFEFF]", "");
+
+			return mainText.trim();
+		}
+
+		return "";
 	}
 
 	public List<Document> limitResults(List<Document> documents, int minResults) {

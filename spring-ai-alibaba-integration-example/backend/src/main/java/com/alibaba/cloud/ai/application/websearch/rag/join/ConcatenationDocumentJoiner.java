@@ -10,12 +10,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.retrieval.join.DocumentJoiner;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -27,8 +29,11 @@ public class ConcatenationDocumentJoiner implements DocumentJoiner {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConcatenationDocumentJoiner.class);
 
+	@NotNull
 	@Override
-	public List<Document> join(Map<Query, List<List<Document>>> documentsForQuery) {
+	public List<Document> join(
+			@Nullable Map<Query, List<List<Document>>> documentsForQuery
+	) {
 
 		Assert.notNull(documentsForQuery, "documentsForQuery cannot be null");
 		Assert.noNullElements(documentsForQuery.keySet(), "documentsForQuery cannot contain null keys");

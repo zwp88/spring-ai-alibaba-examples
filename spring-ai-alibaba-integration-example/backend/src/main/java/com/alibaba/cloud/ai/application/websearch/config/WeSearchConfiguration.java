@@ -1,13 +1,13 @@
 package com.alibaba.cloud.ai.application.websearch.config;
 
 import com.alibaba.cloud.ai.application.websearch.rag.postretrieval.DashScopeDocumentRanker;
+import com.alibaba.cloud.ai.application.websearch.rag.preretrieval.query.expansion.MultiQueryExpander;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.model.RerankModel;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.rag.preretrieval.query.expansion.MultiQueryExpander;
 import org.springframework.ai.rag.preretrieval.query.expansion.QueryExpander;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;

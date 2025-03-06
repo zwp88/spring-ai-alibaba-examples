@@ -1,4 +1,4 @@
-package com.alibaba.example.rag.internet.service;
+package com.alibaba.example.rag.search.service;
 
 import org.springframework.stereotype.Service;
 

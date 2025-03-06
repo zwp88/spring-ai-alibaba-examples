@@ -1,4 +1,4 @@
-package com.alibaba.example.rag.internet;
+package com.alibaba.example.rag.search.websearch;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;

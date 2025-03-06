@@ -42,6 +42,6 @@ spring:
 # enabled debug log out.
 logging:
   level:
-    org.springframework.ai: debug
-    com.alibaba.dashscope.api: debug
+#    org.springframework.ai: debug
+#    com.alibaba.dashscope.api: debug
     com.alibaba.cloud.ai.application.websearch: debug
