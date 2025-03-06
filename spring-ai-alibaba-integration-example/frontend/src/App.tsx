@@ -41,8 +41,10 @@ import {
 import ReactMarkdown from "react-markdown";
 import { getChat, getModels } from "./request";
 import { useStyle } from "./style";
+import { litFileSize } from "./utils";
 
 const DEFAULT_MODEL = "qwen-plus";
+const MAX_IMAGE_SIZE = 2048;
 
 const decoder = new TextDecoder("utf-8");
 
@@ -362,7 +364,10 @@ const Independent: React.FC = () => {
   };
 
   const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) => {
-    setAttachedFiles(info.fileList);
+    // 检查文件大小是否不符合预期
+    if (litFileSize(info.fileList?.[0]?.originFileObj as any, MAX_IMAGE_SIZE)) {
+      setAttachedFiles(info.fileList);
+    }
   };
 
   const menuConfig: ConversationsProps["menu"] = (conversation) => ({
@@ -469,6 +474,7 @@ const Independent: React.FC = () => {
       }}
     >
       <Attachments
+        accept=".jpg, .jpeg, .png, .webp"
         maxCount={1}
         beforeUpload={() => false}
         items={attachedFiles}
