@@ -305,7 +305,12 @@ const Independent: React.FC = () => {
   };
 
   const onPromptsItemClick: GetProp<typeof Prompts, "onItemClick"> = (info) => {
-    onRequest(info.data.description as string);
+    onRequest(
+      JSON.stringify({
+        role: "local",
+        value: info.data.description
+      })
+    );
   };
 
   // 将模型返回的消息的 role 转换成历史记录，避免切换会话触发渲染动效
