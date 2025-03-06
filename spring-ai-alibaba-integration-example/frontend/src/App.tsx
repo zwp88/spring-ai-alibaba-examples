@@ -214,19 +214,8 @@ const Independent: React.FC = () => {
       const res = await getChat(
         JSON.parse(message || "{}")?.value || "",
         (value) => {
-          const res = JSON.parse(decoder.decode(value)) as Array<{
-            code: number;
-            message: string;
-            data: string;
-          }>;
-          if (res?.length > 0) {
-            res.forEach((item) => {
-              if (item?.message === "success") {
-                buffer = buffer + item?.data;
-                onUpdate(JSON.stringify({ role: "ai", value: buffer }));
-              }
-            });
-          }
+          buffer = buffer + decoder.decode(value);
+          onUpdate(JSON.stringify({ role: "ai", value: buffer }));
         },
         {
           image: attachedFiles?.[0]?.originFileObj,
