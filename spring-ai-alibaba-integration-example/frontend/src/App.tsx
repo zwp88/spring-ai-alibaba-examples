@@ -22,7 +22,9 @@ import {
   ReadOutlined,
   SmileOutlined,
   EditOutlined,
-  ShareAltOutlined
+  ShareAltOutlined,
+  RobotFilled,
+  UserOutlined
 } from "@ant-design/icons";
 import {
   Flex,
@@ -32,9 +34,9 @@ import {
   Space,
   Typography,
   Tag,
-  type GetProp,
   Tooltip,
-  Select
+  Select,
+  type GetProp
 } from "antd";
 import ReactMarkdown from "react-markdown";
 import { getChat, getModels } from "./request";
@@ -44,14 +46,32 @@ const DEFAULT_MODEL = "qwen-plus";
 
 const decoder = new TextDecoder("utf-8");
 
+// 用于临时保存会话记录
+const messagesMap = {} as Record<string, { model: string; messages: any[] }>;
+
+// 默认会话
+const defaultKey = Date.now().toString();
+const defaultConversationsItems = [
+  {
+    key: defaultKey,
+    label: (
+      <span>
+        Conversation 1
+        <Tag style={{ marginLeft: 8 }} color="green">
+          {DEFAULT_MODEL}
+        </Tag>
+      </span>
+    )
+  }
+];
+
+// 会话初始展示
 const renderTitle = (icon: React.ReactElement, title: string) => (
   <Space align="start">
     {icon}
     <span>{title}</span>
   </Space>
 );
-
-// 新会话默认展示
 const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
@@ -99,25 +119,7 @@ const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   }
 ];
 
-// 默认会话
-const defaultKey = Date.now().toString();
-const defaultConversationsItems = [
-  {
-    key: defaultKey,
-    label: (
-      <span>
-        Conversation 1
-        <Tag style={{ marginLeft: 8 }} color="green">
-          {DEFAULT_MODEL}
-        </Tag>
-      </span>
-    )
-  }
-];
-
-// 用于临时保存会话记录
-const messagesMap = {} as Record<string, { model: string; messages: any[] }>;
-
+// 会话框上的常驻提示词
 const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
@@ -132,37 +134,37 @@ const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
 ];
 
 // 会话中角色列表
+const aiConfig = {
+  placement: "start" as "start" | "end",
+  avatar: {
+    icon: <RobotFilled />
+  },
+  styles: {
+    content: {
+      borderRadius: 16
+    }
+  },
+  messageRender: (content) => (
+    <Typography>
+      <ReactMarkdown>{content}</ReactMarkdown>
+    </Typography>
+  )
+};
 const roles: GetProp<typeof Bubble.List, "roles"> = {
   ai: {
-    placement: "start",
     typing: { step: 5, interval: 20 },
-    styles: {
-      content: {
-        borderRadius: 16
-      }
-    },
-    messageRender: (content) => (
-      <Typography>
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </Typography>
-    )
+
+    ...aiConfig
   },
   aiHistory: {
-    placement: "start",
-    styles: {
-      content: {
-        borderRadius: 16
-      }
-    },
-    messageRender: (content) => (
-      <Typography>
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </Typography>
-    )
+    ...aiConfig
   },
   local: {
     placement: "end",
-    variant: "shadow"
+    variant: "shadow",
+    avatar: {
+      icon: <UserOutlined />
+    }
   },
   file: {
     placement: "end",
