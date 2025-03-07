@@ -371,7 +371,6 @@ const Independent: React.FC = () => {
       const reader = new FileReader();
       reader.onload = function (e) {
         const base64String = e.target?.result;
-        console.log("nowImageBase64", base64String);
         nowImageBase64 = base64String as string;
       };
       reader.readAsDataURL(info.fileList?.[0]?.originFileObj as File);
@@ -399,8 +398,13 @@ const Independent: React.FC = () => {
         });
         const nextIndex = Math.min(index, newConversationsItems.length - 1);
         delete messagesMap[key];
+        setHeaderOpen(false);
+        setAttachedFiles([]);
+        const activeKey = newConversationsItems[nextIndex].key;
+        setActiveKey(activeKey);
+        setMessages(messagesMap[activeKey].messages || []);
+        setModel(messagesMap[activeKey].model || DEFAULT_MODEL);
         setConversationsItems(newConversationsItems);
-        setActiveKey(newConversationsItems[nextIndex].key);
       }
     });
   };
