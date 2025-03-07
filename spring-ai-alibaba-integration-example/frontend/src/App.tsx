@@ -14,14 +14,14 @@ import {
   CloudUploadOutlined,
   CommentOutlined,
   DeleteOutlined,
-  EllipsisOutlined,
+  LinkOutlined,
   FireOutlined,
   HeartOutlined,
   PaperClipOutlined,
   PlusOutlined,
   ReadOutlined,
   SmileOutlined,
-  ShareAltOutlined,
+  GithubOutlined,
   RobotFilled,
   UserOutlined,
   ExclamationCircleFilled
@@ -421,8 +421,20 @@ const Independent: React.FC = () => {
         description="An AI assistant built with Spring AI Alibaba framework, with embedded Spring AI Alibaba domain knowledge using RAG. Supports text and image user input, audio generation, and image generation."
         extra={
           <Space>
-            <Button icon={<ShareAltOutlined />} />
-            <Button icon={<EllipsisOutlined />} />
+            <a
+              href="https://github.com/alibaba/spring-ai-alibaba"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button icon={<GithubOutlined />} />
+            </a>
+            <a
+              href="https://sca.aliyun.com/en/ai/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button icon={<LinkOutlined />} />
+            </a>
           </Space>
         }
       />
