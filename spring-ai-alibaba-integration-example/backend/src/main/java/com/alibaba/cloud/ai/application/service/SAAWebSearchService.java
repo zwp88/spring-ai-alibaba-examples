@@ -13,6 +13,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.rag.postretrieval.ranking.DocumentRanker;
 import org.springframework.ai.rag.preretrieval.query.expansion.QueryExpander;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,9 +45,10 @@ public class SAAWebSearchService {
 			ChatClient.Builder chatClientBuilder,
 			QueryTransformer queryTransformer,
 			QueryExpander queryExpander,
-			@Qualifier("queryArgumentPromptTemplate") PromptTemplate queryArgumentPromptTemplate,
 			IQSSearchEngine searchEngine,
-			DataClean dataCleaner
+			DataClean dataCleaner,
+			DocumentRanker documentRanker,
+			@Qualifier("queryArgumentPromptTemplate") PromptTemplate queryArgumentPromptTemplate
 	) {
 
 		this.queryTransformer = queryTransformer;
@@ -60,7 +62,7 @@ public class SAAWebSearchService {
 		this.chatClient = chatClientBuilder
 				.defaultOptions(
 						DashScopeChatOptions.builder()
-								.withModel("deepseek-r1")
+								.withModel("qwen-plus")
 								.withIncrementalOutput(false)
 								.build())
 				.build();
@@ -72,6 +74,8 @@ public class SAAWebSearchService {
 				.searchEngine(searchEngine)
 				.dataCleaner(dataCleaner)
 				.maxResults(2)
+				.enableRanker(true)
+				.documentRanker(documentRanker)
 				.build();
 	}
 
@@ -98,8 +102,9 @@ public class SAAWebSearchService {
 						new CustomContextQueryAugmenter(
 								queryArgumentPromptTemplate,
 								null,
-								true))
-				.queryExpander(queryExpander).documentJoiner(new ConcatenationDocumentJoiner())
+								true)
+				).queryExpander(queryExpander)
+				.documentJoiner(new ConcatenationDocumentJoiner())
 				.build();
 	}
 

@@ -88,6 +88,8 @@ public class MultiQueryExpander implements QueryExpander {
 				.call()
 				.content();
 
+		logger.debug("MultiQueryExpander#expand() Response from chat client: {}", resp);
+
 		if (Objects.isNull(resp)) {
 
 			logger.warn("No response from chat client for query: {}. is return.", query.text());

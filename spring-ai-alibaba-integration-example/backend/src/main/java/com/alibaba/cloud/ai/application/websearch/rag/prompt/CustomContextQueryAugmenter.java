@@ -69,6 +69,10 @@ public class CustomContextQueryAugmenter implements QueryAugmenter {
 		this.emptyPromptTemplate = emptyPromptTemplate != null ? emptyPromptTemplate : DEFAULT_EMPTY_PROMPT_TEMPLATE;
 		this.allowEmptyContext = allowEmptyContext != null ? allowEmptyContext : DEFAULT_ALLOW_EMPTY_PROMPT;
 
+		logger.debug("CustomContextQueryAugmenter promptTemplate: {}", promptTemplate.getTemplate());
+		logger.debug("CustomContextQueryAugmenter emptyPromptTemplate: {}", emptyPromptTemplate);
+		logger.debug("CustomContextQueryAugmenter allowEmptyContext: {}", allowEmptyContext);
+
 		PromptAssert.templateHasRequiredPlaceholders(this.promptTemplate, "query", "context");
 	}
 

@@ -71,7 +71,7 @@ public class DashScopeDocumentRanker implements DocumentRanker {
 							.filter(doc ->
 							{
 								// debug rerank output.
-								logger.debug("doc id: {}, outputDocs id: {}", doc.getId(), outputDocs.getId());
+								logger.debug("DashScopeDocumentRanker#rank() doc id: {}, outputDocs id: {}", doc.getId(), outputDocs.getId());
 								return Objects.equals(doc.getId(), outputDocs.getId());
 							})
 							.findFirst();
