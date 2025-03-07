@@ -40,8 +40,7 @@ image:
 	cp -r $(VITE_PROJECT_DIR)/dist ./docker/nginx/html
 
 	@echo "Building Docker image using Buildx..."
-# 	@docker buildx build --platform linux/amd64 -t $(IMAGE_NAME):$(TAG) -f $(DOCKERFILE_PATH) .
-	@docker buildx build --platform linux/arm64 -t $(IMAGE_NAME):$(TAG) -f $(DOCKERFILE_PATH) .
+	@docker buildx build --platform linux/amd64 -t $(IMAGE_NAME):$(TAG) -f $(DOCKERFILE_PATH) .
 
 .PHONY: run
 run:

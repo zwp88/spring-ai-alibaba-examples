@@ -28,7 +28,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
-@SpringBootApplication()
+@SpringBootApplication
 public class SpringAIIntegrationApplication {
 
 	public static void main(String[] args) {

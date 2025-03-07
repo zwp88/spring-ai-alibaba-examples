@@ -79,27 +79,6 @@ public class SAAFunctionController {
 			return Flux.just(Result.failed("No chat prompt provided"));
 		}
 
-		Set<Map<String, String>> dashScope = baseService.getDashScope();
-		List<String> modelName = dashScope.stream()
-				.flatMap(map -> map.keySet().stream().map(map::get))
-				.distinct()
-				.toList();
-
-		if (StringUtils.hasText(models)) {
-			if (!modelName.contains(models)) {
-				return Flux.just(Result.failed("Input models not support."));
-			}
-		}
-		else {
-			models = "qwen-plus";
-		}
-
-		response.setCharacterEncoding("UTF-8");
-
-		if (!StringUtils.hasText(chatId)) {
-			chatId = "spring-ai-alibaba-playground";
-		}
-
 		return functionService.chat(chatId, models, prompt).map(Result::success);
 	}
 
