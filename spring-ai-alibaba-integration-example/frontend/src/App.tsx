@@ -21,14 +21,14 @@ import {
   PlusOutlined,
   ReadOutlined,
   SmileOutlined,
-  EditOutlined,
   ShareAltOutlined,
   RobotFilled,
-  UserOutlined
+  UserOutlined,
+  ExclamationCircleFilled
 } from "@ant-design/icons";
 import {
+  message,
   Flex,
-  App,
   Badge,
   Button,
   Space,
@@ -36,6 +36,7 @@ import {
   Tag,
   Tooltip,
   Select,
+  Modal,
   type GetProp
 } from "antd";
 import ReactMarkdown from "react-markdown";
@@ -201,8 +202,6 @@ const Independent: React.FC = () => {
   const [attachedFiles, setAttachedFiles] = React.useState<
     GetProp<typeof Attachments, "items">
   >([]);
-
-  const { message } = App.useApp();
 
   // 当前会话的模型
   const [model, setModel] = React.useState(DEFAULT_MODEL);
@@ -370,13 +369,28 @@ const Independent: React.FC = () => {
     }
   };
 
+  // 会话管理功能
+  const { confirm } = Modal;
+  const confirmDelete = (key: string) => {
+    confirm({
+      title: "Do you want to delete this conversation?",
+      icon: <ExclamationCircleFilled />,
+      onOk() {
+        const index = conversationsItems.findIndex((item) => {
+          return item.key === key;
+        });
+        const newConversationsItems = conversationsItems.filter((item) => {
+          return item.key !== key;
+        });
+        const nextIndex = Math.min(index, newConversationsItems.length - 1);
+        delete messagesMap[key];
+        setConversationsItems(newConversationsItems);
+        setActiveKey(newConversationsItems[nextIndex].key);
+      }
+    });
+  };
   const menuConfig: ConversationsProps["menu"] = (conversation) => ({
     items: [
-      {
-        label: "Edit",
-        key: "edit",
-        icon: <EditOutlined />
-      },
       {
         label: "Delete",
         key: "delete",
@@ -385,7 +399,15 @@ const Independent: React.FC = () => {
       }
     ],
     onClick: (menuInfo) => {
-      message.info(`Click ${conversation.key} - ${menuInfo.key}`);
+      if (menuInfo.key === "delete") {
+        if (conversationsItems.length === 1) {
+          message.info(
+            "Can only be deleted if there are multiple conversations"
+          );
+        } else {
+          confirmDelete(conversation.key);
+        }
+      }
     }
   });
 
@@ -423,7 +445,7 @@ const Independent: React.FC = () => {
   // messages 转 items
   useEffect(() => {
     setItems(
-      messages.map(({ id, message, status }) => {
+      messages.map(({ id, message }) => {
         const item = JSON.parse(message || "{}");
         if (item?.role === "file") {
           const value = item?.value;
@@ -511,7 +533,7 @@ const Independent: React.FC = () => {
         {logoNode}
         {/* 🌟 模型选择 */}
         <div className={styles.chooseModel}>
-          选择模型类型
+          select model type
           <Select
             onChange={setNextModel}
             options={modelItems}
