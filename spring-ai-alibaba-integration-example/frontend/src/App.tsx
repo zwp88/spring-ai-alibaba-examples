@@ -28,7 +28,7 @@ import {
 } from "@ant-design/icons";
 import {
   message,
-  Flex,
+  Image,
   Badge,
   Button,
   Space,
@@ -51,6 +51,9 @@ const decoder = new TextDecoder("utf-8");
 
 // 用于临时保存会话记录
 const messagesMap = {} as Record<string, { model: string; messages: any[] }>;
+
+// 用于临时保存图片的 base64 字符串
+let nowImageBase64 = "";
 
 // 默认会话
 const defaultKey = Date.now().toString();
@@ -156,7 +159,6 @@ const aiConfig = {
 const roles: GetProp<typeof Bubble.List, "roles"> = {
   ai: {
     typing: { step: 5, interval: 20 },
-
     ...aiConfig
   },
   aiHistory: {
@@ -172,13 +174,12 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
   file: {
     placement: "end",
     variant: "borderless",
-    messageRender: (items: any) => (
-      <Flex vertical gap="middle">
-        {(items as any[]).map((item) => (
-          <Attachments.FileCard key={item.uid} item={item} />
-        ))}
-      </Flex>
-    )
+    messageRender: (base64: string) => {
+      return (
+        <Image src={base64} style={{ maxHeight: 250, paddingRight: 32 }} />
+      );
+    },
+    avatar: <></>
   }
 };
 
@@ -278,9 +279,7 @@ const Independent: React.FC = () => {
           message: JSON.stringify({
             role: "file",
             value: {
-              uid: attachedFiles?.[0]?.originFileObj?.uid,
-              name: attachedFiles?.[0]?.originFileObj?.name,
-              size: attachedFiles?.[0]?.originFileObj?.size
+              base64: nowImageBase64
             }
           }),
           status: "success"
@@ -364,7 +363,23 @@ const Independent: React.FC = () => {
 
   const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) => {
     // 检查文件大小是否不符合预期
-    if (litFileSize(info.fileList?.[0]?.originFileObj as any, MAX_IMAGE_SIZE)) {
+    if (
+      info.fileList?.length > 0 &&
+      litFileSize(info.fileList?.[0]?.originFileObj as any, MAX_IMAGE_SIZE)
+    ) {
+      // 图片转 base64
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const base64String = e.target?.result;
+        console.log("nowImageBase64", base64String);
+        nowImageBase64 = base64String as string;
+      };
+      reader.readAsDataURL(info.fileList?.[0]?.originFileObj as File);
+
+      setAttachedFiles(info.fileList);
+    }
+
+    if (info.fileList?.length === 0) {
       setAttachedFiles(info.fileList);
     }
   };
@@ -465,13 +480,7 @@ const Independent: React.FC = () => {
             key: id,
             role: item?.role,
             loading: !value,
-            content: [
-              {
-                uid: value?.uid,
-                name: value?.name,
-                size: value?.size
-              }
-            ]
+            content: value?.base64
           };
         } else {
           const value = item?.value;
