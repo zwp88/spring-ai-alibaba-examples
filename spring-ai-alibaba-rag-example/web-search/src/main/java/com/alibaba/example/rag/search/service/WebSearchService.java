@@ -1,4 +1,4 @@
-package com.alibaba.example.rag.internet.service;
+package com.alibaba.example.rag.search.service;
 
 import org.springframework.stereotype.Service;
 
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-public class InternetSearchService {
+public class WebSearchService {
 
 
 
