@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAChatService;
 import com.alibaba.cloud.ai.application.utils.ValidText;
@@ -104,6 +103,25 @@ public class SAAChatController {
 		}
 
 		return chatService.chat(chatId, models, prompt);
+	}
+
+	@GetMapping("/deep-thinking/chat")
+	public Flux<String> deepThinkingChat(
+			@RequestParam("prompt") String prompt,
+			HttpServletResponse response,
+			@RequestHeader(value = "models", required = false) String models,
+			@RequestHeader(value = "chatId", required = false) String chatId
+	) {
+
+		// 接口限流在审计平台中配置
+
+		if (!ValidText.isValidate(prompt)) {
+
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return Flux.just("No chat prompt provided");
+		}
+
+		return chatService.deepThinkingChat(chatId, models, prompt);
 	}
 
 }
