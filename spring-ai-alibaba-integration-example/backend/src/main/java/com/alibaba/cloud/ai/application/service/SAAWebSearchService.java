@@ -41,6 +41,8 @@ public class SAAWebSearchService {
 
 	private final WebSearchRetriever webSearchRetriever;
 
+	private static final String DEFAULT_WEB_SEARCH_MODEL = "deepseek-r1";
+
 	public SAAWebSearchService(
 			ChatClient.Builder chatClientBuilder,
 			QueryTransformer queryTransformer,
@@ -62,8 +64,9 @@ public class SAAWebSearchService {
 		this.chatClient = chatClientBuilder
 				.defaultOptions(
 						DashScopeChatOptions.builder()
-								.withModel("qwen-plus")
-								.withIncrementalOutput(false)
+								.withModel(DEFAULT_WEB_SEARCH_MODEL)
+								// stream 模式下是否开启增量输出
+								.withIncrementalOutput(true)
 								.build())
 				.build();
 
