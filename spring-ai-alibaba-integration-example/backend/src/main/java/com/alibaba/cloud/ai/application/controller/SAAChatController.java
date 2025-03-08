@@ -67,7 +67,7 @@ public class SAAChatController {
 	@UserIp
 	@GetMapping("/chat")
 	@Operation(summary = "DashScope Flux Chat")
-	public Flux<Result<String>> chat(
+	public Flux<String> chat(
 			@RequestParam("prompt") String prompt,
 			HttpServletResponse response,
 			@RequestHeader(value = "models", required = false) String models,
@@ -79,7 +79,7 @@ public class SAAChatController {
 		if (!ValidText.isValidate(prompt)) {
 
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return Flux.just(Result.failed("No chat prompt provided"));
+			return Flux.just("No chat prompt provided");
 		}
 
 		Set<Map<String, String>> dashScope = baseService.getDashScope();
@@ -90,7 +90,7 @@ public class SAAChatController {
 
 		if (StringUtils.hasText(models)) {
 			if (!modelName.contains(models)) {
-				return Flux.just(Result.failed("Input models not support."));
+				return Flux.just("Input models not support.");
 			}
 		}
 		else {
@@ -103,7 +103,7 @@ public class SAAChatController {
 			chatId = "spring-ai-alibaba-playground";
 		}
 
-		return chatService.chat(chatId, models, prompt).map(Result::success);
+		return chatService.chat(chatId, models, prompt);
 	}
 
 }

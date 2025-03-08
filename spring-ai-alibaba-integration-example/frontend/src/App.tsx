@@ -14,44 +14,70 @@ import {
   CloudUploadOutlined,
   CommentOutlined,
   DeleteOutlined,
-  EllipsisOutlined,
+  LinkOutlined,
   FireOutlined,
   HeartOutlined,
   PaperClipOutlined,
   PlusOutlined,
   ReadOutlined,
   SmileOutlined,
-  EditOutlined,
-  ShareAltOutlined
+  GithubOutlined,
+  RobotFilled,
+  UserOutlined,
+  ExclamationCircleFilled
 } from "@ant-design/icons";
 import {
-  Flex,
-  App,
+  message,
+  Image,
   Badge,
   Button,
   Space,
   Typography,
   Tag,
-  type GetProp,
   Tooltip,
-  Select
+  Select,
+  Modal,
+  type GetProp
 } from "antd";
 import ReactMarkdown from "react-markdown";
 import { getChat, getModels } from "./request";
 import { useStyle } from "./style";
+import { litFileSize } from "./utils";
 
 const DEFAULT_MODEL = "qwen-plus";
+const MAX_IMAGE_SIZE = 2048;
 
 const decoder = new TextDecoder("utf-8");
 
+// 用于临时保存会话记录
+const messagesMap = {} as Record<string, { model: string; messages: any[] }>;
+
+// 用于临时保存图片的 base64 字符串
+let nowImageBase64 = "";
+
+// 默认会话
+const defaultKey = Date.now().toString();
+const defaultConversationsItems = [
+  {
+    key: defaultKey,
+    label: (
+      <span>
+        Conversation 1
+        <Tag style={{ marginLeft: 8 }} color="green">
+          {DEFAULT_MODEL}
+        </Tag>
+      </span>
+    )
+  }
+];
+
+// 会话初始展示
 const renderTitle = (icon: React.ReactElement, title: string) => (
   <Space align="start">
     {icon}
     <span>{title}</span>
   </Space>
 );
-
-// 新会话默认展示
 const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
@@ -99,25 +125,7 @@ const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   }
 ];
 
-// 默认会话
-const defaultKey = Date.now().toString();
-const defaultConversationsItems = [
-  {
-    key: defaultKey,
-    label: (
-      <span>
-        Conversation 1
-        <Tag style={{ marginLeft: 8 }} color="green">
-          {DEFAULT_MODEL}
-        </Tag>
-      </span>
-    )
-  }
-];
-
-// 用于临时保存会话记录
-const messagesMap = {} as Record<string, { model: string; messages: any[] }>;
-
+// 会话框上的常驻提示词
 const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
   {
     key: "1",
@@ -132,48 +140,46 @@ const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
 ];
 
 // 会话中角色列表
+const aiConfig = {
+  placement: "start" as "start" | "end",
+  avatar: {
+    icon: <RobotFilled />
+  },
+  styles: {
+    content: {
+      borderRadius: 16
+    }
+  },
+  messageRender: (content) => (
+    <Typography>
+      <ReactMarkdown>{content}</ReactMarkdown>
+    </Typography>
+  )
+};
 const roles: GetProp<typeof Bubble.List, "roles"> = {
   ai: {
-    placement: "start",
     typing: { step: 5, interval: 20 },
-    styles: {
-      content: {
-        borderRadius: 16
-      }
-    },
-    messageRender: (content) => (
-      <Typography>
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </Typography>
-    )
+    ...aiConfig
   },
   aiHistory: {
-    placement: "start",
-    styles: {
-      content: {
-        borderRadius: 16
-      }
-    },
-    messageRender: (content) => (
-      <Typography>
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </Typography>
-    )
+    ...aiConfig
   },
   local: {
     placement: "end",
-    variant: "shadow"
+    variant: "shadow",
+    avatar: {
+      icon: <UserOutlined />
+    }
   },
   file: {
     placement: "end",
     variant: "borderless",
-    messageRender: (items: any) => (
-      <Flex vertical gap="middle">
-        {(items as any[]).map((item) => (
-          <Attachments.FileCard key={item.uid} item={item} />
-        ))}
-      </Flex>
-    )
+    messageRender: (base64: string) => {
+      return (
+        <Image src={base64} style={{ maxHeight: 250, paddingRight: 32 }} />
+      );
+    },
+    avatar: <></>
   }
 };
 
@@ -198,8 +204,6 @@ const Independent: React.FC = () => {
     GetProp<typeof Attachments, "items">
   >([]);
 
-  const { message } = App.useApp();
-
   // 当前会话的模型
   const [model, setModel] = React.useState(DEFAULT_MODEL);
   // 将要新增会话的模型
@@ -214,19 +218,8 @@ const Independent: React.FC = () => {
       const res = await getChat(
         JSON.parse(message || "{}")?.value || "",
         (value) => {
-          const res = JSON.parse(decoder.decode(value)) as Array<{
-            code: number;
-            message: string;
-            data: string;
-          }>;
-          if (res?.length > 0) {
-            res.forEach((item) => {
-              if (item?.message === "success") {
-                buffer = buffer + item?.data;
-                onUpdate(JSON.stringify({ role: "ai", value: buffer }));
-              }
-            });
-          }
+          buffer = buffer + decoder.decode(value);
+          onUpdate(JSON.stringify({ role: "ai", value: buffer }));
         },
         {
           image: attachedFiles?.[0]?.originFileObj,
@@ -286,9 +279,7 @@ const Independent: React.FC = () => {
           message: JSON.stringify({
             role: "file",
             value: {
-              uid: attachedFiles?.[0]?.originFileObj?.uid,
-              name: attachedFiles?.[0]?.originFileObj?.name,
-              size: attachedFiles?.[0]?.originFileObj?.size
+              base64: nowImageBase64
             }
           }),
           status: "success"
@@ -305,7 +296,12 @@ const Independent: React.FC = () => {
   };
 
   const onPromptsItemClick: GetProp<typeof Prompts, "onItemClick"> = (info) => {
-    onRequest(info.data.description as string);
+    onRequest(
+      JSON.stringify({
+        role: "local",
+        value: info.data.description
+      })
+    );
   };
 
   // 将模型返回的消息的 role 转换成历史记录，避免切换会话触发渲染动效
@@ -366,16 +362,54 @@ const Independent: React.FC = () => {
   };
 
   const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) => {
-    setAttachedFiles(info.fileList);
+    // 检查文件大小是否不符合预期
+    if (
+      info.fileList?.length > 0 &&
+      litFileSize(info.fileList?.[0]?.originFileObj as any, MAX_IMAGE_SIZE)
+    ) {
+      // 图片转 base64
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const base64String = e.target?.result;
+        nowImageBase64 = base64String as string;
+      };
+      reader.readAsDataURL(info.fileList?.[0]?.originFileObj as File);
+
+      setAttachedFiles(info.fileList);
+    }
+
+    if (info.fileList?.length === 0) {
+      setAttachedFiles(info.fileList);
+    }
   };
 
+  // 会话管理功能
+  const { confirm } = Modal;
+  const confirmDelete = (key: string) => {
+    confirm({
+      title: "Do you want to delete this conversation?",
+      icon: <ExclamationCircleFilled />,
+      onOk() {
+        const index = conversationsItems.findIndex((item) => {
+          return item.key === key;
+        });
+        const newConversationsItems = conversationsItems.filter((item) => {
+          return item.key !== key;
+        });
+        const nextIndex = Math.min(index, newConversationsItems.length - 1);
+        delete messagesMap[key];
+        setHeaderOpen(false);
+        setAttachedFiles([]);
+        const activeKey = newConversationsItems[nextIndex].key;
+        setActiveKey(activeKey);
+        setMessages(messagesMap[activeKey].messages || []);
+        setModel(messagesMap[activeKey].model || DEFAULT_MODEL);
+        setConversationsItems(newConversationsItems);
+      }
+    });
+  };
   const menuConfig: ConversationsProps["menu"] = (conversation) => ({
     items: [
-      {
-        label: "Edit",
-        key: "edit",
-        icon: <EditOutlined />
-      },
       {
         label: "Delete",
         key: "delete",
@@ -384,7 +418,15 @@ const Independent: React.FC = () => {
       }
     ],
     onClick: (menuInfo) => {
-      message.info(`Click ${conversation.key} - ${menuInfo.key}`);
+      if (menuInfo.key === "delete") {
+        if (conversationsItems.length === 1) {
+          message.info(
+            "Can only be deleted if there are multiple conversations"
+          );
+        } else {
+          confirmDelete(conversation.key);
+        }
+      }
     }
   });
 
@@ -398,8 +440,20 @@ const Independent: React.FC = () => {
         description="An AI assistant built with Spring AI Alibaba framework, with embedded Spring AI Alibaba domain knowledge using RAG. Supports text and image user input, audio generation, and image generation."
         extra={
           <Space>
-            <Button icon={<ShareAltOutlined />} />
-            <Button icon={<EllipsisOutlined />} />
+            <a
+              href="https://github.com/alibaba/spring-ai-alibaba"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button icon={<GithubOutlined />} />
+            </a>
+            <a
+              href="https://sca.aliyun.com/en/ai/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button icon={<LinkOutlined />} />
+            </a>
           </Space>
         }
       />
@@ -422,7 +476,7 @@ const Independent: React.FC = () => {
   // messages 转 items
   useEffect(() => {
     setItems(
-      messages.map(({ id, message, status }) => {
+      messages.map(({ id, message }) => {
         const item = JSON.parse(message || "{}");
         if (item?.role === "file") {
           const value = item?.value;
@@ -430,13 +484,7 @@ const Independent: React.FC = () => {
             key: id,
             role: item?.role,
             loading: !value,
-            content: [
-              {
-                uid: value?.uid,
-                name: value?.name,
-                size: value?.size
-              }
-            ]
+            content: value?.base64
           };
         } else {
           const value = item?.value;
@@ -473,6 +521,7 @@ const Independent: React.FC = () => {
       }}
     >
       <Attachments
+        accept=".jpg, .jpeg, .png, .webp"
         maxCount={1}
         beforeUpload={() => false}
         items={attachedFiles}
@@ -509,7 +558,7 @@ const Independent: React.FC = () => {
         {logoNode}
         {/* 🌟 模型选择 */}
         <div className={styles.chooseModel}>
-          选择模型类型
+          select model type
           <Select
             onChange={setNextModel}
             options={modelItems}
