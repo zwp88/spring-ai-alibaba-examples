@@ -67,7 +67,7 @@ public class SAAFunctionController {
 	public Flux<Result<String>> chat(
 			@RequestParam("prompt") String prompt,
 			HttpServletResponse response,
-			@RequestHeader(value = "models", required = false) String models,
+			@RequestHeader(value = "model", required = false) String model,
 			@RequestHeader(value = "chatId", required = false) String chatId
 	) {
 
@@ -79,7 +79,7 @@ public class SAAFunctionController {
 			return Flux.just(Result.failed("No chat prompt provided"));
 		}
 
-		return functionService.chat(chatId, models, prompt).map(Result::success);
+		return functionService.chat(chatId, model, prompt).map(Result::success);
 	}
 
 }

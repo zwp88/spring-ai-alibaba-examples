@@ -37,6 +37,7 @@ import {
   Tooltip,
   Select,
   Modal,
+  Radio,
   type GetProp
 } from "antd";
 import ReactMarkdown from "react-markdown";
@@ -49,8 +50,18 @@ const MAX_IMAGE_SIZE = 2048;
 
 const decoder = new TextDecoder("utf-8");
 
+// 标记创建的下一个会话的 index
+let conversationFlag = 2;
+
 // 用于临时保存会话记录
-const messagesMap = {} as Record<string, { model: string; messages: any[] }>;
+const conversationsMap: Record<
+  string,
+  {
+    model: string;
+    messages: any[];
+    params: { onlinSearch: boolean; deepThink: boolean };
+  }
+> = {};
 
 // 用于临时保存图片的 base64 字符串
 let nowImageBase64 = "";
@@ -125,20 +136,6 @@ const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   }
 ];
 
-// 会话框上的常驻提示词
-const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
-  {
-    key: "1",
-    description: "No, thanks.",
-    icon: <FireOutlined style={{ color: "#FF4D4F" }} />
-  },
-  {
-    key: "2",
-    description: "Ok, please.",
-    icon: <ReadOutlined style={{ color: "#1890FF" }} />
-  }
-];
-
 // 会话中角色列表
 const aiConfig = {
   placement: "start" as "start" | "end",
@@ -192,17 +189,23 @@ const Independent: React.FC = () => {
 
   const [content, setContent] = React.useState("");
 
+  // 会话列表
   const [conversationsItems, setConversationsItems] = React.useState(
     defaultConversationsItems
   );
 
+  // 当前会话的 key
   const [activeKey, setActiveKey] = React.useState(
     defaultConversationsItems[0].key
   );
 
+  // 上传的文件列表
   const [attachedFiles, setAttachedFiles] = React.useState<
     GetProp<typeof Attachments, "items">
   >([]);
+
+  // 当前会话交互模式
+  const [communicateType, setCommunicateType] = React.useState("");
 
   // 当前会话的模型
   const [model, setModel] = React.useState(DEFAULT_MODEL);
@@ -224,7 +227,9 @@ const Independent: React.FC = () => {
         {
           image: attachedFiles?.[0]?.originFileObj,
           chatId: activeKey,
-          model
+          model,
+          deepThink: communicateType === "deepThink",
+          onlineSearch: communicateType === "onlineSearch"
         }
       );
 
@@ -238,7 +243,7 @@ const Independent: React.FC = () => {
 
       onSuccess(JSON.stringify({ role: "ai", value }));
     },
-    customParams: [attachedFiles]
+    customParams: [attachedFiles, communicateType, activeKey]
   });
 
   // 获取模型列表
@@ -327,7 +332,7 @@ const Independent: React.FC = () => {
         key: newKey,
         label: (
           <span>
-            {`Conversation ${conversationsItems.length + 1}`}
+            {`Conversation ${conversationFlag}`}
             <Tag style={{ marginLeft: 8 }} color="green">
               {nextModel}
             </Tag>
@@ -335,30 +340,49 @@ const Independent: React.FC = () => {
         )
       }
     ]);
-    messagesMap[activeKey] = {
+    conversationFlag = conversationFlag + 1;
+    conversationsMap[activeKey] = {
       model,
-      messages: getMessageHistory()
+      messages: getMessageHistory(),
+      params: {
+        onlinSearch: communicateType === "onlineSearch",
+        deepThink: communicateType === "deepThink"
+      }
     };
     setHeaderOpen(false);
     setAttachedFiles([]);
     setActiveKey(newKey);
     setMessages([]);
     setModel(nextModel);
+    setCommunicateType("");
   };
 
   // 切换会话
   const onConversationClick: GetProp<typeof Conversations, "onActiveChange"> = (
     key
   ) => {
-    messagesMap[activeKey] = {
+    conversationsMap[activeKey] = {
       model,
-      messages: getMessageHistory()
+      messages: getMessageHistory(),
+      params: {
+        onlinSearch: communicateType === "onlineSearch",
+        deepThink: communicateType === "deepThink"
+      }
     };
     setHeaderOpen(false);
     setAttachedFiles([]);
     setActiveKey(key);
-    setMessages(messagesMap[key].messages || []);
-    setModel(messagesMap[key].model || DEFAULT_MODEL);
+    setMessages(conversationsMap[key].messages || []);
+    setModel(conversationsMap[key].model || DEFAULT_MODEL);
+    let type: string;
+    if (conversationsMap[key].params.onlinSearch) {
+      type = "onlineSearch";
+    } else if (conversationsMap[key].params.deepThink) {
+      type = "deepThink";
+    } else {
+      type = "";
+    }
+    setCommunicateType(type);
   };
 
   const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) => {
@@ -397,13 +421,22 @@ const Independent: React.FC = () => {
           return item.key !== key;
         });
         const nextIndex = Math.min(index, newConversationsItems.length - 1);
-        delete messagesMap[key];
+        delete conversationsMap[key];
         setHeaderOpen(false);
         setAttachedFiles([]);
         const activeKey = newConversationsItems[nextIndex].key;
         setActiveKey(activeKey);
-        setMessages(messagesMap[activeKey].messages || []);
-        setModel(messagesMap[activeKey].model || DEFAULT_MODEL);
+        setMessages(conversationsMap[activeKey].messages || []);
+        setModel(conversationsMap[activeKey].model || DEFAULT_MODEL);
+        let type: string;
+        if (conversationsMap[activeKey].params.onlinSearch) {
+          type = "onlineSearch";
+        } else if (conversationsMap[activeKey].params.deepThink) {
+          type = "deepThink";
+        } else {
+          type = "";
+        }
+        setCommunicateType(type);
         setConversationsItems(newConversationsItems);
       }
     });
@@ -438,24 +471,6 @@ const Independent: React.FC = () => {
         icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
         title="Hello, I'm Spring Ai Alibaba"
         description="An AI assistant built with Spring AI Alibaba framework, with embedded Spring AI Alibaba domain knowledge using RAG. Supports text and image user input, audio generation, and image generation."
-        extra={
-          <Space>
-            <a
-              href="https://github.com/alibaba/spring-ai-alibaba"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button icon={<GithubOutlined />} />
-            </a>
-            <a
-              href="https://sca.aliyun.com/en/ai/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button icon={<LinkOutlined />} />
-            </a>
-          </Space>
-        }
       />
       <Prompts
         title="What do you want?"
@@ -504,6 +519,7 @@ const Independent: React.FC = () => {
       <Button
         type="text"
         icon={<PaperClipOutlined />}
+        disabled={!!communicateType}
         onClick={() => setHeaderOpen(!headerOpen)}
       />
     </Badge>
@@ -552,64 +568,127 @@ const Independent: React.FC = () => {
 
   // ==================== Render =================
   return (
-    <div className={styles.layout}>
-      <div className={styles.menu}>
-        {/* 🌟 Logo */}
-        {logoNode}
-        {/* 🌟 模型选择 */}
-        <div className={styles.chooseModel}>
-          select model type
-          <Select
-            onChange={setNextModel}
-            options={modelItems}
-            style={{ width: 120 }}
-            value={nextModel}
+    <>
+      <Space className={styles.linkWrapper}>
+        <Tooltip title={"spring-ai-alibaba-examples link"}>
+          <a
+            href="https://github.com/springaialibaba/spring-ai-alibaba-examples"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button icon={<GithubOutlined />} />
+          </a>
+        </Tooltip>
+        <Tooltip title={"spring-ai-alibaba link"}>
+          <a
+            href="https://github.com/alibaba/spring-ai-alibaba"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button icon={<GithubOutlined />} />
+          </a>
+        </Tooltip>
+        <Tooltip title={"spring-ai-alibabad-docs link "}>
+          <a
+            href="https://sca.aliyun.com/en/ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button icon={<LinkOutlined />} />
+          </a>
+        </Tooltip>
+      </Space>
+      <div className={styles.layout}>
+        <div className={styles.menu}>
+          {/* 🌟 Logo */}
+          {logoNode}
+          {/* 🌟 模型选择 */}
+          <div className={styles.chooseModel}>
+            select model type
+            <Select
+              onChange={setNextModel}
+              options={modelItems}
+              style={{ width: 120 }}
+              value={nextModel}
+            />
+          </div>
+          {/* 🌟 添加会话 */}
+          <Button
+            onClick={onAddConversation}
+            type="link"
+            className={styles.addBtn}
+            icon={<PlusOutlined />}
+          >
+            New Conversation
+          </Button>
+          {/* 🌟 会话管理 */}
+          <Conversations
+            items={conversationsItems}
+            className={styles.conversations}
+            activeKey={activeKey}
+            menu={menuConfig}
+            onActiveChange={onConversationClick}
           />
         </div>
-        {/* 🌟 添加会话 */}
-        <Button
-          onClick={onAddConversation}
-          type="link"
-          className={styles.addBtn}
-          icon={<PlusOutlined />}
-        >
-          New Conversation
-        </Button>
-        {/* 🌟 会话管理 */}
-        <Conversations
-          items={conversationsItems}
-          className={styles.conversations}
-          activeKey={activeKey}
-          menu={menuConfig}
-          onActiveChange={onConversationClick}
-        />
+        <div className={styles.chat}>
+          {/* 🌟 消息列表 */}
+          <Bubble.List
+            items={
+              items.length > 0
+                ? items
+                : [{ content: placeholderNode, variant: "borderless" }]
+            }
+            roles={roles}
+            className={styles.messages}
+          />
+          {/* 🌟 输入框 */}
+          <Sender
+            value={content}
+            header={senderHeader}
+            onSubmit={onSubmit}
+            allowSpeech
+            onChange={setContent}
+            prefix={attachmentsNode}
+            loading={agent.isRequesting()}
+            className={styles.sender}
+            placeholder={"You can ask me any questions..."}
+          />
+          {/* 🌟 交互方式 */}
+          <Radio.Group
+            value={communicateType}
+            optionType="button"
+            buttonStyle="solid"
+          >
+            <Radio.Button
+              value="onlineSearch"
+              onClick={(e: any) => {
+                if (e.target.value === communicateType) {
+                  setCommunicateType("");
+                } else {
+                  setCommunicateType(e.target.value);
+                }
+              }}
+            >
+              Online search
+            </Radio.Button>
+            <Tooltip title="Only support deepseek-r1">
+              <Radio.Button
+                value="deepThink"
+                onClick={(e: any) => {
+                  if (e.target.value === communicateType) {
+                    setCommunicateType("");
+                  } else {
+                    setCommunicateType(e.target.value);
+                  }
+                }}
+              >
+                Deep Think
+              </Radio.Button>
+            </Tooltip>
+          </Radio.Group>
+        </div>
       </div>
-      <div className={styles.chat}>
-        {/* 🌟 消息列表 */}
-        <Bubble.List
-          items={
-            items.length > 0
-              ? items
-              : [{ content: placeholderNode, variant: "borderless" }]
-          }
-          roles={roles}
-          className={styles.messages}
-        />
-        {/* 🌟 提示词 */}
-        <Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />
-        {/* 🌟 输入框 */}
-        <Sender
-          value={content}
-          header={senderHeader}
-          onSubmit={onSubmit}
-          allowSpeech
-          onChange={setContent}
-          prefix={attachmentsNode}
-          loading={agent.isRequesting()}
-          className={styles.sender}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 
