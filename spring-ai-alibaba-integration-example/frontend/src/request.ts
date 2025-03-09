@@ -28,6 +28,8 @@ export const getChat = async (
     image?: File;
     model?: string;
     chatId?: string;
+    deepThink?: boolean;
+    onlineSearch?: boolean;
   }
 ) => {
   const { image, model, chatId } = params;

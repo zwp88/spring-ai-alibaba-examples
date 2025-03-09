@@ -227,7 +227,9 @@ const Independent: React.FC = () => {
         {
           image: attachedFiles?.[0]?.originFileObj,
           chatId: activeKey,
-          model
+          model,
+          deepThink: communicateType === "deepThink",
+          onlineSearch: communicateType === "onlineSearch"
         }
       );
 
@@ -517,6 +519,7 @@ const Independent: React.FC = () => {
       <Button
         type="text"
         icon={<PaperClipOutlined />}
+        disabled={!!communicateType}
         onClick={() => setHeaderOpen(!headerOpen)}
       />
     </Badge>
@@ -652,17 +655,35 @@ const Independent: React.FC = () => {
           />
           {/* 🌟 交互方式 */}
           <Radio.Group
-            options={[
-              { label: "Online search", value: "onlineSearch" },
-              { label: "Deep Think", value: "deepThink" }
-            ]}
             value={communicateType}
-            onChange={(e) => {
-              setCommunicateType(e.target.value);
-            }}
             optionType="button"
             buttonStyle="solid"
-          />
+          >
+            <Radio.Button
+              value="onlineSearch"
+              onClick={(e: any) => {
+                if (e.target.value === communicateType) {
+                  setCommunicateType("");
+                } else {
+                  setCommunicateType(e.target.value);
+                }
+              }}
+            >
+              Online search
+            </Radio.Button>
+            <Radio.Button
+              value="deepThink"
+              onClick={(e: any) => {
+                if (e.target.value === communicateType) {
+                  setCommunicateType("");
+                } else {
+                  setCommunicateType(e.target.value);
+                }
+              }}
+            >
+              Deep Think
+            </Radio.Button>
+          </Radio.Group>
         </div>
       </div>
     </>
