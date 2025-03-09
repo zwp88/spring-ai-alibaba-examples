@@ -243,7 +243,7 @@ const Independent: React.FC = () => {
 
       onSuccess(JSON.stringify({ role: "ai", value }));
     },
-    customParams: [attachedFiles]
+    customParams: [attachedFiles, communicateType, activeKey]
   });
 
   // 获取模型列表

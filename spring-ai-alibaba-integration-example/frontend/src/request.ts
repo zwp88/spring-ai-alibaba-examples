@@ -42,14 +42,14 @@ export const getChat = async (
       method: "POST",
       body: formData
     })) as any;
-  } else if (onlineSearch !== undefined) {
+  } else if (onlineSearch) {
     res = (await fetch(BASE_URL + "/search?query=" + message, {
       method: "GET",
       headers: {
         chatId: chatId ? chatId : ""
       }
     })) as any;
-  } else if (deepThink !== undefined) {
+  } else if (deepThink) {
     res = (await fetch(BASE_URL + "/deep-thinking/chat?prompt=" + message, {
       method: "GET",
       headers: {
