@@ -27,10 +27,10 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>spring-ai-alibaba-text-summarizer-example</artifactId>
+	<artifactId>spring-ai-alibaba-sql-example</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Spring AI Alibaba Text Summarizer Example</name>
-	<description>Spring AI Alibaba Text Summarizer Example</description>
+	<name>Spring AI Alibaba SQL Example</name>
+	<description>Spring AI Alibaba SQL Example</description>
 
 	<properties>
 		<maven.compiler.source>17</maven.compiler.source>
@@ -51,8 +51,14 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-tika-document-reader</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 

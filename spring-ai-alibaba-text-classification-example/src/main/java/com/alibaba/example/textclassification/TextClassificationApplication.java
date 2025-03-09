@@ -1,4 +1,4 @@
-package com.alibaba.example.summarizer;
+package com.alibaba.example.textclassification;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
