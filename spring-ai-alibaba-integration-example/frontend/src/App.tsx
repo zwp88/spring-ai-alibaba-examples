@@ -424,24 +424,6 @@ const Independent: React.FC = () => {
         icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
         title="Hello, I'm Spring Ai Alibaba"
         description="An AI assistant built with Spring AI Alibaba framework, with embedded Spring AI Alibaba domain knowledge using RAG. Supports text and image user input, audio generation, and image generation."
-        extra={
-          <Space>
-            <a
-              href="https://github.com/alibaba/spring-ai-alibaba"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button icon={<GithubOutlined />} />
-            </a>
-            <a
-              href="https://sca.aliyun.com/en/ai/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button icon={<LinkOutlined />} />
-            </a>
-          </Space>
-        }
       />
       <Prompts
         title="What do you want?"
@@ -538,63 +520,94 @@ const Independent: React.FC = () => {
 
   // ==================== Render =================
   return (
-    <div className={styles.layout}>
-      <div className={styles.menu}>
-        {/* 🌟 Logo */}
-        {logoNode}
-        {/* 🌟 模型选择 */}
-        <div className={styles.chooseModel}>
-          select model type
-          <Select
-            onChange={setNextModel}
-            options={modelItems}
-            style={{ width: 120 }}
-            value={nextModel}
+    <>
+      <Space className={styles.linkWrapper}>
+        <Tooltip title={"spring-ai-alibaba-examples link"}>
+          <a
+            href="https://github.com/springaialibaba/spring-ai-alibaba-examples"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button icon={<GithubOutlined />} />
+          </a>
+        </Tooltip>
+        <Tooltip title={"spring-ai-alibaba link"}>
+          <a
+            href="https://github.com/alibaba/spring-ai-alibaba"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button icon={<GithubOutlined />} />
+          </a>
+        </Tooltip>
+        <Tooltip title={"spring-ai-alibabad-docs link "}>
+          <a
+            href="https://sca.aliyun.com/en/ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button icon={<LinkOutlined />} />
+          </a>
+        </Tooltip>
+      </Space>
+      <div className={styles.layout}>
+        <div className={styles.menu}>
+          {/* 🌟 Logo */}
+          {logoNode}
+          {/* 🌟 模型选择 */}
+          <div className={styles.chooseModel}>
+            select model type
+            <Select
+              onChange={setNextModel}
+              options={modelItems}
+              style={{ width: 120 }}
+              value={nextModel}
+            />
+          </div>
+          {/* 🌟 添加会话 */}
+          <Button
+            onClick={onAddConversation}
+            type="link"
+            className={styles.addBtn}
+            icon={<PlusOutlined />}
+          >
+            New Conversation
+          </Button>
+          {/* 🌟 会话管理 */}
+          <Conversations
+            items={conversationsItems}
+            className={styles.conversations}
+            activeKey={activeKey}
+            menu={menuConfig}
+            onActiveChange={onConversationClick}
           />
         </div>
-        {/* 🌟 添加会话 */}
-        <Button
-          onClick={onAddConversation}
-          type="link"
-          className={styles.addBtn}
-          icon={<PlusOutlined />}
-        >
-          New Conversation
-        </Button>
-        {/* 🌟 会话管理 */}
-        <Conversations
-          items={conversationsItems}
-          className={styles.conversations}
-          activeKey={activeKey}
-          menu={menuConfig}
-          onActiveChange={onConversationClick}
-        />
+        <div className={styles.chat}>
+          {/* 🌟 消息列表 */}
+          <Bubble.List
+            items={
+              items.length > 0
+                ? items
+                : [{ content: placeholderNode, variant: "borderless" }]
+            }
+            roles={roles}
+            className={styles.messages}
+          />
+          {/* 🌟 输入框 */}
+          <Sender
+            value={content}
+            header={senderHeader}
+            onSubmit={onSubmit}
+            allowSpeech
+            onChange={setContent}
+            prefix={attachmentsNode}
+            loading={agent.isRequesting()}
+            className={styles.sender}
+            placeholder={"You can ask me any questions..."}
+          />
+        </div>
       </div>
-      <div className={styles.chat}>
-        {/* 🌟 消息列表 */}
-        <Bubble.List
-          items={
-            items.length > 0
-              ? items
-              : [{ content: placeholderNode, variant: "borderless" }]
-          }
-          roles={roles}
-          className={styles.messages}
-        />
-        {/* 🌟 输入框 */}
-        <Sender
-          value={content}
-          header={senderHeader}
-          onSubmit={onSubmit}
-          allowSpeech
-          onChange={setContent}
-          prefix={attachmentsNode}
-          loading={agent.isRequesting()}
-          className={styles.sender}
-          placeholder={"你可以问我任何问题..."}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 

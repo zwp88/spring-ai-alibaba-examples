@@ -2,6 +2,11 @@ import { createStyles } from "antd-style";
 
 export const useStyle = createStyles(({ token, css }) => {
   return {
+    linkWrapper: css`
+      position: absolute;
+      right: 30px;
+      top: 10px;
+    `,
     layout: css`
       width: 100%;
       min-width: 1000px;
