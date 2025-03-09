@@ -25,11 +25,10 @@
 		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>com.alibaba.cloud.ai</groupId>
+
 	<artifactId>rag-example</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>rag-example</name>
-	<description>Demo project for Spring AI Alibaba</description>
+	<description>RAG Demo project for Spring AI Alibaba</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
