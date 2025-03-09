@@ -3,6 +3,8 @@ package com.alibaba.cloud.ai.application.advisor;
 import java.util.List;
 import java.util.Objects;
 
+import org.jetbrains.annotations.NotNull;
+
 import org.springframework.ai.chat.client.advisor.api.AdvisedRequest;
 import org.springframework.ai.chat.client.advisor.api.AdvisedResponse;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
@@ -25,12 +27,14 @@ public class ReasoningContentAdvisor implements BaseAdvisor {
 		this.order = order != null ? order : 0;
 	}
 
+	@NotNull
 	@Override
-	public AdvisedRequest before(AdvisedRequest request) {
+	public AdvisedRequest before(@NotNull AdvisedRequest request) {
 
 		return request;
 	}
 
+	@NotNull
 	@Override
 	public AdvisedResponse after(AdvisedResponse advisedResponse) {
 
@@ -46,6 +50,7 @@ public class ReasoningContentAdvisor implements BaseAdvisor {
 					.map(generation -> {
 						AssistantMessage output = generation.getOutput();
 						// 将 think 思维链的内容整合到原始的输出中
+						// 将在 spring ai alibaba 1.0.0-M6.1 中发布，暂时无法体验。
 						AssistantMessage thinkAssistantMessage = new AssistantMessage(
 									String.format("<think>%s</think>", reasoningContent) + output.getContent(),
 								output.getMetadata(),
