@@ -88,8 +88,8 @@ public class SAAWebSearchService {
 		return chatClient.prompt()
 				.advisors(
 						createRetrievalAugmentationAdvisor(),
-						// 不整合到 reasoning content 输出中
-						// reasoningContentAdvisor,
+						 // 整合到 reasoning content 输出中
+						 reasoningContentAdvisor,
 						simpleLoggerAdvisor
 				).user(prompt)
 				.stream()
