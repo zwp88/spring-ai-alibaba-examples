@@ -125,20 +125,6 @@ const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
   }
 ];
 
-// 会话框上的常驻提示词
-const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
-  {
-    key: "1",
-    description: "No, thanks.",
-    icon: <FireOutlined style={{ color: "#FF4D4F" }} />
-  },
-  {
-    key: "2",
-    description: "Ok, please.",
-    icon: <ReadOutlined style={{ color: "#1890FF" }} />
-  }
-];
-
 // 会话中角色列表
 const aiConfig = {
   placement: "start" as "start" | "end",
@@ -595,8 +581,6 @@ const Independent: React.FC = () => {
           roles={roles}
           className={styles.messages}
         />
-        {/* 🌟 提示词 */}
-        <Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />
         {/* 🌟 输入框 */}
         <Sender
           value={content}
