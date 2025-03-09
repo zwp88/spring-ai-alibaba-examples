@@ -17,18 +17,18 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.alibaba.cloud.ai</groupId>
-        <artifactId>spring-ai-alibaba-rag-example</artifactId>
-        <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-    <artifactId>rag-example</artifactId>
-    <version>${revision}</version>
-    <name>rag-example</name>
-    <description>Demo project for Spring AI Alibaba</description>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.alibaba.cloud.ai</groupId>
+		<artifactId>spring-ai-alibaba-rag-example</artifactId>
+		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>rag-example</artifactId>
+	<name>rag-example</name>
+	<description>RAG Demo project for Spring AI Alibaba</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

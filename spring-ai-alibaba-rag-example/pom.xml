@@ -34,14 +34,14 @@
     <description>Spring AI Alibaba RAG Example</description>
     <name>Spring AI Alibaba RAG Examples</name>
 
-    <modules>
-        <module>bailian-agent</module>
-        <module>bailian-rag-knowledge</module>
-        <module>rag-example</module>
-        <module>rag-milvus-example</module>
-        <module>rag-pgvector-example</module>
-        <module>web-search</module>
-    </modules>
+	<modules>
+		<module>bailian-rag-knowledge</module>
+		<module>bailian-agent</module>
+		<module>rag-example</module>
+		<module>rag-milvus-example</module>
+		<module>rag-pgvector-example</module>
+		<module>module-rag</module>
+	</modules>
 
     <build>
         <plugins>
