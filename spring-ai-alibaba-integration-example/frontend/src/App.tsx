@@ -38,6 +38,7 @@ import {
   Select,
   Modal,
   Radio,
+  Layout,
   type GetProp
 } from "antd";
 import ReactMarkdown from "react-markdown";
@@ -688,6 +689,16 @@ const Independent: React.FC = () => {
           </Radio.Group>
         </div>
       </div>
+      <Layout.Footer
+        style={{
+          textAlign: "center",
+          padding: "10px 50px",
+          color: "rgba(0, 0, 0, 0.5)",
+          backgroundColor: "rgba(0, 0, 0, 0.03)"
+        }}
+      >
+        Copyright 2024-2026 By srping-ai-alibaba-community
+      </Layout.Footer>
     </>
   );
 };
