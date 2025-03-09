@@ -37,6 +37,7 @@ import {
   Tooltip,
   Select,
   Modal,
+  Radio,
   type GetProp
 } from "antd";
 import ReactMarkdown from "react-markdown";
@@ -49,8 +50,18 @@ const MAX_IMAGE_SIZE = 2048;
 
 const decoder = new TextDecoder("utf-8");
 
+// 标记创建的下一个会话的 index
+let conversationFlag = 2;
+
 // 用于临时保存会话记录
-const messagesMap = {} as Record<string, { model: string; messages: any[] }>;
+const conversationsMap: Record<
+  string,
+  {
+    model: string;
+    messages: any[];
+    params: { onlinSearch: boolean; deepThink: boolean };
+  }
+> = {};
 
 // 用于临时保存图片的 base64 字符串
 let nowImageBase64 = "";
@@ -178,17 +189,23 @@ const Independent: React.FC = () => {
 
   const [content, setContent] = React.useState("");
 
+  // 会话列表
   const [conversationsItems, setConversationsItems] = React.useState(
     defaultConversationsItems
   );
 
+  // 当前会话的 key
   const [activeKey, setActiveKey] = React.useState(
     defaultConversationsItems[0].key
   );
 
+  // 上传的文件列表
   const [attachedFiles, setAttachedFiles] = React.useState<
     GetProp<typeof Attachments, "items">
   >([]);
+
+  // 当前会话交互模式
+  const [communicateType, setCommunicateType] = React.useState("");
 
   // 当前会话的模型
   const [model, setModel] = React.useState(DEFAULT_MODEL);
@@ -313,7 +330,7 @@ const Independent: React.FC = () => {
         key: newKey,
         label: (
           <span>
-            {`Conversation ${conversationsItems.length + 1}`}
+            {`Conversation ${conversationFlag}`}
             <Tag style={{ marginLeft: 8 }} color="green">
               {nextModel}
             </Tag>
@@ -321,30 +338,49 @@ const Independent: React.FC = () => {
         )
       }
     ]);
-    messagesMap[activeKey] = {
+    conversationFlag = conversationFlag + 1;
+    conversationsMap[activeKey] = {
       model,
-      messages: getMessageHistory()
+      messages: getMessageHistory(),
+      params: {
+        onlinSearch: communicateType === "onlineSearch",
+        deepThink: communicateType === "deepThink"
+      }
     };
     setHeaderOpen(false);
     setAttachedFiles([]);
     setActiveKey(newKey);
     setMessages([]);
     setModel(nextModel);
+    setCommunicateType("");
   };
 
   // 切换会话
   const onConversationClick: GetProp<typeof Conversations, "onActiveChange"> = (
     key
   ) => {
-    messagesMap[activeKey] = {
+    conversationsMap[activeKey] = {
       model,
-      messages: getMessageHistory()
+      messages: getMessageHistory(),
+      params: {
+        onlinSearch: communicateType === "onlineSearch",
+        deepThink: communicateType === "deepThink"
+      }
     };
     setHeaderOpen(false);
     setAttachedFiles([]);
     setActiveKey(key);
-    setMessages(messagesMap[key].messages || []);
-    setModel(messagesMap[key].model || DEFAULT_MODEL);
+    setMessages(conversationsMap[key].messages || []);
+    setModel(conversationsMap[key].model || DEFAULT_MODEL);
+    let type: string;
+    if (conversationsMap[key].params.onlinSearch) {
+      type = "onlineSearch";
+    } else if (conversationsMap[key].params.deepThink) {
+      type = "deepThink";
+    } else {
+      type = "";
+    }
+    setCommunicateType(type);
   };
 
   const handleFileChange: GetProp<typeof Attachments, "onChange"> = (info) => {
@@ -383,13 +419,22 @@ const Independent: React.FC = () => {
           return item.key !== key;
         });
         const nextIndex = Math.min(index, newConversationsItems.length - 1);
-        delete messagesMap[key];
+        delete conversationsMap[key];
         setHeaderOpen(false);
         setAttachedFiles([]);
         const activeKey = newConversationsItems[nextIndex].key;
         setActiveKey(activeKey);
-        setMessages(messagesMap[activeKey].messages || []);
-        setModel(messagesMap[activeKey].model || DEFAULT_MODEL);
+        setMessages(conversationsMap[activeKey].messages || []);
+        setModel(conversationsMap[activeKey].model || DEFAULT_MODEL);
+        let type: string;
+        if (conversationsMap[activeKey].params.onlinSearch) {
+          type = "onlineSearch";
+        } else if (conversationsMap[activeKey].params.deepThink) {
+          type = "deepThink";
+        } else {
+          type = "";
+        }
+        setCommunicateType(type);
         setConversationsItems(newConversationsItems);
       }
     });
@@ -604,6 +649,19 @@ const Independent: React.FC = () => {
             loading={agent.isRequesting()}
             className={styles.sender}
             placeholder={"You can ask me any questions..."}
+          />
+          {/* 🌟 交互方式 */}
+          <Radio.Group
+            options={[
+              { label: "Online search", value: "onlineSearch" },
+              { label: "Deep Think", value: "deepThink" }
+            ]}
+            value={communicateType}
+            onChange={(e) => {
+              setCommunicateType(e.target.value);
+            }}
+            optionType="button"
+            buttonStyle="solid"
           />
         </div>
       </div>
