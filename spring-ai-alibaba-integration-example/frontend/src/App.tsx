@@ -671,18 +671,20 @@ const Independent: React.FC = () => {
             >
               Online search
             </Radio.Button>
-            <Radio.Button
-              value="deepThink"
-              onClick={(e: any) => {
-                if (e.target.value === communicateType) {
-                  setCommunicateType("");
-                } else {
-                  setCommunicateType(e.target.value);
-                }
-              }}
-            >
-              Deep Think
-            </Radio.Button>
+            <Tooltip title="Only support deepseek-r1">
+              <Radio.Button
+                value="deepThink"
+                onClick={(e: any) => {
+                  if (e.target.value === communicateType) {
+                    setCommunicateType("");
+                  } else {
+                    setCommunicateType(e.target.value);
+                  }
+                }}
+              >
+                Deep Think
+              </Radio.Button>
+            </Tooltip>
           </Radio.Group>
         </div>
       </div>
