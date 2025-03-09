@@ -1,11 +1,11 @@
-package com.alibaba.example.summarizer.controller;
+package com.alibaba.example.sql.controller;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
-import com.alibaba.example.summarizer.SQLGenerationException;
+import com.alibaba.example.sql.SQLGenerationException;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;
