@@ -607,6 +607,7 @@ const Independent: React.FC = () => {
           prefix={attachmentsNode}
           loading={agent.isRequesting()}
           className={styles.sender}
+          placeholder={"你可以问我任何问题..."}
         />
       </div>
     </div>
