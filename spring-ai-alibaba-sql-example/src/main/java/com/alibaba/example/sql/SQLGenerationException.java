@@ -1,4 +1,4 @@
-package com.alibaba.example.summarizer;
+package com.alibaba.example.sql;
 
 public class SQLGenerationException extends RuntimeException {
 

@@ -27,10 +27,10 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>spring-ai-alibaba-text-summarizer-example</artifactId>
+	<artifactId>spring-ai-alibaba-text-classification-example</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Spring AI Alibaba Text Summarizer Example</name>
-	<description>Spring AI Alibaba Text Summarizer Example</description>
+	<name>Spring AI Alibaba Text Classification Example</name>
+	<description>Spring AI Alibaba Text Classification Example</description>
 
 	<properties>
 		<maven.compiler.source>17</maven.compiler.source>
@@ -48,11 +48,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-tika-document-reader</artifactId>
 		</dependency>
 	</dependencies>
 

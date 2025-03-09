@@ -1,4 +1,4 @@
-package com.alibaba.example.summarizer;
+package com.alibaba.example.sql;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
