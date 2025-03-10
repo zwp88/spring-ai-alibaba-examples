@@ -10,7 +10,7 @@ export const useStyle = createStyles(({ token, css }) => {
     layout: css`
       width: 100%;
       min-width: 1000px;
-      height: calc(100vh - 16px);
+      height: calc(100vh - 56px);
       border-radius: ${token.borderRadius}px;
       display: flex;
       background: ${token.colorBgContainer};
