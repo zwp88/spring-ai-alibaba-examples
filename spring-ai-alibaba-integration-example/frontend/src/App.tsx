@@ -220,7 +220,7 @@ const Independent: React.FC = () => {
       onUpdate(JSON.stringify({ role: "ai", value: "" }));
 
       const res = await getChat(
-        JSON.parse(message || "{}")?.value || "",
+          encodeURIComponent(JSON.parse(message || "{}")?.value || ""),
         (value) => {
           buffer = buffer + decoder.decode(value);
           onUpdate(JSON.stringify({ role: "ai", value: buffer }));
