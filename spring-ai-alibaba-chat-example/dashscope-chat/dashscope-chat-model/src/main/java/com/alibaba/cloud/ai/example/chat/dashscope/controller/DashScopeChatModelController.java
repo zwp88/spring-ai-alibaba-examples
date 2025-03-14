@@ -52,7 +52,10 @@ public class DashScopeChatModelController {
 	@GetMapping("/simple/chat")
 	public String simpleChat() {
 
-		return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT)).getResult().getOutput().getContent();
+		return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, DashScopeChatOptions
+				.builder()
+				.withModel("qwen2.5-vl-72b-instruct")
+				.build())).getResult().getOutput().getContent();
 	}
 
 	/**
@@ -65,7 +68,10 @@ public class DashScopeChatModelController {
 		// 避免返回乱码
 		response.setCharacterEncoding("UTF-8");
 
-		Flux<ChatResponse> stream = dashScopeChatModel.stream(new Prompt(DEFAULT_PROMPT));
+		Flux<ChatResponse> stream = dashScopeChatModel.stream(new Prompt(DEFAULT_PROMPT, DashScopeChatOptions
+				.builder()
+				.withModel("qwen2.5-vl-72b-instruct")
+				.build()));
 		return stream.map(resp -> resp.getResult().getOutput().getContent());
 	}
 
