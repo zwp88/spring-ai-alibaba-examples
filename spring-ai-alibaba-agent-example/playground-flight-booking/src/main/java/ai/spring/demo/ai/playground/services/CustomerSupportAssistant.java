@@ -32,7 +32,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 /**
- * * @author Christian Tzolov
+ * * @author brianxiadong
  */
 @Service
 public class CustomerSupportAssistant {

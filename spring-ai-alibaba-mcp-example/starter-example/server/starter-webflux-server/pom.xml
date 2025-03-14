@@ -10,20 +10,18 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>mcp-stdio-server-exmaple</artifactId>
+    <groupId>com.example</groupId>
+
+    <artifactId>mcp-starter-webflux-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>Spring AI MCP STDIO server</name>
-    <description>Sample Spring Boot application demonstrating MCP stdio server usage</description>
-
-    <properties>
-        <main.class>org.springframework.ai.mcp.sample.server.McpServerApplication</main.class>
-    </properties>
+    <name>Spring AI MCP WEBFLUX server</name>
+    <description>Sample Spring Boot application demonstrating MCP client and server usage</description>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-mcp-server-spring-boot-starter</artifactId>
+            <artifactId>spring-ai-mcp-server-webflux-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -47,5 +45,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
