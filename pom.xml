@@ -57,6 +57,7 @@
 
 	<modules>
 		<module>spring-ai-alibaba-helloworld</module>
+		<module>spring-ai-alibaba-scene-example</module>
 		<module>spring-ai-alibaba-audio-example</module>
 		<module>spring-ai-alibaba-chat-example</module>
 		<module>spring-ai-alibaba-agent-example</module>
