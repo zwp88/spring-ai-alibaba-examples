@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.web.client.RestClient;
 
-
 @SpringBootApplication
 public class Application  {
 
