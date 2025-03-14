@@ -30,9 +30,14 @@
 
 	<artifactId>spring-ai-alibaba-scene-example</artifactId>
 	<version>${revision}</version>
+	<packaging>pom</packaging>
 
 	<description>Spring AI Alibaba Scene Example</description>
 	<name>Spring AI Alibaba Scene Examples</name>
+
+	<modules>
+		<module>multimodelchat</module>
+	</modules>
 
 	<build>
 		<plugins>
