@@ -24,7 +24,11 @@ import {
   GithubOutlined,
   RobotFilled,
   UserOutlined,
-  ExclamationCircleFilled
+  ExclamationCircleFilled,
+  FormOutlined,
+  DingdingOutlined,
+  SyncOutlined,
+  CopyOutlined
 } from "@ant-design/icons";
 import {
   message,
@@ -39,6 +43,7 @@ import {
   Modal,
   Radio,
   Layout,
+  theme,
   type GetProp
 } from "antd";
 import ReactMarkdown from "react-markdown";
@@ -61,6 +66,21 @@ const conversationsMap: Record<
     model: string;
     messages: any[];
     params: { onlinSearch: boolean; deepThink: boolean };
+  }
+> = {};
+
+// 标记当前请求是否是重试
+let isRetry = false;
+
+// 记录每个会话的最后一次请求参数，用于重试
+let lastRequestParamsMap: Record<
+  string,
+  {
+    image: File | undefined;
+    chatId: string;
+    model: string;
+    deepThink: boolean;
+    onlineSearch: boolean;
   }
 > = {};
 
@@ -182,6 +202,8 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
 };
 
 const Independent: React.FC = () => {
+  const { token } = theme.useToken();
+
   // 页面样式
   const { styles } = useStyle();
 
@@ -225,6 +247,17 @@ const Independent: React.FC = () => {
       let buffer = "";
       onUpdate(JSON.stringify({ role: "ai", value: "" }));
 
+      const requestParams = isRetry
+        ? lastRequestParamsMap[activeKey]
+        : {
+            image: attachedFiles?.[0]?.originFileObj,
+            chatId: activeKey,
+            model,
+            deepThink: communicateType === "deepThink",
+            onlineSearch: communicateType === "onlineSearch"
+          };
+      isRetry = false;
+
       const res = await getChat(
         encodeURIComponent(JSON.parse(message || "{}")?.value || ""),
         (value) => {
@@ -235,18 +268,13 @@ const Independent: React.FC = () => {
             onUpdate(JSON.stringify({ role: "ai", value: buffer }));
           }
         },
-        {
-          image: attachedFiles?.[0]?.originFileObj,
-          chatId: activeKey,
-          model,
-          deepThink: communicateType === "deepThink",
-          onlineSearch: communicateType === "onlineSearch"
-        }
+        requestParams
       );
 
       let value: string;
       if (res?.status === 200) {
         value = buffer;
+        lastRequestParamsMap[activeKey] = requestParams;
       } else {
         value =
           "Request failed." + (res?.statusText ? " " + res?.statusText : "");
@@ -485,7 +513,7 @@ const Independent: React.FC = () => {
     }
   });
 
-  // ==================== Nodes ====================
+  // 默认会话界面
   const placeholderNode = (
     <Space direction="vertical" size={16} className={styles.placeholder}>
       <Welcome
@@ -510,13 +538,42 @@ const Independent: React.FC = () => {
     </Space>
   );
 
+  // 消息下的功能区域
+  const createMessageFooter = (value: string, isLast: boolean) => (
+    <Space size={token.paddingXXS}>
+      {isLast && (
+        <Button
+          color="default"
+          variant="text"
+          size="small"
+          onClick={() => {
+            isRetry = true;
+            const request = messages[messages.length - 2]?.message;
+            setMessages(messages.slice(0, messages.length - 2));
+            onRequest(request);
+          }}
+          icon={<SyncOutlined />}
+        />
+      )}
+      <Button
+        color="default"
+        variant="text"
+        size="small"
+        onClick={() => {
+          navigator.clipboard.writeText(value);
+        }}
+        icon={<CopyOutlined />}
+      />
+    </Space>
+  );
+
   // messages 转 items
   useEffect(() => {
     setItems(
-      messages.map(({ id, message }) => {
+      messages.map(({ id, message }, index) => {
         const item = JSON.parse(message || "{}");
+        const value = item?.value;
         if (item?.role === "file") {
-          const value = item?.value;
           return {
             key: id,
             role: item?.role,
@@ -524,12 +581,15 @@ const Independent: React.FC = () => {
             content: value?.base64
           };
         } else {
-          const value = item?.value;
           return {
             key: id,
             role: item?.role,
             loading: !value,
-            content: value
+            content: value,
+            footer:
+              item?.role === "ai" || item?.role === "aiHistory"
+                ? createMessageFooter(value, index === messages.length - 1)
+                : undefined
           };
         }
       })
@@ -591,7 +651,7 @@ const Independent: React.FC = () => {
   // ==================== Render =================
   return (
     <>
-      <Space className={styles.linkWrapper}>
+      <Space className={styles.topLinkWrapper}>
         <Tooltip title={"spring-ai-alibaba-examples link"}>
           <a
             href="https://github.com/springaialibaba/spring-ai-alibaba-examples"
@@ -610,13 +670,29 @@ const Independent: React.FC = () => {
             <Button icon={<GithubOutlined />} />
           </a>
         </Tooltip>
-        <Tooltip title={"spring-ai-alibabad-docs link "}>
+        <Tooltip title={"spring-ai-alibabad-docs link"}>
           <a
             href="https://sca.aliyun.com/en/ai/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <Button icon={<LinkOutlined />} />
+          </a>
+        </Tooltip>
+      </Space>
+      <Space className={styles.bottomLinkWrapper}>
+        <Tooltip title={"Question Feedback"}>
+          <a
+            href="https://github.com/springaialibaba/spring-ai-alibaba-examples/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button icon={<FormOutlined />} />
+          </a>
+        </Tooltip>
+        <Tooltip title={"Contact Us"}>
+          <a target="_blank" rel="noopener noreferrer">
+            <Button icon={<DingdingOutlined />} />
           </a>
         </Tooltip>
       </Space>
