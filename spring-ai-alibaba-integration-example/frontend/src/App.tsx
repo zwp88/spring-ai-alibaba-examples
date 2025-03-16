@@ -24,7 +24,9 @@ import {
   GithubOutlined,
   RobotFilled,
   UserOutlined,
-  ExclamationCircleFilled
+  ExclamationCircleFilled,
+  FormOutlined,
+  DingdingOutlined
 } from "@ant-design/icons";
 import {
   message,
@@ -591,7 +593,7 @@ const Independent: React.FC = () => {
   // ==================== Render =================
   return (
     <>
-      <Space className={styles.linkWrapper}>
+      <Space className={styles.topLinkWrapper}>
         <Tooltip title={"spring-ai-alibaba-examples link"}>
           <a
             href="https://github.com/springaialibaba/spring-ai-alibaba-examples"
@@ -610,13 +612,29 @@ const Independent: React.FC = () => {
             <Button icon={<GithubOutlined />} />
           </a>
         </Tooltip>
-        <Tooltip title={"spring-ai-alibabad-docs link "}>
+        <Tooltip title={"spring-ai-alibabad-docs link"}>
           <a
             href="https://sca.aliyun.com/en/ai/"
             target="_blank"
             rel="noopener noreferrer"
           >
             <Button icon={<LinkOutlined />} />
+          </a>
+        </Tooltip>
+      </Space>
+      <Space className={styles.bottomLinkWrapper}>
+        <Tooltip title={"Question Feedback"}>
+          <a
+            href="https://github.com/springaialibaba/spring-ai-alibaba-examples/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button icon={<FormOutlined />} />
+          </a>
+        </Tooltip>
+        <Tooltip title={"Contact Us"}>
+          <a target="_blank" rel="noopener noreferrer">
+            <Button icon={<DingdingOutlined />} />
           </a>
         </Tooltip>
       </Space>
