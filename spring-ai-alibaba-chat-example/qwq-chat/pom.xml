@@ -23,28 +23,27 @@
 
 	<parent>
 		<groupId>com.alibaba.cloud.ai</groupId>
-		<artifactId>spring-ai-alibaba-examples</artifactId>
+		<artifactId>spring-ai-alibaba-chat-example</artifactId>
 		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<version>${revision}</version>
-	<artifactId>spring-ai-alibaba-chat-example</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>qwq-chat</artifactId>
+	<description>Spring AI Alibaba QWQ Chat Client Example</description>
+	<name>Spring AI Alibaba QWQ Chat Client Examples</name>
 
-	<description>Spring AI Alibaba Chat Example</description>
-	<name>Spring AI Alibaba Chat Examples</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
 
-	<modules>
-		<module>dashscope-chat</module>
-		<module>qwq-chat</module>
-		<module>deepseek-chat</module>
-		<module>openai-chat</module>
-		<module>ollama-chat</module>
-		<module>ollama-deepseek-chat</module>
-		<module>zhipuai-chat</module>
-		<module>moonshot-chat</module>
-	</modules>
+		<dependency>
+			<groupId>com.alibaba.cloud.ai</groupId>
+			<artifactId>spring-ai-alibaba-starter</artifactId>
+			<version>${spring-ai-alibaba.version}</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
