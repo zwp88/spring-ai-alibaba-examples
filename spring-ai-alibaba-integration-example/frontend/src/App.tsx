@@ -247,13 +247,16 @@ const Independent: React.FC = () => {
       let buffer = "";
       onUpdate(JSON.stringify({ role: "ai", value: "" }));
 
-      const requestParams = {
-        image: attachedFiles?.[0]?.originFileObj,
-        chatId: activeKey,
-        model,
-        deepThink: communicateType === "deepThink",
-        onlineSearch: communicateType === "onlineSearch"
-      };
+      const requestParams = isRetry
+        ? lastRequestParamsMap[activeKey]
+        : {
+            image: attachedFiles?.[0]?.originFileObj,
+            chatId: activeKey,
+            model,
+            deepThink: communicateType === "deepThink",
+            onlineSearch: communicateType === "onlineSearch"
+          };
+      isRetry = false;
 
       const res = await getChat(
         encodeURIComponent(JSON.parse(message || "{}")?.value || ""),
@@ -265,10 +268,9 @@ const Independent: React.FC = () => {
             onUpdate(JSON.stringify({ role: "ai", value: buffer }));
           }
         },
-        isRetry ? lastRequestParamsMap[activeKey] : requestParams
+        requestParams
       );
 
-      isRetry = false;
       let value: string;
       if (res?.status === 200) {
         value = buffer;
