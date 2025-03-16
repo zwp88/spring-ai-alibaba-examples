@@ -65,14 +65,14 @@ public class MultiModelChatController {
         // Wrap each stream in SSE events with source identifiers
         Flux<ServerSentEvent<String>> ollamaSseStream = ollamaStream
                 .map(content -> ServerSentEvent.builder(content)
-                        .id("ollama-" + System.currentTimeMillis())  // 唯一ID
-                        .event("ollama")  // 事件类型
+                        .id("ollama-" + System.currentTimeMillis())
+                        .event("ollama")
                         .build());
 
         Flux<ServerSentEvent<String>> dashScopeSseStream = dashScopeStream
                 .map(content -> ServerSentEvent.builder(content)
-                        .id("dashScope-" + System.currentTimeMillis())  // 唯一ID
-                        .event("dashScope")  // 事件类型
+                        .id("dashScope-" + System.currentTimeMillis())
+                        .event("dashScope")
                         .build());
 
         // Merge both event streams and return as a single SSE response
