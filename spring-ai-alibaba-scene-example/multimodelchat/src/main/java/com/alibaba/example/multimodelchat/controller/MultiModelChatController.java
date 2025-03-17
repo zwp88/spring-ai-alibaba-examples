@@ -42,8 +42,8 @@ public class MultiModelChatController {
      */
     @GetMapping(value = "/stream/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> streamChat(
-            @RequestParam("prompt") String prompt,
-            @RequestParam("userId") String userId,
+            @RequestParam(value = "prompt", defaultValue = "你是谁？") String prompt,
+            @RequestParam(value = "userId", defaultValue = "userName") String userId,
             HttpServletResponse httpResponse) {
 
         // Set response character encoding to avoid garbled text
