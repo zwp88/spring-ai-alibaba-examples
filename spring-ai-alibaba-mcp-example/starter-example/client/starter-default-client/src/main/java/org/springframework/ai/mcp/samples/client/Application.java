@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2025 the original author or authors.
+ * Copyright 2025-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author brianxiadong
  */
 package org.springframework.ai.mcp.samples.client;
 
@@ -27,27 +29,27 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
-	// 直接硬编码中文问题，避免配置文件编码问题
-	private String userInput = "北京的天气如何？";
+    // 直接硬编码中文问题，避免配置文件编码问题
+    private String userInput = "北京的天气如何？";
 
-	@Bean
-	public CommandLineRunner predefinedQuestions(ChatClient.Builder chatClientBuilder, ToolCallbackProvider tools,
-			ConfigurableApplicationContext context) {
+    @Bean
+    public CommandLineRunner predefinedQuestions(ChatClient.Builder chatClientBuilder, ToolCallbackProvider tools,
+            ConfigurableApplicationContext context) {
 
-		return args -> {
+        return args -> {
 
-			var chatClient = chatClientBuilder
-					.defaultTools(tools)
-					.build();
+            var chatClient = chatClientBuilder
+                    .defaultTools(tools)
+                    .build();
 
-			System.out.println("\n>>> QUESTION: " + userInput);
-			System.out.println("\n>>> ASSISTANT: " + chatClient.prompt(userInput).call().content());
+            System.out.println("\n>>> QUESTION: " + userInput);
+            System.out.println("\n>>> ASSISTANT: " + chatClient.prompt(userInput).call().content());
 
-			context.close();
-		};
-	}
+            context.close();
+        };
+    }
 }
