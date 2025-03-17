@@ -27,4 +27,4 @@ spring:
         name: my-weather-server
         version: 0.0.1
 
-# logging.pattern.console= 
+# logging.pattern.console=

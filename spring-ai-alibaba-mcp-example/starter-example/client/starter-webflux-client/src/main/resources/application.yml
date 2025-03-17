@@ -32,4 +32,4 @@ logging:
 
 ai:
   user:
-    input: 北京的天气如何？ 
+    input: 北京的天气如何？
