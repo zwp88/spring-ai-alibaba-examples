@@ -26,7 +26,9 @@ pnpm dev
 [http://localhost:5173](http://localhost:5173)
 
 ### 后端设置
-// 如果有后端设置步骤，可以在这里补充
+1、src/main/resources/application.yml 中配置对应模型参数
+
+2、启动：src/main/java/com/alibaba/example/multimodelchat/MultiModelChatApplication.java
 
 ## 其他信息
 // 可以在这里添加关于项目的其他信息，如贡献指南、许可证等。
