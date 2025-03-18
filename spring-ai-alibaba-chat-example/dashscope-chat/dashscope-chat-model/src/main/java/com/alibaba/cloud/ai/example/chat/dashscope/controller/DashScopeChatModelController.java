@@ -17,6 +17,7 @@
 
 package com.alibaba.cloud.ai.example.chat.dashscope.controller;
 
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
@@ -54,8 +55,8 @@ public class DashScopeChatModelController {
 
 		return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, DashScopeChatOptions
 				.builder()
-				.withModel("qwen2.5-vl-72b-instruct")
-				.build())).getResult().getOutput().getContent();
+				.withModel(DashScopeApi.ChatModel.QWEN_PLUS.getModel())
+				.build())).getResult().getOutput().getText();
 	}
 
 	/**
@@ -70,9 +71,9 @@ public class DashScopeChatModelController {
 
 		Flux<ChatResponse> stream = dashScopeChatModel.stream(new Prompt(DEFAULT_PROMPT, DashScopeChatOptions
 				.builder()
-				.withModel("qwen2.5-vl-72b-instruct")
+				.withModel(DashScopeApi.ChatModel.QWEN_PLUS.getModel())
 				.build()));
-		return stream.map(resp -> resp.getResult().getOutput().getContent());
+		return stream.map(resp -> resp.getResult().getOutput().getText());
 	}
 
 
@@ -89,7 +90,7 @@ public class DashScopeChatModelController {
 				.withTemperature(0.8)
 				.build();
 
-		return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getContent();
+		return dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getText();
 	}
 
 }
