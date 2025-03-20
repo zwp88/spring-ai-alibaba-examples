@@ -10,16 +10,10 @@ import {
 } from "@ant-design/x";
 import React, { useEffect } from "react";
 
-import {
-	FireOutlined,
-	MenuFoldOutlined,
-	MenuUnfoldOutlined,
-	PaperClipOutlined,
-	PlusOutlined,
-	ReadOutlined,
-} from "@ant-design/icons";
+import { PaperClipOutlined, PlusOutlined } from "@ant-design/icons";
 import { Badge, Button, type GetProp, Layout, Tooltip } from "antd";
 import { PlaceHolderNode, LogoNode, FriendlyLinkBar } from "./components";
+import { useQueryClient } from "@tanstack/react-query";
 
 const { Header, Sider, Content } = Layout;
 
@@ -27,19 +21,6 @@ const defaultConversationsItems = [
 	{
 		key: "0",
 		label: "Conversation",
-	},
-];
-
-const senderPromptsItems: GetProp<typeof Prompts, "items"> = [
-	{
-		key: "1",
-		description: "Hot Topics",
-		icon: <FireOutlined style={{ color: "#FF4D4F" }} />,
-	},
-	{
-		key: "2",
-		description: "Design Guide",
-		icon: <ReadOutlined style={{ color: "#1890FF" }} />,
 	},
 ];
 
@@ -59,8 +40,6 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
 	},
 };
 
-// 会话管理
-
 const Independent: React.FC = () => {
 	// ==================== State ====================
 	const [sideCollapsed, setSideCollapsed] = React.useState(false);
@@ -69,6 +48,7 @@ const Independent: React.FC = () => {
 	const [conversationsItems, setConversationsItems] = React.useState(
 		defaultConversationsItems
 	);
+	const queryClient = useQueryClient();
 	const [activeKey, setActiveKey] = React.useState(
 		defaultConversationsItems[0].key
 	);
@@ -76,15 +56,96 @@ const Independent: React.FC = () => {
 		GetProp<typeof Attachments, "items">
 	>([]);
 
-	// ==================== Runtime ====================
-	const [agent] = useXAgent({
-		request: async ({ message }, { onSuccess }) => {
-			onSuccess(`Mock success return. You said: ${message}`);
+	//  ==================== EventsourceQuery ====================
+	const [eventSourceAgent] = useXAgent({
+		request: async ({ message }, { onSuccess, onError }) => {
+			const queryKey = ["chartStream", activeKey, message];
+
+			// react-query 管理响应
+
+			await queryClient.fetchQuery({
+				queryKey,
+				queryFn: async () => {
+					const eventSource = new EventSource(
+						`/api/stream/chat?prompt=${encodeURIComponent(message as string)}&conversationId=${activeKey}`,
+						{
+							withCredentials: true,
+							// 添加自定义头
+						}
+					);
+
+					const messageMap = new Map<string, string>();
+
+					return new Promise((resolve, reject) => {
+						eventSource.onmessage = (event) => {
+							console.log("event====>", event);
+							// const data = JSON.parse(event.data);
+
+							// const { event: eventType, content } = data;
+
+							// if (["ollama", "dashScope"].includes(eventType)) {
+							// 	if (!messageMap.has(eventType)) {
+							// 		const messageId = crypto.randomUUID();
+							// 		messageMap.set(eventType, messageId);
+							// 		console.log(
+							// 			"%c [ messageId, content,eventType ]: ",
+							// 			"color: #bf2c9f; background: pink; font-size: 13px;",
+							// 			"messageId, content,eventType"
+							// 		);
+							// 		// onMessage({
+							// 		// 	id: messageId,
+							// 		// 	message: content,
+							// 		// 	status: "loading",
+							// 		// 	role: "ai",
+							// 		// 	model: eventType,
+							// 		// });
+							// 	} else {
+							// 		const messageId = messageMap.get(eventType);
+							// 		console.log(
+							// 			"%c [ messageId, content, eventType ]: ",
+							// 			"color: #bf2c9f; background: pink; font-size: 13px;",
+							// 			"messageId, content, eventType"
+							// 		);
+							// 	}
+							// }
+
+							resolve(event);
+						};
+
+						eventSource.onerror = (error) => {
+							console.error("SSE 错误详情:", {
+								readyState: eventSource.readyState,
+								url: eventSource.url,
+								error: error,
+							});
+							eventSource.close();
+							reject(error);
+						};
+						// 添加详细事件监听
+						eventSource.addEventListener("open", () => {
+							console.log("SSE 连接成功");
+						});
+
+						eventSource.addEventListener("done", () => {
+							eventSource.close();
+							messageMap.forEach((id) => {
+								console.log(
+									"%c [ id,  ]: ",
+									"color: #bf2c9f; background: pink; font-size: 13px;",
+									"id, "
+								);
+
+								resolve(null);
+							});
+						});
+					});
+				},
+			});
 		},
 	});
 
 	const { onRequest, messages, setMessages } = useXChat({
-		agent,
+		agent: eventSourceAgent,
 	});
 
 	useEffect(() => {
@@ -212,14 +273,13 @@ const Independent: React.FC = () => {
 					roles={roles}
 					className="flex-1"
 				/>
-				{/* 🌟 提示词历史 */}
 				{/* 🌟 输入框 */}
 				<Sender
 					value={content}
 					onSubmit={onSubmit}
 					onChange={setContent}
 					prefix={attachmentsNode}
-					loading={agent.isRequesting()}
+					loading={eventSourceAgent.isRequesting()}
 					className="shadow-md"
 				/>
 			</div>
