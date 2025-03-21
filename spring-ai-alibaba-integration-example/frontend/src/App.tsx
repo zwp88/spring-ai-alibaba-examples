@@ -168,11 +168,21 @@ const aiConfig = {
       borderRadius: 16
     }
   },
-  messageRender: (content) => (
-    <Typography>
-      <ReactMarkdown>{content}</ReactMarkdown>
-    </Typography>
-  )
+  messageRender: (content) => {
+    const regex = /<think>([\s\S]*?)<\/think>/;
+    const match = content.match(regex);
+
+    if (match) {
+      const extractedContent = match[1].replace("\n", ">");
+      const newString = content.replace(regex, "");
+      content = extractedContent + newString;
+    }
+    return (
+      <Typography>
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </Typography>
+    );
+  }
 };
 const roles: GetProp<typeof Bubble.List, "roles"> = {
   ai: {
