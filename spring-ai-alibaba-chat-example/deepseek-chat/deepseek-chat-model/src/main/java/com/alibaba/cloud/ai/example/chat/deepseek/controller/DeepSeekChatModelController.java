@@ -46,7 +46,7 @@ public class DeepSeekChatModelController {
      */
     @GetMapping("/simple/chat")
     public String simpleChat () {
-        return DeepSeekChatModel.call(new Prompt(DEFAULT_PROMPT)).getResult().getOutput().getContent();
+        return DeepSeekChatModel.call(new Prompt(DEFAULT_PROMPT)).getResult().getOutput().getText();
     }
 
     /**
@@ -69,6 +69,6 @@ public class DeepSeekChatModelController {
     @GetMapping("/custom/chat")
     public String customChat () {
         OpenAiChatOptions customOptions = OpenAiChatOptions.builder().temperature(0.8d).build();
-        return DeepSeekChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getContent();
+        return DeepSeekChatModel.call(new Prompt(DEFAULT_PROMPT, customOptions)).getResult().getOutput().getText();
     }
 }
