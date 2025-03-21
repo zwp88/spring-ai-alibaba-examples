@@ -50,14 +50,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-resolver-dns-native-macos</artifactId>
-            <version>4.1.119.Final</version>
-            <classifier>osx-aarch_64</classifier>  <!-- M1/M2 芯片 -->
-        </dependency>
-
-
-        <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-tool-calling-baidutranslate</artifactId>
             <version>${spring-ai-alibaba.version}</version>
