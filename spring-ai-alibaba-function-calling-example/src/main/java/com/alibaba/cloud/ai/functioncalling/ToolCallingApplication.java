@@ -23,9 +23,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author 北极星
  */
 @SpringBootApplication
-public class MainApplication {
+public class ToolCallingApplication {
 
     public static void main (String[] args) {
-        SpringApplication.run(MainApplication.class, args);
+        SpringApplication.run(ToolCallingApplication.class, args);
     }
 }
