@@ -6,8 +6,8 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
@@ -34,16 +34,16 @@ public class MultiModelChatController {
     /**
      * Streams responses from two large models simultaneously using Server-Sent Events (SSE).
      *
-     * @param prompt      The user input prompt
-     * @param conversationId      The key to retrieve the chat memory conversation id from the context.
+     * @param chatRequest The user input prompt and conversation ID
      * @param httpResponse The HTTP response object, used to set the character encoding to prevent garbled text
      * @return A merged SSE stream containing responses from both models
      */
-    @GetMapping(value = "/stream/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(value = "/stream/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> streamChat(
-            @RequestParam(value = "prompt", defaultValue = "你是谁？") String prompt,
-            @RequestParam(value = "conversationId", defaultValue = "conversationId") String conversationId,
+            @RequestBody ChatRequest chatRequest,
             HttpServletResponse httpResponse) {
+        String prompt = chatRequest.getPrompt();
+        String conversationId = chatRequest.getConversationId();
 
         // Set response character encoding to avoid garbled text
         httpResponse.setCharacterEncoding("UTF-8");
@@ -78,5 +78,27 @@ public class MultiModelChatController {
 
         // Merge both event streams and return as a single SSE response
         return Flux.merge(ollamaSseStream, dashScopeSseStream);
+    }
+
+    public static class ChatRequest {
+        private String prompt;
+        private String conversationId;
+
+        // Getters and Setters
+        public String getPrompt() {
+            return prompt;
+        }
+
+        public void setPrompt(String prompt) {
+            this.prompt = prompt;
+        }
+
+        public String getConversationId() {
+            return conversationId;
+        }
+
+        public void setConversationId(String conversationId) {
+            this.conversationId = conversationId;
+        }
     }
 }
