@@ -2,6 +2,9 @@ package com.alibaba.cloud.ai.example.chat.openai.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -76,6 +79,20 @@ public class OpenAiChatClientController {
 
 		response.setCharacterEncoding("UTF-8");
 		return openAiChatClient.prompt(DEFAULT_PROMPT).stream().content();
+	}
+
+	/**
+	 * ChatClient 流式响应
+	 */
+	@GetMapping(value = "/stream/response", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<ServerSentEvent<String>> simpleChat(@RequestParam String message) {
+		return openAiChatClient.prompt()
+				.user(message)
+				.stream()
+				.content()
+				.map(content -> ServerSentEvent.<String>builder()
+						.data(content)
+						.build());
 	}
 
 }
