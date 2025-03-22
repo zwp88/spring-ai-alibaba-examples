@@ -1,44 +1,56 @@
-# Spring AI Alibaba Example
+# Spring AI Alibaba Examples
 
-> Spring AI Alibaba Example.
+> Spring AI Alibaba Example 示例。
 
-## Introduce
+## 介绍
 
-This repository contains many examples to introduce various uses of Spring AI Alibaba from basic to advanced and best practices for AI projects.
-For a more detailed introduction, please refer to the README.md in each sub-project and [Spring AI Alibaba official website](https://java2ai.com).
+此仓库中包含许多 Example 来介绍 Spring AI Alibaba 从基础到高级的各种用法和 AI 项目的最佳实践。
+更详细的介绍介绍请参阅每个子项目中的 README.md 和 [Spring AI Alibaba 官网](https://java2ai.com)。
 
-## How to participate
+## 如何参与
 
-We welcome contributions of any kind, including but not limited to:
+我们欢迎任何形式的贡献，包括但不限于：
 
-- Spring AI Alibaba usage examples;
-- Use of Spring AI Alibaba API;
-- Spring AI usage examples;
-- Best practices for AI projects, etc.
+- Spring AI Alibaba 的使用示例；
+- Spring AI Alibaba API 的使用；
+- Spring AI 的使用示例；
+- AI 项目的最佳实践 等。
 
-The project warehouse is under construction, please read [Roadmap.md](./Roadmap-zh.md) for more information.
+此项目仓库正在建设中，请阅读 [Roadmap.md](./Roadmap-zh.md) 了解更多信息。
 
-## Project Structure
+## 已集成的功能模型
 
-In this example project, we combine modules according to the way of function, and strive to modularize the functions of each example to make it easier for everyone to find and use. An example of a basic module is as follows:
+| Category | Options                                |
+|----------|----------------------------------------|
+| Chat     | DashScope, OpenAI, ark（火山方舟）, ollama, ZhiPuAI, moonshot（月之暗面） |
+| RAG      | ES, milvus, pgvector                   |
+| 多模态    | ark（火山方舟）, Dashscope              |
+| Image    | Dashscope, OpenAI                      |
+| Audio    | DashScope                              |
+| 开发生态  | MCP，Nacos，Higress，Kong，可观测，Prompt 模版，函数调用，集成示例，结构化输出 |
+
+## 项目结构
+
+在此 Example 项目中，我们按照功能的方式组合模块，力求将每个 Example 的功能模块化，方便大家查找和使用。
+一个基本的模块示例如下：
 
 ```text
 |-spring-ai-alibaba-chat-example
-|-- dashscope-chat
-|----dashscope-chat-model
+|-- dashscope
+|----chat-model
 |------ src
 |------ README.md
 |------ pom.xml
-|----dashscope-chat-client
+|----chat-client
 |------ src
 |------ README.md
 |------ pom.xml
-|-- ollama-chat
-|----ollama-chat-model
+|-- ollama
+|----chat-model
 |------ src
 |------ README.md
 |------ pom.xml
-|----ollama-chat-client
+|----chat-client
 |------ src
 |------ README.md
 |------ pom.xml

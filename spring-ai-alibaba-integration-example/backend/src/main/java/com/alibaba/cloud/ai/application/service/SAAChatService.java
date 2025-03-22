@@ -17,13 +17,21 @@
 
 package com.alibaba.cloud.ai.application.service;
 
-import jakarta.servlet.http.HttpServletResponse;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 /**
  * @author yuluo
@@ -33,20 +41,76 @@ import org.springframework.stereotype.Service;
 @Service
 public class SAAChatService {
 
-	private final ChatClient daschScopeChatClient;
+	private final ChatClient defaultChatClient;
 
-	public SAAChatService(ChatModel chatModel) {
+	private final PromptTemplate deepThinkPromptTemplate;
 
-		this.daschScopeChatClient = ChatClient
-				.builder(chatModel)
-				.build();
+	public SAAChatService(
+			ChatModel chatModel,
+			@Qualifier("deepThinkPromptTemplate") PromptTemplate deepThinkPromptTemplate
+	) {
+
+		this.defaultChatClient = ChatClient.builder(chatModel)
+				.defaultSystem(
+         			"""
+						You're a Q&A bot built by the Spring AI Alibaba project that answers the user's input questions.
+						When you receive a question from a user, you should answer the user's question in a friendly and polite manner, taking care not to answer the wrong message.
+						
+						When answering user questions, you need to adhere to the following conventions:
+									  
+						1. Don't provide any information that is not related to the question, and don't output any duplicate content;
+						2. Avoid using "context-based..." or "The provided information..." said;
+						3. Your answers must be correct, accurate, and written in an expertly unbiased and professional tone;
+						4. The appropriate text structure in the answer is determined according to the characteristics of the content, please include subheadings in the output to improve readability;
+						5. When generating a response, provide a clear conclusion or main idea first, and do not need to have a title;
+						6. Make sure each section has clear subheadings so that users can better understand and reference your output;
+						7. If the information is complex or contains multiple sections, make sure each section has an appropriate heading to create a hierarchical structure.
+						
+						If a user asks a question about Spring AI Alibaba or Spring AI, after answering the user's question,
+						Directs users to the Spring AI Alibaba project official website https://java2ai.com for more information.
+						"""
+				).defaultAdvisors(
+						new MessageChatMemoryAdvisor(new InMemoryChatMemory()),
+						new SimpleLoggerAdvisor()
+				).build();
+
+		this.deepThinkPromptTemplate = deepThinkPromptTemplate;
 	}
 
-	public Flux<String> chat(String chatPrompt, HttpServletResponse response) {
+	public Flux<String> chat(String chatId, String model, String chatPrompt) {
 
-		response.setCharacterEncoding("UTF-8");
-
-		return daschScopeChatClient.prompt(new Prompt(chatPrompt)).stream().content();
+		return defaultChatClient.prompt()
+				.options(DashScopeChatOptions.builder()
+						.withModel(model)
+						.withTemperature(0.8)
+						.withResponseFormat(DashScopeResponseFormat.builder()
+								.type(DashScopeResponseFormat.Type.TEXT)
+								.build()
+						).build()
+				).user(chatPrompt)
+				.advisors(memoryAdvisor -> memoryAdvisor
+						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+				).stream()
+				.content();
 	}
 
+	public Flux<String> deepThinkingChat(String chatId, String model, String chatPrompt) {
+
+		return defaultChatClient.prompt()
+				.options(DashScopeChatOptions.builder()
+						.withModel(model)
+						.withTemperature(0.8)
+						.withResponseFormat(DashScopeResponseFormat.builder()
+								.type(DashScopeResponseFormat.Type.TEXT)
+								.build()
+						).build()
+				).system(deepThinkPromptTemplate.getTemplate())
+				.user(chatPrompt)
+				.advisors(memoryAdvisor -> memoryAdvisor
+						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+				).stream()
+				.content();
+	}
 }

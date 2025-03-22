@@ -36,7 +36,8 @@
 	<name>Spring AI Alibaba Multi Model Examples</name>
 
 	<modules>
-		<!--<module>dashscope</module>-->
+		<module>dashscope-multi-model</module>
+		<module>ark-multi-model</module>
 	</modules>
 
 	<build>

@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.web.client.RestClient;
 
-
 @SpringBootApplication
 public class Application  {
 
@@ -39,14 +38,15 @@ public class Application  {
 			vectorStore.write(new TokenTextSplitter().transform(new TextReader(termsOfServiceDocs).read()));
 
 			vectorStore.similaritySearch("Cancelling Bookings").forEach(doc -> {
-				logger.info("Similar Document: {}", doc.getContent());
+				logger.info("Similar Document: {}", doc.getText());
 			});
 		};
 	}
 
 	@Bean
 	public VectorStore vectorStore(EmbeddingModel embeddingModel) {
-		return new SimpleVectorStore(embeddingModel);
+
+		return SimpleVectorStore.builder(embeddingModel).build();
 	}
 
 	@Bean

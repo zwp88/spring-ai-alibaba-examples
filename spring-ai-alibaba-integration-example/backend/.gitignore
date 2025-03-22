@@ -34,3 +34,13 @@ target/
 
 # node_modules
 **/node_modules
+
+logs/
+
+# ignore test.
+*.wav
+*.png
+*.jpg
+
+# ignore db files
+/src/main/resources/db/user.db
