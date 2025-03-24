@@ -6,6 +6,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
  * @Date: 2025/3/14
  */
 @RestController
+@CrossOrigin
 public class MultiModelChatController {
 
     private final ChatClient ollamaChatClient;
@@ -65,15 +67,15 @@ public class MultiModelChatController {
 
         // Wrap each stream in SSE events with source identifiers
         Flux<ServerSentEvent<String>> ollamaSseStream = ollamaStream
+                .doOnNext(content -> System.out.println("ollama: " + content))
                 .map(content -> ServerSentEvent.builder(content)
-                        .id("ollama-" + System.currentTimeMillis())
                         .event("ollama")
                         .build());
 
         Flux<ServerSentEvent<String>> dashScopeSseStream = dashScopeStream
+                .doOnNext(content -> System.out.println("dashScopeSseStream: " + content))
                 .map(content -> ServerSentEvent.builder(content)
-                        .id("dashScope-" + System.currentTimeMillis())
-                        .event("dashScope")
+                        .event("dashscope")
                         .build());
 
         // Merge both event streams and return as a single SSE response
