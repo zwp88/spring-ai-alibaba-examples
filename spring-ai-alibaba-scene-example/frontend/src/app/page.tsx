@@ -66,9 +66,9 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
 			},
 		},
 	},
-	dashScope: {
+	dashscope: {
 		placement: "start",
-		header: "dashScope",
+		header: "dashscope",
 		avatar: {
 			style: barAvatar,
 			icon: <UserAddOutlined />,
@@ -108,7 +108,7 @@ const Independent: React.FC = () => {
 	const [sideCollapsed, setSideCollapsed] = React.useState(false);
 	const [selectModels, setSelectModels] = useState([
 		"ollama",
-		"dashScope",
+		"dashscope",
 	] as Model[]);
 	const [headerOpen, setHeaderOpen] = React.useState(false);
 	const [content, setContent] = React.useState("");

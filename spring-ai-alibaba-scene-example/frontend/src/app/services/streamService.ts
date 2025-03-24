@@ -1,7 +1,7 @@
 import { Model, StreamHandlers, StreamParams } from "@/types/streamTypes";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 
-const models: Model[] = ["ollama", "dashScope"];
+const models: Model[] = ["ollama", "dashscope"];
 
 const isValidModel = (model: string): model is Model => {
 	return models.includes(model as Model);

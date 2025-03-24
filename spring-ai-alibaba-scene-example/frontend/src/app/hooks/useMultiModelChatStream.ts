@@ -23,7 +23,7 @@ const streamReducer = (
 			let newModelMessages = new Map(conversation.modelMessages);
 
 			if (!action.models || action.models.length === 0) {
-				["ollama", "dashScope"].forEach((model) => {
+				["ollama", "dashscope"].forEach((model) => {
 					newModelMessages = new Map(newModelMessages).set(model, [
 						...(newModelMessages.get(model) || []),
 						{
@@ -191,12 +191,6 @@ const useMultiModelStream = (conversationId: string) => {
 					});
 				},
 				onError: (error) => {
-					console.error("Stream error:", {
-						requestId,
-						conversationId,
-						params: streamParams,
-						error: error instanceof Error ? error.stack : error,
-					});
 					dispatch({
 						type: "ERROR",
 						error:

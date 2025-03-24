@@ -1,4 +1,4 @@
-export type Model = "ollama" | "dashScope" | "user";
+export type Model = "ollama" | "dashscope" | "user";
 
 export type StreamMessage = {
 	model: Model;
