@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
 		return [
 			{
 				source: "/api/stream/:path*", // 前端请求路径
-				destination: "http://wbcuri.natappfree.cc/stream/:path*", // 实际后端地址
+				destination: "http://localhost:8848/stream/:path*", // 实际后端地址
 			},
 		];
 	},
