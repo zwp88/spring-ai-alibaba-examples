@@ -3,6 +3,8 @@ package com.alibaba.example.multimodelchat.controller;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -27,6 +29,8 @@ public class MultiModelChatController {
     private final ChatClient ollamaChatClient;
 
     private final ChatClient dashScopeChatClient;
+
+    private final InMemoryChatMemory inMemoryChatMemory = new InMemoryChatMemory() ;
 
     public MultiModelChatController(OllamaChatModel ollamaChatModel, DashScopeChatModel dashScopeChatModel) {
         this.ollamaChatClient = ChatClient.builder(ollamaChatModel).build();
@@ -53,6 +57,7 @@ public class MultiModelChatController {
         // Retrieve response streams from both models
         Flux<String> ollamaStream = ollamaChatClient.prompt()
                 .user(prompt)
+                .advisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
                 .advisors(memoryAdvisor -> memoryAdvisor
                         .param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
@@ -60,6 +65,7 @@ public class MultiModelChatController {
 
         Flux<String> dashScopeStream = dashScopeChatClient.prompt()
                 .user(prompt)
+                .advisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
                 .advisors(memoryAdvisor -> memoryAdvisor
                         .param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
