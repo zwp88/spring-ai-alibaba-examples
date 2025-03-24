@@ -2,169 +2,157 @@
 import {
 	Attachments,
 	Bubble,
+	BubbleProps,
 	Conversations,
 	Prompts,
 	Sender,
-	useXAgent,
-	useXChat,
 } from "@ant-design/x";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import markdownit from "markdown-it";
 
-import { PaperClipOutlined, PlusOutlined } from "@ant-design/icons";
-import { Badge, Button, type GetProp, Layout, Tooltip } from "antd";
+import {
+	PaperClipOutlined,
+	PlusOutlined,
+	UserAddOutlined,
+	UserOutlined,
+} from "@ant-design/icons";
+import {
+	Badge,
+	Button,
+	Flex,
+	type GetProp,
+	Layout,
+	Space,
+	Splitter,
+	Tooltip,
+	Typography,
+} from "antd";
 import { PlaceHolderNode, LogoNode, FriendlyLinkBar } from "./components";
-import { useQueryClient } from "@tanstack/react-query";
+import { Conversation, Model, StreamMessage } from "@/types/streamTypes";
+import useMultiModelChatStream from "./hooks/useMultiModelChatStream";
 
-const { Header, Sider, Content } = Layout;
+const { Sider } = Layout;
+const md = markdownit({ html: true, breaks: true });
 
 const defaultConversationsItems = [
 	{
-		key: "0",
+		key: Date.now().toString(),
 		label: "Conversation",
 	},
 ];
 
+const fooAvatar: React.CSSProperties = {
+	color: "#f56a00",
+	backgroundColor: "#fde3cf",
+};
+
+const barAvatar: React.CSSProperties = {
+	color: "#fff",
+	backgroundColor: "#87d068",
+};
+
 const roles: GetProp<typeof Bubble.List, "roles"> = {
-	ai: {
-		placement: "start",
-		typing: { step: 5, interval: 20 },
+	user: {
+		placement: "end",
+		avatar: {
+			style: fooAvatar,
+			icon: <UserOutlined />,
+		},
+		header: "user",
 		styles: {
 			content: {
+				maxWidth: 500,
 				borderRadius: 16,
 			},
 		},
 	},
-	local: {
-		placement: "end",
-		variant: "shadow",
+	dashScope: {
+		placement: "start",
+		header: "dashScope",
+		avatar: {
+			style: barAvatar,
+			icon: <UserAddOutlined />,
+		},
+		styles: {
+			content: {
+				maxWidth: 500,
+				borderRadius: 16,
+			},
+		},
+	},
+	ollama: {
+		placement: "start",
+		header: "ollama",
+		avatar: {
+			style: barAvatar,
+			icon: <UserAddOutlined />,
+		},
+		styles: {
+			content: {
+				maxWidth: 500,
+				borderRadius: 16,
+			},
+		},
 	},
 };
+
+const renderMarkdown: BubbleProps["messageRender"] = (content) => (
+	<Typography>
+		{/* biome-ignore lint/security/noDangerouslySetInnerHtml: used in demo */}
+		<div dangerouslySetInnerHTML={{ __html: md.render(content) }} />
+	</Typography>
+);
 
 const Independent: React.FC = () => {
 	// ==================== State ====================
 	const [sideCollapsed, setSideCollapsed] = React.useState(false);
+	const [selectModels, setSelectModels] = useState([
+		"ollama",
+		"dashScope",
+	] as Model[]);
 	const [headerOpen, setHeaderOpen] = React.useState(false);
 	const [content, setContent] = React.useState("");
 	const [conversationsItems, setConversationsItems] = React.useState(
 		defaultConversationsItems
 	);
-	const queryClient = useQueryClient();
+	const [sizes, setSizes] = React.useState<(number | string)[]>(["50%", "50%"]);
+
+	// ================================= 会话的 key ===================================
 	const [activeKey, setActiveKey] = React.useState(
 		defaultConversationsItems[0].key
 	);
+
+	// 附件
 	const [attachedFiles, setAttachedFiles] = React.useState<
 		GetProp<typeof Attachments, "items">
 	>([]);
 
-	//  ==================== EventsourceQuery ====================
-	const [eventSourceAgent] = useXAgent({
-		request: async ({ message }, { onSuccess, onError }) => {
-			const queryKey = ["chartStream", activeKey, message];
+	// 获取会话请求的接口
+	const { conversations, getConversationsState, chatStream, error } =
+		useMultiModelChatStream(activeKey);
 
-			// react-query 管理响应
-
-			await queryClient.fetchQuery({
-				queryKey,
-				queryFn: async () => {
-					const eventSource = new EventSource(
-						`/api/stream/chat?prompt=${encodeURIComponent(message as string)}&conversationId=${activeKey}`,
-						{
-							withCredentials: true,
-							// 添加自定义头
-						}
-					);
-
-					const messageMap = new Map<string, string>();
-
-					return new Promise((resolve, reject) => {
-						eventSource.onmessage = (event) => {
-							console.log("event====>", event);
-							// const data = JSON.parse(event.data);
-
-							// const { event: eventType, content } = data;
-
-							// if (["ollama", "dashScope"].includes(eventType)) {
-							// 	if (!messageMap.has(eventType)) {
-							// 		const messageId = crypto.randomUUID();
-							// 		messageMap.set(eventType, messageId);
-							// 		console.log(
-							// 			"%c [ messageId, content,eventType ]: ",
-							// 			"color: #bf2c9f; background: pink; font-size: 13px;",
-							// 			"messageId, content,eventType"
-							// 		);
-							// 		// onMessage({
-							// 		// 	id: messageId,
-							// 		// 	message: content,
-							// 		// 	status: "loading",
-							// 		// 	role: "ai",
-							// 		// 	model: eventType,
-							// 		// });
-							// 	} else {
-							// 		const messageId = messageMap.get(eventType);
-							// 		console.log(
-							// 			"%c [ messageId, content, eventType ]: ",
-							// 			"color: #bf2c9f; background: pink; font-size: 13px;",
-							// 			"messageId, content, eventType"
-							// 		);
-							// 	}
-							// }
-
-							resolve(event);
-						};
-
-						eventSource.onerror = (error) => {
-							console.error("SSE 错误详情:", {
-								readyState: eventSource.readyState,
-								url: eventSource.url,
-								error: error,
-							});
-							eventSource.close();
-							reject(error);
-						};
-						// 添加详细事件监听
-						eventSource.addEventListener("open", () => {
-							console.log("SSE 连接成功");
-						});
-
-						eventSource.addEventListener("done", () => {
-							eventSource.close();
-							messageMap.forEach((id) => {
-								console.log(
-									"%c [ id,  ]: ",
-									"color: #bf2c9f; background: pink; font-size: 13px;",
-									"id, "
-								);
-
-								resolve(null);
-							});
-						});
-					});
-				},
-			});
-		},
-	});
-
-	const { onRequest, messages, setMessages } = useXChat({
-		agent: eventSourceAgent,
-	});
-
-	useEffect(() => {
-		if (activeKey !== undefined) {
-			setMessages([]);
-		}
-	}, [activeKey]);
-
-	// ==================== Event ====================
+	// 触发 prompt 请求
 	const onSubmit = (nextContent: string) => {
 		if (!nextContent) return;
-		onRequest(nextContent);
+		setContent(nextContent); // 触发流式请求
+		chatStream({
+			prompt: content,
+			conversationId: activeKey,
+		});
 		setContent("");
 	};
 
+	// TODO 上一个请求没结束不能触发
 	const onPromptsItemClick: GetProp<typeof Prompts, "onItemClick"> = (info) => {
-		onRequest(info.data.description as string);
+		setContent(info.data.description as string);
+		chatStream({
+			prompt: info.data.description as string,
+			conversationId: activeKey,
+		});
+		setContent("");
 	};
 
+	// TODO 会话返回过程中要切换、新增会话怎么办
 	const onAddConversation = () => {
 		setConversationsItems([
 			...conversationsItems,
@@ -182,15 +170,6 @@ const Independent: React.FC = () => {
 		setActiveKey(key);
 	};
 
-	const items: GetProp<typeof Bubble.List, "items"> = messages.map(
-		({ id, message, status }) => ({
-			key: id,
-			loading: status === "loading",
-			role: status === "local" ? "local" : "ai",
-			content: message,
-		})
-	);
-
 	const attachmentsNode = (
 		<Badge dot={attachedFiles.length > 0 && !headerOpen}>
 			<Tooltip title="暂不支持">
@@ -204,6 +183,69 @@ const Independent: React.FC = () => {
 		</Badge>
 	);
 
+	// ==================== 消息合并 ====================
+	const mergedMessages = useMemo(() => {
+		const conversation = conversations.get(activeKey);
+		if (!conversation)
+			return [
+				{
+					content: <PlaceHolderNode onPromptsItemClick={onPromptsItemClick} />,
+					variant: "borderless" as const,
+				},
+			];
+		const { messages } = conversation as Conversation;
+
+		return messages.length
+			? messages.map((message) => {
+					return {
+						messageRender: renderMarkdown,
+						key: message.requestId + message.model,
+						role: message.model,
+						content: message.content,
+					};
+				})
+			: [
+					{
+						content: (
+							<PlaceHolderNode onPromptsItemClick={onPromptsItemClick} />
+						),
+
+						variant: "borderless" as const,
+					},
+				];
+	}, [conversations, activeKey]);
+
+	const dividedMessages = useMemo((): Map<Model, StreamMessage[]> => {
+		const conversation = conversations.get(activeKey);
+		if (!conversation) {
+			const mockModelMessages = new Map();
+			selectModels.forEach((model) => {
+				mockModelMessages.set(model, [
+					{
+						disableMdKit: true,
+						content: (
+							<PlaceHolderNode onPromptsItemClick={onPromptsItemClick} />
+						),
+						model,
+						variant: "borderless" as const,
+					},
+				]);
+			});
+			return mockModelMessages;
+		}
+		const { modelMessages } = conversation as Conversation;
+
+		return modelMessages;
+	}, [conversations, activeKey]);
+
+	// ==================== 错误处理 ====================
+	useEffect(() => {
+		if (error) {
+			console.error("流式请求错误:", error);
+			// TODO 在这里添加 Ant Design 的通知提示
+		}
+	}, [error]);
+
 	// ==================== Render =================
 	return (
 		<div className="w-full min-w-[1000px] h-screen min-h-[722px] rounded flex bg-white font-[AlibabaPuHuiTi,system-ui]">
@@ -215,12 +257,8 @@ const Independent: React.FC = () => {
 				theme="dark"
 				collapsedWidth="120"
 				collapsible
-				onBreakpoint={(broken) => {
-					console.log(broken);
-				}}
 				onCollapse={(collapsed, type) => {
 					setSideCollapsed(collapsed);
-					console.log(collapsed, type);
 				}}
 				collapsed={sideCollapsed}>
 				{/* 🌟 Logo */}
@@ -252,36 +290,64 @@ const Independent: React.FC = () => {
 				/>
 			</Sider>
 
-			<div className="h-full w-full max-w-[700px] mx-auto box-border flex flex-col p-2 gap-4">
+			<div className="h-full w-ful   min-w-[600px] mx-auto box-border flex flex-col p-2 gap-4 relative">
 				<FriendlyLinkBar />
 				{/* 🌟 消息列表 */}
-				<Bubble.List
-					items={
-						items.length > 0
-							? items
-							: [
-									{
-										content: (
-											<PlaceHolderNode
-												onPromptsItemClick={onPromptsItemClick}
-											/>
-										),
-										variant: "borderless",
-									},
-								]
-					}
-					roles={roles}
-					className="flex-1"
-				/>
+				{/* <Bubble.List items={mergedMessages} roles={roles} className="flex-1" /> */}
+
+				<div
+					style={{
+						height: "calc(100vh - 120px)",
+					}}>
+					<Flex
+						vertical={false}
+						gap="middle"
+						style={{
+							height: "100%",
+							overflowY: "hidden",
+						}}>
+						{selectModels.map((model) => {
+							return (
+								<Bubble.List
+									key={model}
+									items={(dividedMessages.get(model) || []).map((message) => {
+										return message?.disableMdKit
+											? {
+													key: message.requestId + message.model,
+													role: message.model,
+													content: message.content,
+												}
+											: {
+													messageRender: renderMarkdown,
+													key: message.requestId + message.model,
+													role: message.model,
+													content: message.content,
+												};
+									})}
+									roles={roles}
+									className="flex-1"
+									style={{
+										height: "100%",
+										minWidth: "700px",
+										overflowY: "scroll",
+										padding: "0 2px",
+									}}
+								/>
+							);
+						})}
+					</Flex>
+				</div>
 				{/* 🌟 输入框 */}
-				<Sender
-					value={content}
-					onSubmit={onSubmit}
-					onChange={setContent}
-					prefix={attachmentsNode}
-					loading={eventSourceAgent.isRequesting()}
-					className="shadow-md"
-				/>
+				<div className=" absolute bottom-0 w-full">
+					<Sender
+						value={content}
+						onSubmit={onSubmit}
+						onChange={setContent}
+						prefix={attachmentsNode}
+						loading={getConversationsState(activeKey).isLoading}
+						className="shadow-md"
+					/>
+				</div>
 			</div>
 		</div>
 	);
