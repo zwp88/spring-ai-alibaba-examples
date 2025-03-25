@@ -22,8 +22,6 @@ import {
 	Flex,
 	type GetProp,
 	Layout,
-	Space,
-	Splitter,
 	Tooltip,
 	Typography,
 } from "antd";
@@ -338,7 +336,7 @@ const Independent: React.FC = () => {
 					</Flex>
 				</div>
 				{/* 🌟 输入框 */}
-				<div className=" absolute bottom-0 w-full">
+				<div className=" absolute bottom-2 w-full">
 					<Sender
 						value={content}
 						onSubmit={onSubmit}

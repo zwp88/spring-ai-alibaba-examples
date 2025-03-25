@@ -9,6 +9,19 @@ export type StreamMessage = {
 	disableMdKit?: boolean;
 };
 
+export const createStreamMessage = (
+	base: Pick<StreamMessage, "model" | "content" | "requestId"> & {
+		startTime?: string;
+		timeStamp?: string;
+		disableMdKit?: boolean;
+	}
+): StreamMessage => ({
+	startTime: base.startTime ?? Date.now().toString(),
+	timeStamp: base.timeStamp ?? Date.now().toString(),
+	disableMdKit: base.disableMdKit ?? false,
+	...base,
+});
+
 export type StreamParams = {
 	prompt: string;
 	model?: Model[];
@@ -21,14 +34,25 @@ export type StreamHandlers = {
 	onError: (error: Error) => void;
 	onOpen?: () => void;
 	onClose?: () => void;
+	onOpenError: (error: Error) => void;
 };
 
 export type StreamAction =
 	| {
+			type: "OPEN_ERROR";
+			error: Error;
+			conversationId: string;
+			requestId: string;
+			requestTime: string;
+			model: Model;
+			models?: Model[];
+			prompt: string;
+	  }
+	| {
 			type: "REQUEST_START";
 			conversationId: string;
 			requestId: string;
-			content: string;
+			prompt: string;
 			requestTime: string;
 			model: Model;
 			models?: Model[];

@@ -25,7 +25,7 @@ const createChartStreamConnection = (
 			if (res.status === 200) {
 				handlers.onOpen?.();
 			} else {
-				handlers.onError(new Error(`Server error: ${res.status}`));
+				handlers.onOpenError(new Error(`Server error: ${res.status}`));
 			}
 		},
 		onmessage: (event) => {
