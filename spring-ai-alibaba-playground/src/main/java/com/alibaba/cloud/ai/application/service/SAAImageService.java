@@ -27,6 +27,7 @@ import com.alibaba.cloud.ai.application.utils.FilesUtils;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.dashscope.chat.MessageFormat;
+import com.alibaba.cloud.ai.dashscope.image.DashScopeImageOptions;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
 
@@ -37,7 +38,6 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
-import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.model.Media;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -113,10 +113,45 @@ public class SAAImageService {
 		return Flux.just(result.toString());
 	}
 
-	public void text2Image(String prompt, HttpServletResponse response) {
+	public void text2Image(String prompt, String style, HttpServletResponse response) {
 
-		ImageResponse imageResponse = imageModel.call(new ImagePrompt(prompt));
-		String imageUrl = imageResponse.getResult().getOutput().getUrl();
+		String imageUrl = imageModel.call(
+						new ImagePrompt(
+								prompt,
+								DashScopeImageOptions.builder()
+										.withStyle(style)
+										.build())
+				).getResult()
+				.getOutput()
+				.getUrl();
+
+		try {
+			URL url = URI.create(imageUrl).toURL();
+			InputStream in = url.openStream();
+
+			response.setHeader("Content-Type", MediaType.IMAGE_PNG_VALUE);
+			response.getOutputStream().write(in.readAllBytes());
+			response.getOutputStream().flush();
+		}
+		catch (IOException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	/**
+	 * 生成不同分辨率的图片
+	 */
+	public void images(String prompt, String resolution, HttpServletResponse response) {
+		;
+		String imageUrl = imageModel.call(
+						new ImagePrompt(prompt,
+								DashScopeImageOptions.builder()
+										.withHeight(Integer.valueOf(resolution.split("\\*")[0]))
+										.withWidth(Integer.valueOf(resolution.split("\\*")[1]))
+										.build())
+				).getResult()
+				.getOutput()
+				.getUrl();
 
 		try {
 			URL url = URI.create(imageUrl).toURL();

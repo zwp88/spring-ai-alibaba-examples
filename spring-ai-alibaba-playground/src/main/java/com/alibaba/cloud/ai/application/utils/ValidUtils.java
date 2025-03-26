@@ -22,14 +22,21 @@ package com.alibaba.cloud.ai.application.utils;
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
-public final class ValidText {
+public final class ValidUtils {
 
-	private ValidText() {
+	private ValidUtils() {
 	}
 
 	public static boolean isValidate(String text) {
 
 		return text != null && !text.isEmpty();
+	}
+
+	public static boolean isValidResolution(String resolution) {
+
+		String regex = "\\d+\\*\\d+";
+
+		return resolution.matches(regex);
 	}
 
 }

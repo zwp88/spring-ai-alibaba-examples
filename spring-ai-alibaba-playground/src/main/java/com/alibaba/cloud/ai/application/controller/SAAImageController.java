@@ -20,7 +20,7 @@ package com.alibaba.cloud.ai.application.controller;
 import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAAImageService;
-import com.alibaba.cloud.ai.application.utils.ValidText;
+import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -85,14 +85,42 @@ public class SAAImageController {
 	@Operation(summary = "DashScope Image Generation")
 	public Result<Void> text2Image(
 			@RequestParam("prompt") String prompt,
+			@RequestParam(value = "style", required = false) String style,
 			HttpServletResponse response
 	) {
 
-		if (!ValidText.isValidate(prompt)) {
+		if (!ValidUtils.isValidate(prompt)) {
 			return Result.failed("No prompt provided");
 		}
 
-		imageService.text2Image(prompt, response);
+		imageService.text2Image(prompt, style, response);
+
+		return Result.success();
+	}
+
+	@UserIp
+	@GetMapping("/images")
+	@Operation(summary = "生成不同分辨率的图片")
+	public Result<Void> images(
+			@RequestParam("prompt") String prompt,
+			@RequestParam(value = "resolution", required = false) String resolution,
+			HttpServletResponse response
+	) {
+
+		if (!ValidUtils.isValidate(prompt)) {
+			return Result.failed("No prompt provided");
+		}
+
+		// Check if the resolution is valid
+		if (StringUtils.hasText(resolution)) {
+			if (!ValidUtils.isValidResolution(resolution)) {
+				return Result.failed("Invalid resolution format");
+			}
+		} else {
+			resolution = "1024*1024";
+		}
+
+		imageService.images(prompt, resolution, response);
 
 		return Result.success();
 	}

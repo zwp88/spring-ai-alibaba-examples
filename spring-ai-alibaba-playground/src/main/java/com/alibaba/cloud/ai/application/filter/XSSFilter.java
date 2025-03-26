@@ -38,7 +38,11 @@ public class XSSFilter implements Filter {
 			throws IOException, ServletException {
 
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		httpResponse.setHeader("Content-Security-Policy", "default-src 'self';");
+
+		// 设置 CPS 允许内联样式和跨域获取图片
+		httpResponse.setHeader(
+				"Content-Security-Policy",
+				"default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https://mdn.alipayobjects.com blob: data:;");
 		chain.doFilter(request, response);
 	}
 
