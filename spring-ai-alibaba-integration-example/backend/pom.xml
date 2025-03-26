@@ -108,6 +108,12 @@
 			<artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>
 			<version>1.0.0-M6</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.bytedeco</groupId>
+			<artifactId>javacv-platform</artifactId>
+			<version>1.5.9</version>
+		</dependency>
 	</dependencies>
 
 	<build>

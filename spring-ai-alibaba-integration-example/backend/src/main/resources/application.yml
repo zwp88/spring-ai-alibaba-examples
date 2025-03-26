@@ -21,6 +21,9 @@ server:
 spring:
   application:
     name: spring-ai-alibaba-integration-application
-
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   profiles:
     active: dev
