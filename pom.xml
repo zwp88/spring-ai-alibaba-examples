@@ -69,7 +69,6 @@
 		<module>spring-ai-alibaba-structured-example</module>
 		<module>spring-ai-alibaba-mcp-example</module>
 		<module>spring-ai-alibaba-nacos-example</module>
-		<module>spring-ai-alibaba-integration-example</module>
 		<module>spring-ai-alibaba-more-platform-and-model-example</module>
 		<module>spring-ai-alibaba-text-summarizer-example</module>
 		<module>spring-ai-alibaba-sql-example</module>
