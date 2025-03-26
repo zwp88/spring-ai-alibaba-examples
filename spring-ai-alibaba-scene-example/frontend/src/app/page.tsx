@@ -59,7 +59,7 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
 		header: "user",
 		styles: {
 			content: {
-				maxWidth: 500,
+				maxWidth: 600,
 				borderRadius: 16,
 			},
 		},
@@ -73,7 +73,7 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
 		},
 		styles: {
 			content: {
-				maxWidth: 500,
+				maxWidth: 600,
 				borderRadius: 16,
 			},
 		},
@@ -87,7 +87,7 @@ const roles: GetProp<typeof Bubble.List, "roles"> = {
 		},
 		styles: {
 			content: {
-				maxWidth: 500,
+				maxWidth: 600,
 				borderRadius: 16,
 			},
 		},
@@ -295,7 +295,7 @@ const Independent: React.FC = () => {
 
 				<div
 					style={{
-						height: "calc(100vh - 120px)",
+						height: "calc(100vh - 130px)",
 					}}>
 					<Flex
 						vertical={false}

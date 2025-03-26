@@ -4,14 +4,12 @@ import React from "react";
 
 import {
 	CommentOutlined,
-	EllipsisOutlined,
 	FireOutlined,
 	HeartOutlined,
 	ReadOutlined,
-	ShareAltOutlined,
 	SmileOutlined,
 } from "@ant-design/icons";
-import { Button, type GetProp, Space } from "antd";
+import { type GetProp, Space } from "antd";
 const renderTitle = (icon: React.ReactElement, title: string) => (
 	<Space align="start">
 		{icon}
