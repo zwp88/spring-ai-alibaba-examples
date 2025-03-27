@@ -32,11 +32,4 @@ public final class ValidUtils {
 		return text != null && !text.isEmpty();
 	}
 
-	public static boolean isValidResolution(String resolution) {
-
-		String regex = "\\d+\\*\\d+";
-
-		return resolution.matches(regex);
-	}
-
 }

@@ -1,7 +1,7 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.service.SAAWebSearchService;
-import com.alibaba.cloud.ai.application.utils.ValidText;
+import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
@@ -35,7 +35,7 @@ public class SAAWebSearchController {
 			HttpServletResponse response
 	) {
 
-		if (!ValidText.isValidate(query)) {
+		if (!ValidUtils.isValidate(query)) {
 			return Flux.just("Invalid query");
 		}
 

@@ -44,6 +44,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/")
 public class SAAImageController {
 
+	private static final String DEFAULT_IMAGE_STYLE = "动漫风格";
+
 	private final SAAImageService imageService;
 
 	public SAAImageController(SAAImageService imageService) {
@@ -86,23 +88,6 @@ public class SAAImageController {
 	public Result<Void> text2Image(
 			@RequestParam("prompt") String prompt,
 			@RequestParam(value = "style", required = false) String style,
-			HttpServletResponse response
-	) {
-
-		if (!ValidUtils.isValidate(prompt)) {
-			return Result.failed("No prompt provided");
-		}
-
-		imageService.text2Image(prompt, style, response);
-
-		return Result.success();
-	}
-
-	@UserIp
-	@GetMapping("/images")
-	@Operation(summary = "生成不同分辨率的图片")
-	public Result<Void> images(
-			@RequestParam("prompt") String prompt,
 			@RequestParam(value = "resolution", required = false) String resolution,
 			HttpServletResponse response
 	) {
@@ -111,16 +96,16 @@ public class SAAImageController {
 			return Result.failed("No prompt provided");
 		}
 
-		// Check if the resolution is valid
-		if (StringUtils.hasText(resolution)) {
-			if (!ValidUtils.isValidResolution(resolution)) {
-				return Result.failed("Invalid resolution format");
-			}
-		} else {
-			resolution = "1024*1024";
+		if (!StringUtils.hasText(resolution)) {
+			// Either width or height should be between 512 and 1440.
+			resolution = "1080*1080";
 		}
 
-		imageService.images(prompt, resolution, response);
+		if (!StringUtils.hasText(style)) {
+			style = DEFAULT_IMAGE_STYLE;
+		}
+
+		imageService.text2Image(prompt, resolution, style, response);
 
 		return Result.success();
 	}

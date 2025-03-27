@@ -20,7 +20,7 @@ package com.alibaba.cloud.ai.application.controller;
 import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAAAudioService;
-import com.alibaba.cloud.ai.application.utils.ValidText;
+import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Flux;
@@ -82,7 +82,7 @@ public class SAAAudioController {
 			@RequestParam("prompt") String prompt
 	) {
 
-		if (!ValidText.isValidate(prompt)) {
+		if (!ValidUtils.isValidate(prompt)) {
 			return Result.failed("No chat prompt provided");
 		}
 
