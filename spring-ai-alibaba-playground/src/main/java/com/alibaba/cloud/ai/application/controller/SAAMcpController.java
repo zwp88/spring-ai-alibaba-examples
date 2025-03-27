@@ -19,7 +19,7 @@ package com.alibaba.cloud.ai.application.controller;
 import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAAMcpService;
-import com.alibaba.cloud.ai.application.utils.ValidText;
+import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,9 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "MCP APIs")
-
-
-
 
 @RequestMapping("/api/v1/")
 public class SAAMcpController {
@@ -57,7 +54,7 @@ public class SAAMcpController {
             HttpServletResponse response,
             @RequestHeader(value = "chatId", required = true) String chatId) {
 
-        if (!ValidText.isValidate(prompt)) {
+        if (!ValidUtils.isValidate(prompt)) {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return Result.failed("No chat prompt provided");

@@ -21,7 +21,7 @@ import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAFunctionService;
-import com.alibaba.cloud.ai.application.utils.ValidText;
+import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -62,7 +62,7 @@ public class SAAFunctionController {
 			@RequestHeader(value = "chatId", required = false) String chatId
 	) {
 
-		if (!ValidText.isValidate(prompt)) {
+		if (!ValidUtils.isValidate(prompt)) {
 
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return Flux.just(Result.failed("No chat prompt provided"));

@@ -41,4 +41,4 @@ spring:
 
   iqs:
     search:
-      api-key: ${ALIYUN_IQS_KEY}
+      api-key: ${IQS_SEARCH_API_KEY}

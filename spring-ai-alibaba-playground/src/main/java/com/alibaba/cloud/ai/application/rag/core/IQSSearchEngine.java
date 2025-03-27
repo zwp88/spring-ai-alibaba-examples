@@ -59,7 +59,7 @@ public class IQSSearchEngine {
 
 		return this.restClient.get()
 				.uri(
-						"/search/genericAdvancedSearch?query={query}&timeRange={timeRange}",
+						"/search/genericSearch?query={query}&timeRange={timeRange}",
 						query,
 						TIME_RANGE
 				).retrieve()

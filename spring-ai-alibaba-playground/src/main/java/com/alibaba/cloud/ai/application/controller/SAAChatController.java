@@ -24,7 +24,7 @@ import java.util.Set;
 import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAChatService;
-import com.alibaba.cloud.ai.application.utils.ValidText;
+import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -76,8 +76,7 @@ public class SAAChatController {
 	) {
 
 		// Interface throttling is configured in the audit platform
-
-		if (!ValidText.isValidate(prompt)) {
+		if (!ValidUtils.isValidate(prompt)) {
 
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return Flux.just("No chat prompt provided");
@@ -115,7 +114,7 @@ public class SAAChatController {
 			@RequestHeader(value = "chatId", required = false) String chatId
 	) {
 
-		if (!ValidText.isValidate(prompt)) {
+		if (!ValidUtils.isValidate(prompt)) {
 
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return Flux.just("No chat prompt provided");

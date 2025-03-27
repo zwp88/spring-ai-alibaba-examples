@@ -39,7 +39,6 @@ logs/
 
 # ignore test.
 *.wav
-*.png
 *.jpg
 
 # ignore db files

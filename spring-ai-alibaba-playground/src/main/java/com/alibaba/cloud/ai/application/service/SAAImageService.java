@@ -36,6 +36,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.model.Media;
@@ -53,7 +54,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class SAAImageService {
 
-	private static final String DEFAULT_MODEL = "qwen-vl-max-latest";
+	private static final String DEFAULT_TEXT2IMAGE_MODEL = "qwen-vl-max-latest";
+
+	private static final String DEFAULT_IMAGE_MODEL = "wanx2.1-t2i-turbo";
 
 	/**
 	 * Images generate text
@@ -94,7 +97,7 @@ public class SAAImageService {
 						new Prompt(
 								message,
 								DashScopeChatOptions.builder()
-										.withModel(DEFAULT_MODEL)
+										.withModel(DEFAULT_TEXT2IMAGE_MODEL)
 										.withMultiModel(true)
 										.build())
 				).stream()
@@ -113,45 +116,22 @@ public class SAAImageService {
 		return Flux.just(result.toString());
 	}
 
-	public void text2Image(String prompt, String style, HttpServletResponse response) {
+	public void text2Image(String prompt, String resolution, String style, HttpServletResponse response) {
 
-		String imageUrl = imageModel.call(
-						new ImagePrompt(
-								prompt,
-								DashScopeImageOptions.builder()
-										.withStyle(style)
-										.build())
-				).getResult()
-				.getOutput()
-				.getUrl();
+		ImageGeneration result = imageModel.call(
+				new ImagePrompt(
+						prompt,
+						DashScopeImageOptions.builder()
+								.withHeight(Integer.valueOf(resolution.split("\\*")[0]))
+								.withWidth(Integer.valueOf(resolution.split("\\*")[1]))
+								.withStyle(style)
+								.withModel(DEFAULT_IMAGE_MODEL)
+								.build())
+		).getResult();
 
-		try {
-			URL url = URI.create(imageUrl).toURL();
-			InputStream in = url.openStream();
+		System.out.println(result);
 
-			response.setHeader("Content-Type", MediaType.IMAGE_PNG_VALUE);
-			response.getOutputStream().write(in.readAllBytes());
-			response.getOutputStream().flush();
-		}
-		catch (IOException e) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	/**
-	 * 生成不同分辨率的图片
-	 */
-	public void images(String prompt, String resolution, HttpServletResponse response) {
-		;
-		String imageUrl = imageModel.call(
-						new ImagePrompt(prompt,
-								DashScopeImageOptions.builder()
-										.withHeight(Integer.valueOf(resolution.split("\\*")[0]))
-										.withWidth(Integer.valueOf(resolution.split("\\*")[1]))
-										.build())
-				).getResult()
-				.getOutput()
-				.getUrl();
+		String imageUrl = result.getOutput().getUrl();
 
 		try {
 			URL url = URI.create(imageUrl).toURL();
