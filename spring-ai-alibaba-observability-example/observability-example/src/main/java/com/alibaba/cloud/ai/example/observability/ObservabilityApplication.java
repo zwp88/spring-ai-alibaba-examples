@@ -16,27 +16,17 @@
 
 package com.alibaba.cloud.ai.example.observability;
 
-import java.util.List;
 import java.util.Map;
 
-import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeChatProperties;
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
-import io.micrometer.observation.ObservationRegistry;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.model.function.FunctionCallback;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -52,25 +42,11 @@ public class ObservabilityApplication {
         return builder.build();
     }
 
-//    @Bean
-//    public OpenTelemetry openTelemetry() {
-//        return GlobalOpenTelemetry.get();
-//    }
-
-//    @Bean
-//    @ConditionalOnProperty(prefix = DashScopeChatProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
-//            matchIfMissing = true)
-//    public DashScopeChatModel dashscopeChatModel(DashScopeChatProperties chatProperties, List<FunctionCallback> toolFunctionCallbacks,
-//                                                 FunctionCallbackContext functionCallbackContext, RetryTemplate retryTemplate,
-//                                                 ObjectProvider<ObservationRegistry> observationRegistry, DashScopeApi dashScopeApi) {
-//
-//        if (!CollectionUtils.isEmpty(toolFunctionCallbacks)) {
-//            chatProperties.getOptions().getFunctionCallbacks().addAll(toolFunctionCallbacks);
-//        }
-//
-//        return new DashScopeChatModel(dashScopeApi, chatProperties.getOptions(), functionCallbackContext, retryTemplate,
-//                observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP));
-//    }
+    @Bean
+    public OpenTelemetry openTelemetry() {
+        // suppress the initialization of OpenTelemetry SDK in micrometer
+        return GlobalOpenTelemetry.get();
+    }
 }
 
 @Controller
