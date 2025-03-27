@@ -1,6 +1,7 @@
 # Spring AI Alibaba 集成示例
 
-本示例项目展示了如何使用 。该项目设计为一个独立且可移植的示例，您可以直接使用或参考此项目，将 Spring AI Alibaba 集成到您的项目中。
+## Introduction
+本示例项目展示了如何使用 Spring AI Alibaba 实现同时询问多个模型并接受多个模型运行结果的功能。该项目设计为一个独立且可移植的运行示例，包含了前端和后端的实现，您可以直接使用或参考此项目，将 Spring AI Alibaba 集成到您的项目中。
 
 ## 快速开始
 
@@ -33,11 +34,3 @@ pnpm dev
 ## 其他信息
 // 可以在这里添加关于项目的其他信息，如贡献指南、许可证等。
 
-## 本地 docker compose 部署启动
-
-打包：make all
-构建镜像：make image
-
-> 修改 docker/docker-compose.yml 文件的 backend image tag 为本地 build 的镜像 tag
-
-启动：make run
