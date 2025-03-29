@@ -52,7 +52,7 @@ public class SAAMcpController {
     public Result<String> chat(
             @RequestParam("prompt") String prompt,
             HttpServletResponse response,
-            @RequestHeader(value = "chatId", required = true) String chatId) {
+            @RequestHeader("chatId") String chatId) {
 
         if (!ValidUtils.isValidate(prompt)) {
 

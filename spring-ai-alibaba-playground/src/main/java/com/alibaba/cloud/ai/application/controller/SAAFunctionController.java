@@ -18,8 +18,6 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.entity.result.Result;
-import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAFunctionService;
 import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,17 +43,14 @@ public class SAAFunctionController {
 
 	private final SAAFunctionService functionService;
 
-	private final SAABaseService baseService;
-
-	public SAAFunctionController(SAAFunctionService functionService, SAABaseService baseService) {
+	public SAAFunctionController(SAAFunctionService functionService) {
 		this.functionService = functionService;
-        this.baseService = baseService;
     }
 
 	@UserIp
 	@GetMapping("tool-call")
 	@Operation(summary = "DashScope ToolCall Chat")
-	public Flux<Result<String>> chat(
+	public Flux<String> chat(
 			@RequestParam("prompt") String prompt,
 			HttpServletResponse response,
 			@RequestHeader(value = "model", required = false) String model,
@@ -65,10 +60,10 @@ public class SAAFunctionController {
 		if (!ValidUtils.isValidate(prompt)) {
 
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return Flux.just(Result.failed("No chat prompt provided"));
+			return Flux.just("No chat prompt provided");
 		}
 
-		return functionService.chat(chatId, model, prompt).map(Result::success);
+		return functionService.chat(chatId, model, prompt);
 	}
 
 }

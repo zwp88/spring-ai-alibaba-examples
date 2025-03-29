@@ -61,3 +61,19 @@ logging:
   level:
     org.springframework.ai: debug
     com.alibaba.dashscope.api: debug
+
+# 部署时不配置，使用默认配置
+management:
+  endpoints:
+    web:
+      exposure:
+        # 开放所有外部端点
+        include: "*"
+  endpoint:
+    health:
+      # 应用健康状态检查，携带详细新学年
+      show-details: always
+  tracing:
+    sampling:
+        # trace 采样信息，记录每个请求
+        probability: 1.0

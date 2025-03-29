@@ -20,15 +20,12 @@ server:
 
 spring:
   application:
-<<<<<<< HEAD
     name: spring-ai-alibaba-playground
 
-=======
-    name: spring-ai-alibaba-integration-application
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
->>>>>>> 20dfdbdaa8fe6a563b1d8ccede90b376c5a8bb0b
+
   profiles:
     active: dev
