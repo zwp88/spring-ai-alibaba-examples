@@ -112,6 +112,19 @@
 			<artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>
 			<version>1.0.0-M6</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-otel</artifactId>
+			<version>1.5.0-M2</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

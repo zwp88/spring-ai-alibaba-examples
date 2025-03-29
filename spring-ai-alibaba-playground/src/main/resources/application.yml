@@ -20,7 +20,7 @@ server:
 
 spring:
   application:
-    name: spring-ai-alibaba-integration-application
+    name: spring-ai-alibaba-playground
 
   profiles:
     active: dev

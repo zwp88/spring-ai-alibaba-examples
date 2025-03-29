@@ -116,6 +116,12 @@ public class SAAImageService {
 		return Flux.just(result.toString());
 	}
 
+	/**
+	 * 可以基于此接口扩展更多参数，调用不同模型来实现
+	 * 图像扩展，反向 Prompt，图像增强，抠图等功能。
+	 * 此示例中不做演示。
+	 * 文档参考：<a href="https://help.aliyun.com/zh/model-studio/developer-reference/text-to-image-v2-api-reference">...</a>
+	 */
 	public void text2Image(String prompt, String resolution, String style, HttpServletResponse response) {
 
 		ImageGeneration result = imageModel.call(
