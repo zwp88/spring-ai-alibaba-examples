@@ -63,6 +63,8 @@ import ReactMarkdown from "react-markdown";
 import { ActionButtonConfig, FunctionMenuItem } from "./types";
 import { Bubble } from "@ant-design/x";
 
+import { DEFAULT_MODEL, MAX_IMAGE_SIZE } from "./constant";
+
 // 导入页面组件
 import ImageGenPage from "./menuPages/imageGenPage";
 import DocSummaryPage from "./menuPages/docSummaryPage";
@@ -129,8 +131,6 @@ export const functionMenuItems: FunctionMenuItem[] = [
   }
 ];
 
-const DEFAULT_MODEL = "qwen-plus";
-const MAX_IMAGE_SIZE = 2048;
 const decoder = new TextDecoder("utf-8");
 // 标记创建的下一个会话的 index
 let conversationFlag = 2;
