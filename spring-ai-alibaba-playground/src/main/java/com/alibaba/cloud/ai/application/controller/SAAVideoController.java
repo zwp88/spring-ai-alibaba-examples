@@ -18,17 +18,17 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAAVideoService;
 import com.alibaba.nacos.common.utils.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import reactor.core.publisher.Flux;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
 
 /**
  * @author huangzhen
@@ -53,13 +53,13 @@ public class SAAVideoController {
     @UserIp
     @PostMapping("/video-qa")
     @Operation(summary = "基于视频内容的问答接口")
-    public Flux<Result<String>> videoQuestionAnswering(
+    public Flux<String> videoQuestionAnswering(
             @RequestParam(value = "prompt", required = false) String prompt,
             @RequestParam("video") MultipartFile video
     ) {
         // 验证视频文件
         if (video.isEmpty()) {
-            return Flux.just(Result.failed("错误：请上传有效的视频文件"));
+            return Flux.just("错误：请上传有效的视频文件");
         }
 
         // 设置默认问题
@@ -70,9 +70,9 @@ public class SAAVideoController {
         try {
             // 调用视频分析服务
             String analyzeVideo = videoService.analyzeVideo(prompt, video);
-            return Flux.just(Result.success(analyzeVideo));
+            return Flux.just(analyzeVideo);
         } catch (Exception e) {
-            return Flux.just(Result.failed("视频处理失败：" + e.getMessage()));
+            return Flux.just("视频处理失败：" + e.getMessage());
         }
     }
 }

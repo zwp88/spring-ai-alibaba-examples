@@ -44,7 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/")
 public class SAAImageController {
 
-	private static final String DEFAULT_IMAGE_STYLE = "动漫风格";
+	private static final String DEFAULT_IMAGE_STYLE = "摄影写实";
 
 	private final SAAImageService imageService;
 
