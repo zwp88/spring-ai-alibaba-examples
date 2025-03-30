@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.example.translation.dashscope.controller;
+package com.alibaba.example.translate.controller;
 
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
@@ -29,21 +29,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * @author Makoto
- * @author <a href="mailto:makoto@example.com">Makoto</a>
+ * DashScope翻译服务控制器
+ * 提供基于DashScope大模型的文本翻译API
  */
-
 @RestController
-@RequestMapping("/translation")
-public class DashScopeTranslationController {
+@RequestMapping("/api/dashscope/translate")
+public class DashScopeTranslateController {
 
 	private static final String TRANSLATION_PROMPT_TEMPLATE = "请将以下文本从%s翻译成%s：\n\n%s";
 
 	private final ChatModel dashScopeChatModel;
 
-	public DashScopeTranslationController(ChatModel chatModel) {
+	public DashScopeTranslateController(@Qualifier("dashScopeChatModel") ChatModel chatModel) {
 		this.dashScopeChatModel = chatModel;
 	}
 
@@ -55,17 +55,19 @@ public class DashScopeTranslationController {
 	 * @return 翻译后的文本
 	 */
 	@GetMapping("/simple")
-	public String simpleTranslation(
+	public TranslateResponse simpleTranslation(
 			@RequestParam String text,
 			@RequestParam(defaultValue = "中文") String sourceLanguage,
 			@RequestParam(defaultValue = "英文") String targetLanguage) {
 
 		String prompt = String.format(TRANSLATION_PROMPT_TEMPLATE, sourceLanguage, targetLanguage, text);
 		
-		return dashScopeChatModel.call(new Prompt(prompt, DashScopeChatOptions
+		String translatedText = dashScopeChatModel.call(new Prompt(prompt, DashScopeChatOptions
 				.builder()
 				.withModel(DashScopeApi.ChatModel.QWEN_PLUS.getModel())
 				.build())).getResult().getOutput().getText();
+		
+		return new TranslateResponse(translatedText);
 	}
 
 	/**
@@ -102,7 +104,7 @@ public class DashScopeTranslationController {
 	 * @return 翻译后的文本
 	 */
 	@GetMapping("/custom")
-	public String customTranslation(
+	public TranslateResponse customTranslation(
 			@RequestParam String text,
 			@RequestParam(defaultValue = "中文") String sourceLanguage,
 			@RequestParam(defaultValue = "英文") String targetLanguage) {
@@ -113,9 +115,12 @@ public class DashScopeTranslationController {
 				.withModel(DashScopeApi.ChatModel.QWEN_PLUS.getModel())
 				.withTopP(0.7)
 				.withTopK(50)
-				.withTemperature(0.5) // 降低温度以获得更准确的翻译
+				.withTemperature(0.5) 
 				.build();
 
-		return dashScopeChatModel.call(new Prompt(prompt, customOptions)).getResult().getOutput().getText();
+		String translatedText = dashScopeChatModel.call(new Prompt(prompt, customOptions))
+                .getResult().getOutput().getText();
+        
+        return new TranslateResponse(translatedText);
 	}
 } 
