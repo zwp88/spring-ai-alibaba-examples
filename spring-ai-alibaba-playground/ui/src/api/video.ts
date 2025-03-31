@@ -1,29 +1,33 @@
 import { BASE_URL } from "../constant";
 
+interface VideoParams {
+  prompt?: string;
+}
+
 // 解析视频接口
 export const postVideo = async (
-  vedio: File,
+  video: File,
   callback: (value: Uint8Array) => void,
-  params?: {
-    prompt?: string;
-  }
-) => {
+  params?: VideoParams
+): Promise<Response> => {
   const { prompt } = params || {};
 
   const formData = new FormData();
   formData.append("prompt", prompt || "");
-  formData.append("vedio", vedio);
-  const res = (await fetch(BASE_URL + "/video-qa", {
+  formData.append("video", video);
+  const res = await fetch(BASE_URL + "/video-qa", {
     method: "POST",
-    body: formData
-  })) as any;
+    body: formData,
+  });
 
-  const reader = res.body.getReader();
+  const reader = res.body?.getReader();
+  if (!reader) {
+    throw new Error("Failed to get response reader");
+  }
+
   await reader.read().then(function process({ done, value }) {
     if (done) return;
-
     callback(value);
-
     return reader.read().then(process);
   });
 

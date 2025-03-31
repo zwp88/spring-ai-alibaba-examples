@@ -58,21 +58,37 @@ export const useStyle = createStyles(({ token, css }) => {
       gap: 8px;
     `,
     conversations: css`
-      width: 100%;
-      padding: 0;
-      margin-top: 2px;
+      flex: 1;
       overflow-y: auto;
+      padding: 8px;
+      cursor: pointer;
+
+      .ant-x-conversations-item {
+        padding: 8px 12px;
+        border-radius: ${token.borderRadius}px;
+        transition: all 0.3s;
+
+        &:hover {
+          background-color: ${token.colorBgTextHover};
+        }
+
+        &.active {
+          background-color: ${token.colorPrimaryBg};
+          color: ${token.colorPrimary};
+        }
+      }
     `,
     chat: css`
       height: 100%;
       width: 100%;
-      max-width: 700px;
+      /* max-width: 1000px; */
       margin: 0 auto;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       padding: ${token.paddingLG}px;
       padding-bottom: 0;
+      margin: 0 8%;
       gap: 16px;
       transition: all 0.3s cubic-bezier(0.34, 0.69, 0.1, 1);
       position: relative;
@@ -229,7 +245,7 @@ export const useStyle = createStyles(({ token, css }) => {
     `,
     userProfile: css`
       display: flex;
-      height: 60px;
+      height: 30px;
       width: 100%;
       justify-content: flex-end;
       gap: 12px;
@@ -346,6 +362,13 @@ export const useStyle = createStyles(({ token, css }) => {
         display: block;
         opacity: 1;
       }
+    `,
+
+    chatPageSender: css`
+      position: fixed;
+      bottom: 12px;
+      padding: 0;
+      margin-top: 2px;
     `,
   };
 });
