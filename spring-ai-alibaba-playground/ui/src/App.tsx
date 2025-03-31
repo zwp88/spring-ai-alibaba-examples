@@ -74,10 +74,7 @@ const Independent: React.FC = () => {
         {/* 菜单页面容器 */}
         <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
           <Routes>
-            {/* 默认路由 */}
             <Route path="/" element={<Navigate to="/chat" replace />} />
-
-            {/* 功能页面路由 */}
             {Object.entries(pageComponents).map(([key, Component]) => (
               <React.Fragment key={key}>
                 {/* 类页面路由 */}
@@ -134,7 +131,6 @@ const Independent: React.FC = () => {
   );
 };
 
-// 包装 App 组件，提供路由功能
 const App = () => {
   return (
     <Router>

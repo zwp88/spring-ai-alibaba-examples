@@ -7,7 +7,7 @@ import {
   PaperClipOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { useStyle } from "../../style";
+import { useStyle } from "./style";
 import { actionButtonConfig, MAX_IMAGE_SIZE } from "../../constant";
 import { litFileSize } from "../../utils";
 import { useFunctionMenuStore } from "../../stores/functionMenu.store";
@@ -227,16 +227,8 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   );
 
   return (
-    <div style={{ height: "100%", position: "relative" }}>
-      <div
-        ref={messagesContainerRef}
-        style={{
-          height: "calc(100% - 60px)",
-          overflowY: "auto",
-          padding: "0 20px",
-          marginBottom: "60px",
-        }}
-      >
+    <div className={styles.container}>
+      <div ref={messagesContainerRef} className={styles.messagesContainer}>
         <Bubble.List
           items={items.map((item, index) => ({
             ...item,
@@ -249,15 +241,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
         />
       </div>
 
-      <div
-        className={styles.chatPageSender}
-        style={{
-          position: "fixed",
-          bottom: "32px",
-          left: "324px",
-          width: "calc(100% - 360px)",
-        }}
-      >
+      <div className={`${styles.chatPageSender} ${styles.senderContainer}`}>
         {actionButtonsNode}
         <div>
           <Sender

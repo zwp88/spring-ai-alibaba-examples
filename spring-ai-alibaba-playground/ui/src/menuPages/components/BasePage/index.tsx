@@ -1,25 +1,19 @@
 import React, { useEffect } from "react";
 import { Typography } from "antd";
 import { useConversationContext } from "../../../stores/conversation.store";
-import { useParams, useNavigate } from "react-router-dom";
-import { useFunctionMenuStore } from "../../../stores/functionMenu.store";
+import { useParams } from "react-router-dom";
 
 interface BasePageProps {
   title: string;
   children?: React.ReactNode;
   conversationId?: string | null;
+  className?: string;
 }
 
-const BasePage: React.FC<BasePageProps> = ({
-  title,
-  children,
-  conversationId,
-}) => {
+const BasePage: React.FC<BasePageProps> = ({ title, children, className }) => {
   const { chooseActiveConversation, clearActiveConversation } =
     useConversationContext();
-  const { inputtingContent } = useFunctionMenuStore();
   const { conversationId: routeConversationId } = useParams();
-  const navigate = useNavigate();
 
   // 监听路由变化
   useEffect(() => {
@@ -33,7 +27,7 @@ const BasePage: React.FC<BasePageProps> = ({
   }, [routeConversationId]);
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div className={className}>
       <Typography.Title level={2}>{title}</Typography.Title>
       {children}
     </div>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sender, Bubble } from "@ant-design/x";
 import { PlaceholderNode } from "../../constant";
-import { useStyle } from "../../style";
+import { useStyle } from "./style";
 import {
   MenuPage,
   useFunctionMenuStore,
@@ -42,25 +42,9 @@ const ChatLandingView: React.FC<ChatLandingViewProps> = ({ onNavigation }) => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        width: "calc(100% - 12px)",
-      }}
-    >
+    <div className={styles.landingContainer}>
       {/* 中间占位区域 - 可以放置欢迎信息、功能介绍等 */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: "50px",
-        }}
-      >
+      <div className={styles.landingContent}>
         <Bubble.List
           items={[
             {
@@ -78,14 +62,7 @@ const ChatLandingView: React.FC<ChatLandingViewProps> = ({ onNavigation }) => {
       </div>
 
       {/* 底部发送区域 */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "80px",
-          left: "324px",
-          width: "calc(100% - 360px)",
-        }}
-      >
+      <div className={styles.landingSender}>
         <Sender
           value={inputValue}
           onChange={(value: string) => setInputValue(value)}
