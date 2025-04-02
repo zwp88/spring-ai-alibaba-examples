@@ -28,7 +28,6 @@ import defaultAlgorithm from 'antd/es/theme/themes/default';
 // 创建自定义主题配置
 const customTheme = {
   token: {
-    // 自定义主题令牌
     colorPrimary: '#1677ff',
     borderRadius: 6,
   },
@@ -42,7 +41,6 @@ const Independent: React.FC = () => {
   
   // 根据当前主题设置body背景色
   useEffect(() => {
-    // 根据主题设置背景色（无过渡）
     document.body.style.backgroundColor = isDark ? '#141414' : '#ffffff';
     
     // 如果是暗色主题，添加class
