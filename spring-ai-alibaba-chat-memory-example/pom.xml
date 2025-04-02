@@ -53,17 +53,17 @@
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-mysql-memory</artifactId>
-			<version>${spring-ai-alibaba.version}</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.alibaba.cloud.ai</groupId>-->
+<!--			<artifactId>spring-ai-alibaba-mysql-memory</artifactId>-->
+<!--			<version>${spring-ai-alibaba.version}</version>-->
+<!--		</dependency>-->
 
-		<dependency>
-			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-redis-memory</artifactId>
-			<version>${spring-ai-alibaba.version}</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.alibaba.cloud.ai</groupId>-->
+<!--			<artifactId>spring-ai-alibaba-redis-memory</artifactId>-->
+<!--			<version>${spring-ai-alibaba.version}</version>-->
+<!--		</dependency>-->
 
 	</dependencies>
 
