@@ -8,10 +8,8 @@ export const useTheme = () => {
 
   // 在组件挂载时设置监听器
   useEffect(() => {
-    // 只有当使用系统主题时才需要监听系统主题变化
     if (themeMode === 'system') {
       return setupThemeListener(() => {
-        // 强制更新组件以应用新主题
         setThemeMode('system');
       });
     }
@@ -28,9 +26,9 @@ export const useTheme = () => {
   };
 
   return {
-    themeMode,     // 当前主题模式（light/dark/system）
-    actualTheme,   // 实际应用的主题（light/dark）
-    toggleTheme,   // 切换主题函数
-    setTheme,      // 设置特定主题函数
+    themeMode,     
+    actualTheme,   
+    toggleTheme,   
+    setTheme,      
   };
 }; 
