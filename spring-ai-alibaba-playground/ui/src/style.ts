@@ -38,7 +38,6 @@ export const useStyle = createStyles(({ token, css }) => {
       flex-direction: column;
       padding: 0 16px;
       box-sizing: border-box;
-      transition: all 0.3s cubic-bezier(0.34, 0.69, 0.1, 1);
       transform-origin: left center;
       overflow-y: auto;
       overflow-x: hidden;
@@ -66,7 +65,6 @@ export const useStyle = createStyles(({ token, css }) => {
       .ant-x-conversations-item {
         padding: 8px 12px;
         border-radius: ${token.borderRadius}px;
-        transition: all 0.3s;
 
         &:hover {
           background-color: ${token.colorBgTextHover};
@@ -150,7 +148,6 @@ export const useStyle = createStyles(({ token, css }) => {
       padding: 10px 16px;
       cursor: pointer;
       border-radius: ${token.borderRadius}px;
-      transition: all 0.3s;
 
       &:hover {
         background-color: ${token.colorBgTextHover};
@@ -183,31 +180,17 @@ export const useStyle = createStyles(({ token, css }) => {
       justify-content: center;
       box-shadow: ${token.boxShadowSecondary};
       cursor: pointer;
-      opacity: 0;
-      transform: scale(0.8);
-      animation: fadeIn 0.3s cubic-bezier(0.34, 0.69, 0.1, 1) forwards;
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: scale(0.8);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
+      opacity: 1;
+      transform: scale(1);
 
       &:hover {
         transform: scale(1.05);
-        transition: transform 0.2s ease;
       }
     `,
     pageContainer: css`
       flex: 1;
       display: none;
       opacity: 0;
-      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
       &.active {
         display: flex;
@@ -228,7 +211,6 @@ export const useStyle = createStyles(({ token, css }) => {
       height: 100%;
       display: none;
       opacity: 0;
-      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       background-color: ${token.colorBgContainer};
       overflow-y: auto;
 
