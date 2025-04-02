@@ -3,11 +3,13 @@ import {
   GithubOutlined,
   FormOutlined,
   DingdingOutlined,
+  BulbOutlined,
+  BulbFilled,
 } from "@ant-design/icons";
-import { Button, Tooltip, Layout, theme } from "antd";
+import { Button, Tooltip, Layout, theme, ConfigProvider, App as AntdApp } from "antd";
 import { useStyle } from "./style";
 import { Space } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -16,15 +18,52 @@ import {
 } from "react-router-dom";
 import { pageComponents } from "./constant";
 import FunctionMenu from "./menuPages/components/FunctionMenu";
+import { useTheme } from "./hooks/useTheme";
+import { ThemeProvider } from "antd-style";
+
+// 定义深色主题和浅色主题的算法
+import darkAlgorithm from 'antd/es/theme/themes/dark';
+import defaultAlgorithm from 'antd/es/theme/themes/default';
+
+// 创建自定义主题配置
+const customTheme = {
+  token: {
+    // 自定义主题令牌
+    colorPrimary: '#1677ff',
+    borderRadius: 6,
+  },
+};
 
 const Independent: React.FC = () => {
+  const { actualTheme, toggleTheme } = useTheme();
   const { token } = theme.useToken();
   const { styles } = useStyle();
+  const isDark = actualTheme === 'dark';
+  
+  // 根据当前主题设置body背景色
+  useEffect(() => {
+    // 根据主题设置背景色（无过渡）
+    document.body.style.backgroundColor = isDark ? '#141414' : '#ffffff';
+    
+    // 如果是暗色主题，添加class
+    if (isDark) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  }, [isDark]);
 
   // ==================== Render =================
   return (
     <>
       <Space className={styles.topLinkWrapper}>
+        <Tooltip title={isDark ? "切换到亮色模式" : "切换到暗色模式"}>
+          <Button
+            className="theme-toggle-btn"
+            icon={isDark ? <BulbFilled /> : <BulbOutlined />}
+            onClick={toggleTheme}
+          />
+        </Tooltip>
         <Tooltip title={"spring-ai-alibaba-examples link"}>
           <a
             href="https://github.com/springaialibaba/spring-ai-alibaba-examples"
@@ -70,6 +109,7 @@ const Independent: React.FC = () => {
         </Tooltip>
       </Space>
       <div className={styles.layout}>
+        {/* 左侧菜单不应用过渡效果 */}
         <FunctionMenu />
         {/* 菜单页面容器 */}
         <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
@@ -88,7 +128,7 @@ const Independent: React.FC = () => {
                         left: 0,
                         width: "100%",
                         height: "100%",
-                        transition: "opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                        transition: "none",
                         backgroundColor: token.colorBgContainer,
                         overflowY: "auto",
                       }}
@@ -108,7 +148,7 @@ const Independent: React.FC = () => {
                         left: 0,
                         width: "100%",
                         height: "100%",
-                        transition: "opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                        transition: "none",
                         backgroundColor: token.colorBgContainer,
                         overflowY: "auto",
                       }}
@@ -132,10 +172,28 @@ const Independent: React.FC = () => {
 };
 
 const App = () => {
+  const { actualTheme } = useTheme();
+  const isDark = actualTheme === 'dark';
+
   return (
-    <Router>
-      <Independent />
-    </Router>
+    <ConfigProvider
+      theme={{
+        ...customTheme,
+        algorithm: isDark ? darkAlgorithm : defaultAlgorithm,
+      }}
+    >
+      <AntdApp>
+        <ThemeProvider
+          appearance={actualTheme}
+          themeMode={actualTheme}
+          theme={customTheme}
+        >
+          <Router>
+            <Independent />
+          </Router>
+        </ThemeProvider>
+      </AntdApp>
+    </ConfigProvider>
   );
 };
 
