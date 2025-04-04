@@ -17,10 +17,12 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
+import javax.validation.constraints.NotNull;
+
 import com.alibaba.cloud.ai.application.annotation.UserIp;
+import com.alibaba.cloud.ai.application.annotation.ValidPrompt;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAAAudioService;
-import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Flux;
@@ -55,7 +57,7 @@ public class SAAAudioController {
 	@PostMapping("/audio2text")
 	@Operation(summary = "DashScope Audio Transcription")
 	public Flux<Result<String>> audioToText(
-			@RequestParam("audio") MultipartFile audio
+			@NotNull @RequestParam("audio") MultipartFile audio
 	) {
 
 		if (audio.isEmpty()) {
@@ -79,12 +81,9 @@ public class SAAAudioController {
 	@GetMapping("/text2audio")
 	@Operation(summary = "DashScope Speech Synthesis")
 	public Result<byte[]> textToAudio(
-			@RequestParam("prompt") String prompt
+			@ValidPrompt @RequestParam("prompt") String prompt
 	) {
 
-		if (!ValidUtils.isValidate(prompt)) {
-			return Result.failed("No chat prompt provided");
-		}
 
 		byte[] audioData = audioService.text2audio(prompt);
 

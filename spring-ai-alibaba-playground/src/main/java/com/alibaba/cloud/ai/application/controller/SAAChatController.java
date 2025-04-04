@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
+import com.alibaba.cloud.ai.application.annotation.ValidPrompt;
 import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAChatService;
-import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -69,18 +69,11 @@ public class SAAChatController {
 	@GetMapping("/chat")
 	@Operation(summary = "DashScope Flux Chat")
 	public Flux<String> chat(
-			@RequestParam("prompt") String prompt,
 			HttpServletResponse response,
+			@ValidPrompt @RequestParam("prompt") String prompt,
 			@RequestHeader(value = "model", required = false) String model,
-			@RequestHeader(value = "chatId", required = false) String chatId
+			@RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-playground-chat") String chatId
 	) {
-
-		// Interface throttling is configured in the audit platform
-		if (!ValidUtils.isValidate(prompt)) {
-
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return Flux.just("No chat prompt provided");
-		}
 
 		Set<Map<String, String>> dashScope = baseService.getDashScope();
 		List<String> modelName = dashScope.stream()
@@ -98,28 +91,18 @@ public class SAAChatController {
 		}
 
 		response.setCharacterEncoding("UTF-8");
-
-		if (!StringUtils.hasText(chatId)) {
-			chatId = "spring-ai-alibaba-playground";
-		}
-
 		return chatService.chat(chatId, model, prompt);
 	}
 
 	@GetMapping("/deep-thinking/chat")
 	public Flux<String> deepThinkingChat(
-			@RequestParam("prompt") String prompt,
 			HttpServletResponse response,
+			@ValidPrompt @RequestParam("prompt") String prompt,
 			@RequestHeader(value = "model", required = false) String model,
 			@RequestHeader(value = "chatId", required = false) String chatId
 	) {
 
-		if (!ValidUtils.isValidate(prompt)) {
-
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return Flux.just("No chat prompt provided");
-		}
-
+		response.setCharacterEncoding("UTF-8");
 		return chatService.deepThinkingChat(chatId, model, prompt);
 	}
 

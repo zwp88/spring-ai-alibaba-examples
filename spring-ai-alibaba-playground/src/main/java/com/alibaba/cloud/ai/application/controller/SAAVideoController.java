@@ -17,9 +17,10 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
+import javax.validation.constraints.NotNull;
+
 import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.service.SAAVideoService;
-import com.alibaba.nacos.common.utils.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Flux;
@@ -54,17 +55,13 @@ public class SAAVideoController {
     @PostMapping("/video-qa")
     @Operation(summary = "基于视频内容的问答接口")
     public Flux<String> videoQuestionAnswering(
-            @RequestParam(value = "prompt", required = false) String prompt,
-            @RequestParam("video") MultipartFile video
+            @RequestParam(value = "prompt", required = false, defaultValue = "请总结这个视频的主要内容") String prompt,
+            @NotNull @RequestParam("video") MultipartFile video
     ) {
+
         // 验证视频文件
         if (video.isEmpty()) {
             return Flux.just("错误：请上传有效的视频文件");
-        }
-
-        // 设置默认问题
-        if (!StringUtils.hasText(prompt)) {
-            prompt = "请总结这个视频的主要内容";
         }
 
         try {

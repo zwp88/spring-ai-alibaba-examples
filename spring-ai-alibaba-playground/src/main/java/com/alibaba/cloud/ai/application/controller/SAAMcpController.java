@@ -17,12 +17,12 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.entity.result.Result;
+import com.alibaba.cloud.ai.application.annotation.ValidPrompt;
 import com.alibaba.cloud.ai.application.service.SAAMcpService;
-import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import reactor.core.publisher.Flux;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -48,18 +48,14 @@ public class SAAMcpController {
     @UserIp
     @GetMapping("/mcp")
     @Operation(summary = "DashScope Mcp Chat")
-    public Result<String> chat(
-            @RequestParam("prompt") String prompt,
+    public Flux<String> chat(
             HttpServletResponse response,
-            @RequestHeader("chatId") String chatId) {
+            @ValidPrompt @RequestParam("prompt") String prompt,
+            @RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-playground-mcp") String chatId
+    ) {
 
-        if (!ValidUtils.isValidate(prompt)) {
-
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return Result.failed("No chat prompt provided");
-        }
-
-        return Result.success(mcpService.chat(chatId, prompt));
+        response.setCharacterEncoding("UTF-8");
+        return mcpService.chat(chatId, prompt);
     }
 
 }

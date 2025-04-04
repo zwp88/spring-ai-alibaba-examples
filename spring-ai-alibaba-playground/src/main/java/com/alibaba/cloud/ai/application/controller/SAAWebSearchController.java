@@ -1,7 +1,7 @@
 package com.alibaba.cloud.ai.application.controller;
 
+import com.alibaba.cloud.ai.application.annotation.ValidPrompt;
 import com.alibaba.cloud.ai.application.service.SAAWebSearchService;
-import com.alibaba.cloud.ai.application.utils.ValidUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
@@ -31,16 +31,11 @@ public class SAAWebSearchController {
 
 	@GetMapping("/search")
 	public Flux<String> search(
-			@RequestParam(value = "query") String query,
-			HttpServletResponse response
+			HttpServletResponse response,
+			@ValidPrompt @RequestParam(value = "query") String query
 	) {
 
-		if (!ValidUtils.isValidate(query)) {
-			return Flux.just("Invalid query");
-		}
-
 		response.setCharacterEncoding("UTF-8");
-
 		return webSearch.chat(query);
 	}
 
