@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
 
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,10 +37,14 @@ public class SAASummarizerController {
 	@PostMapping("/summarizer")
 	public Flux<String> summary(
 			HttpServletResponse response,
-			@Validated @RequestParam("file") MultipartFile file,
+			@RequestParam(value = "file", required = false) MultipartFile file,
 			@RequestParam(value = "url", required = false) String url,
 			@RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-docs-summary") String chatId
 	) {
+
+		if (file == null && (url == null || url.isEmpty())) {
+			return Flux.just("Either 'file' or 'url' must be provided.");
+		}
 
 		response.setCharacterEncoding("UTF-8");
 		return docsSummaryService.summary(file, url, chatId);

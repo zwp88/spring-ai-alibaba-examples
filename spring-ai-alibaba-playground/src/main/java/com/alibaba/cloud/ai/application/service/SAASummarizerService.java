@@ -78,23 +78,13 @@ public class SAASummarizerService {
 					.collect(Collectors.joining("\n\n"));
 		}
 
-		logger.info("url not impl");
-		// logger.debug("Reading file content form URL");
-		// if (!UrlValidator.isValidUrl(url)) {
-		// 	logger.error("Invalid URL");
-		// 	throw new SAAAppException("Invalid URL");
-		// }
-		//
-		// CrawlerFirecrawlProperties crawlerFirecrawlProperties = new CrawlerFirecrawlProperties();
-		// crawlerFirecrawlProperties.setToken("122222");
-		// CrawlerJinaProperties jinaProperties = new CrawlerJinaProperties();
-		// jinaProperties.setToken(jinaToken);
-		// CrawlerJinaServiceImpl jinaService = new CrawlerJinaServiceImpl(jinaProperties, objectMapper);
-		// String text = jinaService.run(url);
-		//
-		// if (StringUtils.hasText(text)) {
-		// 	return text;
-		// }
+		if (StringUtils.hasText(url)) {
+			logger.debug("Reading file content form url");
+			List<Document> documents = new TikaDocumentReader(url).get();
+			return documents.stream()
+					.map(Document::getFormattedContent)
+					.collect(Collectors.joining("\n\n"));
+		}
 
 		return "";
 	}
