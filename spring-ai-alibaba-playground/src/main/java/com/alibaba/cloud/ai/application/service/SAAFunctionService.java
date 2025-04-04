@@ -22,6 +22,8 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +40,17 @@ public class SAAFunctionService {
 
 	private final ChatClient chatClient;
 
-	public SAAFunctionService(ChatModel chatModel) {
+	public SAAFunctionService(
+			ChatModel chatModel,
+			SimpleLoggerAdvisor simpleLoggerAdvisor,
+			MessageChatMemoryAdvisor messageChatMemoryAdvisor
+	) {
 
-		this.chatClient = ChatClient.builder(chatModel).build();
+		this.chatClient = ChatClient.builder(chatModel)
+				.defaultAdvisors(
+						messageChatMemoryAdvisor,
+						simpleLoggerAdvisor
+				).build();
 	}
 
 	public Flux<String> chat(String chatId, String prompt) {

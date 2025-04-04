@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  */
 
 @Configuration
-public class XSSFilterConfig {
+public class XSSFilterConfiguration {
 
 	@Bean
 	public FilterRegistrationBean<XSSFilter> xssFilter() {

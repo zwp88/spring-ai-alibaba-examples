@@ -39,9 +39,9 @@ import org.springframework.util.ResourceUtils;
  *         在应用启动时处理mcp-servers-config.json中的路径配置
  */
 @Component
-public class McpConfig implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+public class McpConfiguration implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
 
-    private static final Logger logger = LoggerFactory.getLogger(McpConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(McpConfiguration.class);
     private static final String MCP_CONFIG_FILE = "mcp-servers-config.json";
     private static final String MCP_LIBS_DIR = "mcp-libs";
 

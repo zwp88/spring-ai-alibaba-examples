@@ -53,7 +53,10 @@ public class SAAAudioService {
 
 	private static final String DEFAULT_MODEL_1 = "sensevoice-v1";
 
-	public SAAAudioService(AudioTranscriptionModel transcriptionModel, SpeechSynthesisModel speechSynthesisModel) {
+	public SAAAudioService(
+			AudioTranscriptionModel transcriptionModel,
+			SpeechSynthesisModel speechSynthesisModel
+	) {
 
 		this.transcriptionModel = transcriptionModel;
 		this.speechSynthesisModel = speechSynthesisModel;
@@ -99,7 +102,7 @@ public class SAAAudioService {
 
 	/**
 	 * Convert speech to text
-	 * Emmmm~, has error.
+	 * Emm~, has error.
 	 */
 	public String audio2text(MultipartFile file) throws IOException {
 

@@ -69,8 +69,8 @@ public class SAAImageService {
 	private final ChatClient daschScopeChatClient;
 
 	public SAAImageService(
-			ImageModel imageModel,
-			ChatModel chatModel
+			ChatModel chatModel,
+			ImageModel imageModel
 	) {
 
 		this.imageModel = imageModel;

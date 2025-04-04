@@ -34,13 +34,13 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class TmpFolderConfig implements ApplicationRunner {
+public class TmpFolderConfiguration implements ApplicationRunner {
 
 	private static final String ImageTmpFolder = "tmp/image";
 
 	private static final String AudioTmpFolder = "tmp/audio";
 
-	private static final Logger logger = LoggerFactory.getLogger(TmpFolderConfig.class);
+	private static final Logger logger = LoggerFactory.getLogger(TmpFolderConfiguration.class);
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {

@@ -62,12 +62,13 @@ public class SAAWebSearchService {
 	private static final String DEFAULT_WEB_SEARCH_MODEL = "deepseek-r1";
 
 	public SAAWebSearchService(
-			ChatClient.Builder chatClientBuilder,
-			QueryTransformer queryTransformer,
+			DataClean dataCleaner,
 			QueryExpander queryExpander,
 			IQSSearchEngine searchEngine,
-			DataClean dataCleaner,
 			DocumentRanker documentRanker,
+			QueryTransformer queryTransformer,
+			ChatClient.Builder chatClientBuilder,
+			SimpleLoggerAdvisor simpleLoggerAdvisor,
 			@Qualifier("queryArgumentPromptTemplate") PromptTemplate queryArgumentPromptTemplate
 	) {
 
@@ -89,7 +90,7 @@ public class SAAWebSearchService {
 				.build();
 
 		// 日志
-		this.simpleLoggerAdvisor = new SimpleLoggerAdvisor(100);
+		this.simpleLoggerAdvisor = simpleLoggerAdvisor;
 
 		this.webSearchRetriever = WebSearchRetriever.builder()
 				.searchEngine(searchEngine)

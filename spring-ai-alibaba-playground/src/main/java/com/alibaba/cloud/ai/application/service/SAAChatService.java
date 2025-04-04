@@ -24,7 +24,6 @@ import reactor.core.publisher.Flux;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,16 +46,18 @@ public class SAAChatService {
 
 	public SAAChatService(
 			ChatModel chatModel,
-			@Qualifier("deepThinkPromptTemplate") PromptTemplate deepThinkPromptTemplate,
-			@Qualifier("systemPromptTemplate") PromptTemplate systemPromptTemplate
+			SimpleLoggerAdvisor simpleLoggerAdvisor,
+			MessageChatMemoryAdvisor messageChatMemoryAdvisor,
+			@Qualifier("systemPromptTemplate") PromptTemplate systemPromptTemplate,
+			@Qualifier("deepThinkPromptTemplate") PromptTemplate deepThinkPromptTemplate
 	) {
 
 		this.chatClient = ChatClient.builder(chatModel)
 				.defaultSystem(
 					systemPromptTemplate.getTemplate()
 				).defaultAdvisors(
-						new MessageChatMemoryAdvisor(new InMemoryChatMemory()),
-						new SimpleLoggerAdvisor()
+						messageChatMemoryAdvisor,
+						simpleLoggerAdvisor
 				).build();
 
 		this.deepThinkPromptTemplate = deepThinkPromptTemplate;

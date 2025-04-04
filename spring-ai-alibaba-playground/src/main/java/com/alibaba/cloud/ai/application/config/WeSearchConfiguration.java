@@ -6,7 +6,6 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.model.RerankModel;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.rag.preretrieval.query.expansion.QueryExpander;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
@@ -64,12 +63,6 @@ public class WeSearchConfiguration {
 				.chatClientBuilder(chatClient.mutate())
 				.numberOfQueries(2)
 				.build();
-	}
-
-	@Bean
-	public SimpleLoggerAdvisor simpleLoggerAdvisor() {
-
-		return new SimpleLoggerAdvisor();
 	}
 
 }

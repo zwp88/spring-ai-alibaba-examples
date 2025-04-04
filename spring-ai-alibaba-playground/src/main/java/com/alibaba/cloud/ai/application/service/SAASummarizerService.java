@@ -29,7 +29,6 @@ import reactor.core.publisher.Flux;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
@@ -56,6 +55,8 @@ public class SAASummarizerService {
 
 	public SAASummarizerService(
 			ChatModel chatModel,
+			SimpleLoggerAdvisor simpleLoggerAdvisor,
+			MessageChatMemoryAdvisor messageChatMemoryAdvisor,
 			@Qualifier("summarizerPromptTemplate") PromptTemplate docsSummaryPromptTemplate
 	) {
 
@@ -63,8 +64,8 @@ public class SAASummarizerService {
 				.defaultSystem(
 						docsSummaryPromptTemplate.getTemplate()
 				).defaultAdvisors(
-						new MessageChatMemoryAdvisor(new InMemoryChatMemory()),
-						new SimpleLoggerAdvisor()
+						messageChatMemoryAdvisor,
+						simpleLoggerAdvisor
 				).build();
 	}
 
@@ -79,7 +80,7 @@ public class SAASummarizerService {
 				.user("Summarize the document")
 				.advisors(memoryAdvisor -> memoryAdvisor
 						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 1)
+						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
 				).user(text)
 				.stream().content();
 	}
