@@ -18,13 +18,13 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.annotation.ValidPrompt;
 import com.alibaba.cloud.ai.application.service.SAAFunctionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,14 +51,13 @@ public class SAAFunctionController {
 	@GetMapping("/tool-call")
 	@Operation(summary = "DashScope ToolCall Chat")
 	public Flux<String> chat(
-			@ValidPrompt @RequestParam("prompt") String prompt,
 			HttpServletResponse response,
-			@RequestHeader(value = "model", required = false) String model,
+			@Validated @RequestParam("prompt") String prompt,
 			@RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-playground-functions") String chatId
 	) {
 
-		response.setHeader("Access-Control-Allow-Origin", "*");
-		return functionService.chat(chatId, model, prompt);
+		response.setCharacterEncoding("UTF-8");
+		return functionService.chat(chatId, prompt);
 	}
 
 }

@@ -17,13 +17,12 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.annotation.ValidPrompt;
 import com.alibaba.cloud.ai.application.service.SAAMcpService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import reactor.core.publisher.Flux;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,9 +47,9 @@ public class SAAMcpController {
     @UserIp
     @GetMapping("/mcp")
     @Operation(summary = "DashScope Mcp Chat")
-    public Flux<String> chat(
+    public String chat(
             HttpServletResponse response,
-            @ValidPrompt @RequestParam("prompt") String prompt,
+            @Validated @RequestParam("prompt") String prompt,
             @RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-playground-mcp") String chatId
     ) {
 

@@ -81,9 +81,7 @@ public class SAAImageService {
 
 	public Flux<String> image2Text(String prompt, MultipartFile file) throws IOException {
 
-		String filePath = System.getProperty("user.dir") + "/" + "tmp/image/" + file.getOriginalFilename();
-		FilesUtils.saveTempImage(file, filePath);
-
+		String filePath = FilesUtils.saveTempFile(file, "/tmp/image/");
 		UserMessage message = new UserMessage(
 				prompt,
 				new Media(
@@ -109,7 +107,7 @@ public class SAAImageService {
 		if (response != null) {
 			for (ChatResponse chatResponse : response) {
 				String outputContent = chatResponse.getResult().getOutput().getText();
-				result.append(outputContent).append("\n");
+				result.append(outputContent);
 			}
 		}
 

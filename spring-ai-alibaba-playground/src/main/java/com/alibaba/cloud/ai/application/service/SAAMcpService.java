@@ -18,7 +18,6 @@ package com.alibaba.cloud.ai.application.service;
 
 import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -51,7 +50,7 @@ public class SAAMcpService {
 				.build();
 	}
 
-	public Flux<String> chat(String chatId, String chatPrompt) {
+	public String chat(String chatId, String prompt) {
 
 		return defaultChatClient.prompt()
 				.options(DashScopeChatOptions.builder()
@@ -60,13 +59,13 @@ public class SAAMcpService {
 								.type(DashScopeResponseFormat.Type.TEXT)
 								.build())
 						.build())
-				.user(chatPrompt)
+				.user(prompt)
 				.advisors(memoryAdvisor ->
 						memoryAdvisor.param(
 								CHAT_MEMORY_CONVERSATION_ID_KEY,
 								chatId
 						).param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
-                ).stream().content();
+                ).call().content();
 	}
 
 }

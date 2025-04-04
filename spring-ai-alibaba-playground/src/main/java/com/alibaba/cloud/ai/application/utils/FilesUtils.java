@@ -19,6 +19,7 @@ package com.alibaba.cloud.ai.application.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import com.alibaba.cloud.ai.application.exception.SAAAppException;
 import org.slf4j.Logger;
@@ -35,7 +36,34 @@ public final class FilesUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(FilesUtils.class);
 
+	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	private static final Random RANDOM = new Random();
+
 	private FilesUtils() {
+	}
+
+	private static String generateRandomFileName(String originalFilename) {
+
+		String extension = "";
+		int dotIndex = originalFilename.lastIndexOf(".");
+		if (dotIndex > 0) {
+			extension = originalFilename.substring(dotIndex);
+		}
+
+		return generateRandomString() + extension;
+	}
+
+	private static String generateRandomString() {
+
+		StringBuilder result = new StringBuilder(8);
+
+		for (int i = 0; i < 8; i++) {
+			int index = RANDOM.nextInt(CHARACTERS.length());
+			result.append(CHARACTERS.charAt(index));
+		}
+
+		return result.toString();
 	}
 
 	/**
@@ -77,9 +105,18 @@ public final class FilesUtils {
 	/**
 	 * save file to tmp folder
 	 */
-	public static void saveTempImage(MultipartFile file, String path) throws IOException {
+	public static String saveTempFile(MultipartFile file, String path) throws IOException {
 
-		file.transferTo(new File(path));
+		if (file == null || file.isEmpty()) {
+			throw new SAAAppException("File is null or empty");
+		}
+
+		String randomFileName = generateRandomFileName(file.getOriginalFilename());
+		String filePath = System.getProperty("user.dir") + path + randomFileName;
+
+		file.transferTo(new File(filePath));
+
+		return filePath;
 	}
 
 }

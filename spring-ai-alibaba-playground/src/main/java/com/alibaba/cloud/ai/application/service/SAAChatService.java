@@ -62,7 +62,7 @@ public class SAAChatService {
 		this.deepThinkPromptTemplate = deepThinkPromptTemplate;
 	}
 
-	public Flux<String> chat(String chatId, String model, String chatPrompt) {
+	public Flux<String> chat(String chatId, String model, String prompt) {
 
 		return chatClient.prompt()
 				.options(DashScopeChatOptions.builder()
@@ -72,7 +72,7 @@ public class SAAChatService {
 								.type(DashScopeResponseFormat.Type.TEXT)
 								.build()
 						).build()
-				).user(chatPrompt)
+				).user(prompt)
 				.advisors(memoryAdvisor -> memoryAdvisor
 						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
 						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
@@ -80,7 +80,7 @@ public class SAAChatService {
 				.content();
 	}
 
-	public Flux<String> deepThinkingChat(String chatId, String model, String chatPrompt) {
+	public Flux<String> deepThinkingChat(String chatId, String model, String prompt) {
 
 		return chatClient.prompt()
 				.options(DashScopeChatOptions.builder()
@@ -91,7 +91,7 @@ public class SAAChatService {
 								.build()
 						).build()
 				).system(deepThinkPromptTemplate.getTemplate())
-				.user(chatPrompt)
+				.user(prompt)
 				.advisors(memoryAdvisor -> memoryAdvisor
 						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
 						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)

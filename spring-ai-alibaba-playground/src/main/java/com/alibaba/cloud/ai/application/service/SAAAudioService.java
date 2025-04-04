@@ -18,7 +18,6 @@
 package com.alibaba.cloud.ai.application.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
@@ -34,8 +33,7 @@ import com.alibaba.cloud.ai.dashscope.audio.transcription.AudioTranscriptionMode
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
-import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.FileUrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,6 +51,8 @@ public class SAAAudioService {
 
 	private final String DEFAULT_MODEL = "paraformer-realtime-v2";
 
+	private static final String DEFAULT_MODEL_1 = "sensevoice-v1";
+
 	public SAAAudioService(AudioTranscriptionModel transcriptionModel, SpeechSynthesisModel speechSynthesisModel) {
 
 		this.transcriptionModel = transcriptionModel;
@@ -62,10 +62,10 @@ public class SAAAudioService {
 	/**
 	 * Convert text to speech
 	 */
-	public byte[] text2audio(String text) {
+	public byte[] text2audio(String prompt) {
 
 		Flux<SpeechSynthesisResponse> response = speechSynthesisModel.stream(
-				new SpeechSynthesisPrompt(text)
+				new SpeechSynthesisPrompt(prompt)
 		);
 
 		CountDownLatch latch = new CountDownLatch(1);
@@ -99,41 +99,20 @@ public class SAAAudioService {
 
 	/**
 	 * Convert speech to text
+	 * Emmmm~, has error.
 	 */
-	public Flux<String> audio2text(MultipartFile file) throws IOException {
+	public String audio2text(MultipartFile file) throws IOException {
 
-		CountDownLatch latch = new CountDownLatch(1);
-		StringBuilder stringBuilder = new StringBuilder();
-
-		String filePath = System.getProperty("user.dir") + "/" + "tmp/audio/" + file.getOriginalFilename();
-		FilesUtils.saveTempImage(file, filePath);
-
-		Flux<AudioTranscriptionResponse> response = transcriptionModel.stream(
+		String filePath = FilesUtils.saveTempFile(file, "/tmp/audio/");
+		System.out.println(filePath);
+		return transcriptionModel.call(
 				new AudioTranscriptionPrompt(
-						new FileSystemResource(filePath),
+						new FileUrlResource(filePath),
 						DashScopeAudioTranscriptionOptions.builder()
-								.withModel(DEFAULT_MODEL)
-								.withSampleRate(16000)
-								.withFormat(DashScopeAudioTranscriptionOptions.AudioFormat.PCM)
-								.withDisfluencyRemovalEnabled(false)
+								.withModel(DEFAULT_MODEL_1)
 								.build()
 				)
-		);
-
-		response.doFinally(signal -> latch.countDown())
-				.subscribe(resp -> stringBuilder.append(resp.getResult().getOutput()).append("\n"));
-
-		try {
-			latch.await();
-		}
-		catch (InterruptedException e) {
-			throw new SAAAIException("Transcription was interrupted " + e.getMessage());
-		}
-		finally {
-			new File(filePath).delete();
-		}
-
-		return Flux.just(stringBuilder.toString());
+		).getResult().getOutput();
 	}
 
 }

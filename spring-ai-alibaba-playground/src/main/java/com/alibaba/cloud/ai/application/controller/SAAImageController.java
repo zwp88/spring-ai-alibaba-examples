@@ -18,7 +18,6 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.annotation.ValidPrompt;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAAImageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +59,7 @@ public class SAAImageController {
 	@PostMapping("/image2text")
 	@Operation(summary = "DashScope Image Recognition")
 	public Flux<String> image2text(
-			@RequestParam(value = "prompt", required = false, defaultValue = "Describe this image in one sentence") String prompt,
+			@Validated @RequestParam(value = "prompt", required = false, defaultValue = "请总结图片内容") String prompt,
 			@Validated @RequestParam("image") MultipartFile image
 	) {
 
@@ -83,7 +82,7 @@ public class SAAImageController {
 	@Operation(summary = "DashScope Image Generation")
 	public Result<Void> text2Image(
 			HttpServletResponse response,
-			@ValidPrompt @RequestParam("prompt") String prompt,
+			@Validated @RequestParam("prompt") String prompt,
 			@RequestParam(value = "style", required = false, defaultValue = DEFAULT_IMAGE_STYLE) String style,
 			@RequestParam(value = "resolution", required = false, defaultValue = "1080*1080") String resolution
 	) {

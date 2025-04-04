@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.annotation.ValidPrompt;
 import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAChatService;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
@@ -32,6 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
 
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,7 +70,7 @@ public class SAAChatController {
 	@Operation(summary = "DashScope Flux Chat")
 	public Flux<String> chat(
 			HttpServletResponse response,
-			@ValidPrompt @RequestParam("prompt") String prompt,
+			@Validated @RequestParam("prompt") String prompt,
 			@RequestHeader(value = "model", required = false) String model,
 			@RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-playground-chat") String chatId
 	) {
@@ -97,10 +97,25 @@ public class SAAChatController {
 	@GetMapping("/deep-thinking/chat")
 	public Flux<String> deepThinkingChat(
 			HttpServletResponse response,
-			@ValidPrompt @RequestParam("prompt") String prompt,
+			@Validated @RequestParam("prompt") String prompt,
 			@RequestHeader(value = "model", required = false) String model,
-			@RequestHeader(value = "chatId", required = false) String chatId
+			@RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-playground-deepthink-chat") String chatId
 	) {
+
+		Set<Map<String, String>> dashScope = baseService.getDashScope();
+		List<String> modelName = dashScope.stream()
+				.flatMap(map -> map.keySet().stream().map(map::get))
+				.distinct()
+				.toList();
+
+		if (StringUtils.hasText(model)) {
+			if (!modelName.contains(model)) {
+				return Flux.just("Input model not support.");
+			}
+		}
+		else {
+			model = DashScopeApi.ChatModel.QWEN_PLUS.getModel();
+		}
 
 		response.setCharacterEncoding("UTF-8");
 		return chatService.deepThinkingChat(chatId, model, prompt);

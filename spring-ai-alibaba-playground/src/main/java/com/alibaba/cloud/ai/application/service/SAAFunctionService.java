@@ -43,17 +43,16 @@ public class SAAFunctionService {
 		this.chatClient = ChatClient.builder(chatModel).build();
 	}
 
-	public Flux<String> chat(String chatId, String model, String chatPrompt) {
+	public Flux<String> chat(String chatId, String prompt) {
 
 		return chatClient.prompt()
 				.options(DashScopeChatOptions.builder()
-						.withModel(model)
 						.withTemperature(0.8)
 						.withResponseFormat(DashScopeResponseFormat.builder()
 								.type(DashScopeResponseFormat.Type.TEXT)
 								.build())
 						.build())
-				.user(chatPrompt)
+				.user(prompt)
 				.advisors(memoryAdvisor -> memoryAdvisor.param(
 								CHAT_MEMORY_CONVERSATION_ID_KEY,
 								chatId

@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Flux;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,7 +56,7 @@ public class SAAVideoController {
     @PostMapping("/video-qa")
     @Operation(summary = "基于视频内容的问答接口")
     public Flux<String> videoQuestionAnswering(
-            @RequestParam(value = "prompt", required = false, defaultValue = "请总结这个视频的主要内容") String prompt,
+            @Validated @RequestParam(value = "prompt", required = false, defaultValue = "请总结这个视频的主要内容") String prompt,
             @NotNull @RequestParam("video") MultipartFile video
     ) {
 
