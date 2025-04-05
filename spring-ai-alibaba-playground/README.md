@@ -16,7 +16,11 @@
 2. 如果访问接口时，报 9411 端口相关错误，这是 zipkin 服务未启动原因，不影响接口调用；
 3. swagger 接口：http://localhost:8080/doc.html；
 4. 如果服务启动时报 McpClient 相关错误，需要在 resources 目录下将 mcp-servers-config.json 中的 jar 改为本机的绝对路径；
-5. 项目启动之后，浏览器访问 http://localhost:8080 查看前端页面。
+5. 点击启动类启动项目，项目启动之后，浏览器访问 http://localhost:8080 查看前端页面。
+
+## 项目打包
+
+> 需要配置 mcp-libs 目录，可能会引起错误。
 
 ```shell
 mvn clean install -DskipTests
