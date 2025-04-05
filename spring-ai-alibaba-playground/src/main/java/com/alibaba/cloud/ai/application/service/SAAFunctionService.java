@@ -17,6 +17,7 @@
 
 package com.alibaba.cloud.ai.application.service;
 
+import com.alibaba.cloud.ai.application.advisor.TraceContentAdvisor;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import reactor.core.publisher.Flux;
@@ -43,13 +44,15 @@ public class SAAFunctionService {
 	public SAAFunctionService(
 			ChatModel chatModel,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
+			TraceContentAdvisor traceContentAdvisor,
 			MessageChatMemoryAdvisor messageChatMemoryAdvisor
 	) {
 
 		this.chatClient = ChatClient.builder(chatModel)
 				.defaultAdvisors(
-						messageChatMemoryAdvisor,
-						simpleLoggerAdvisor
+						simpleLoggerAdvisor,
+						traceContentAdvisor,
+						messageChatMemoryAdvisor
 				).build();
 	}
 

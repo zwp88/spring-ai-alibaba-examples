@@ -19,10 +19,11 @@ spring:
   ai:
     dashscope:
       api-key: ${AI_DASHSCOPE_API_KEY}
-    mcp:
-      client:
-        stdio:
-          servers-configuration: classpath:/mcp-servers-config.json
+    # 自定义增强 mcp server config
+    # mcp:
+    #   client:
+    #     stdio:
+    #       servers-configuration: classpath:/mcp-servers-config.json
 
     alibaba:
       tool-calling:

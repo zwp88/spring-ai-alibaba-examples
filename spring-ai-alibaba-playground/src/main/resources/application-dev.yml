@@ -19,10 +19,11 @@ spring:
   ai:
     dashscope:
       api-key: ${AI_DASHSCOPE_API_KEY}
-    mcp:
-      client:
-        stdio:
-          servers-configuration: classpath:/mcp-servers-config.json
+    # 自定义增强 mcp server config
+    # mcp:
+    #   client:
+    #     stdio:
+    #       servers-configuration: classpath:/mcp-servers-config.json
 
     # 需要配置相关 tools 的信息
     alibaba:
@@ -74,6 +75,7 @@ logging:
   level:
     org.springframework.ai: debug
     com.alibaba.dashscope.api: debug
+    com.alibaba.cloud.ai.application: debug
 
 # 部署时不配置，使用默认配置
 management:
