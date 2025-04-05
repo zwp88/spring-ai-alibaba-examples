@@ -26,12 +26,7 @@ const BasePage: React.FC<BasePageProps> = ({ title, children, className }) => {
     }
   }, [routeConversationId]);
 
-  return (
-    <div className={className}>
-      <Typography.Title level={2}>{title}</Typography.Title>
-      {children}
-    </div>
-  );
+  return <div className={className}>{children}</div>;
 };
 
 export default BasePage;
