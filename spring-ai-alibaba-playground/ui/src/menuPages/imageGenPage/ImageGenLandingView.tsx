@@ -67,14 +67,14 @@ const ImageGenLandingView: React.FC = () => {
           value={inputContent}
           onChange={setInputContent}
           onSubmit={handleCreateConversation}
-          placeholder="输入提示词开始新对话..."
+          placeholder="输入提示词开始生成图片..."
           className={styles.sender}
           loading={isLoading}
         />
       </div>
 
-      <div style={{ marginTop: "32px" }}>
-        <h2 style={{ marginBottom: "16px" }}>创意灵感</h2>
+      <div>
+        <h2 style={{ margin: "0 0 16px" }}>创意灵感</h2>
         <Masonry
           breakpointCols={breakpointColumns}
           className={styles.masonryGrid}

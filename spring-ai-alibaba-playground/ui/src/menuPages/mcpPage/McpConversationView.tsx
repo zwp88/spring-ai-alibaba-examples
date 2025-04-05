@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import CodeInfo from "./components/CodeInfo";
-import OutputResult from "./components/outputResult";
+import OutputResult from "./components/OutputResult";
 import { useStyles } from "./style";
 import { useConversationContext } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
