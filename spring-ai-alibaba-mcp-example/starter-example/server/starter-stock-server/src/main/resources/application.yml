@@ -9,4 +9,4 @@ spring:
         version: 0.0.1
 
 # NOTE: You must disable the banner and the console logging 
-# to allow the STDIO transport to work !!! 
+# to allow the STDIO transport to work !!!
