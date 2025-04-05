@@ -47,6 +47,10 @@ public class SAAFunctionController {
 		this.functionService = functionService;
     }
 
+	/**
+	 * 触发百度翻译：使用百度翻译将隐私计算翻译为英文
+	 * 触发百度地图：使用百度地图查找杭州市的银行 ATM 机信息 or 使用百度地图查找杭州的信息
+	 */
 	@UserIp
 	@GetMapping("/tool-call")
 	@Operation(summary = "DashScope ToolCall Chat")

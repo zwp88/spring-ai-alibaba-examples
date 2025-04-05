@@ -69,7 +69,7 @@ public class SAAFunctionService {
 				.advisors(memoryAdvisor -> memoryAdvisor.param(
 								CHAT_MEMORY_CONVERSATION_ID_KEY,
 								chatId
-						).param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+						).param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 1)
 				).tools(
 						"baiduTranslateFunction",
 						"baiDuMapGetAddressInformationFunction"

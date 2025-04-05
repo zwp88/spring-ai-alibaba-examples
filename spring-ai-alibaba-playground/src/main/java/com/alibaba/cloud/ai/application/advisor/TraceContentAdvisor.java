@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.alibaba.cloud.ai.application.advisor;
 
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +62,11 @@ public class TraceContentAdvisor implements CallAroundAdvisor, StreamAroundAdvis
 			@NotNull CallAroundAdvisorChain chain
 	) {
 
-		return chain.nextAroundCall(getRequestFunctions(advisedRequest));
+		AdvisedRequest request = getRequestFunctions(advisedRequest);
+		AdvisedResponse advisedResponse = chain.nextAroundCall(request);
+		getResponseFunctions(advisedResponse);
+
+		return advisedResponse;
 	}
 
 	@NotNull
@@ -55,7 +76,10 @@ public class TraceContentAdvisor implements CallAroundAdvisor, StreamAroundAdvis
 			@NotNull StreamAroundAdvisorChain chain
 	) {
 
-		return new MessageAggregator().aggregateAdvisedResponse(chain.nextAroundStream(advisedRequest), this::getResponseFunctions);
+		AdvisedRequest requestFunctions = getRequestFunctions(advisedRequest);
+		Flux<AdvisedResponse> advisedResponseFlux = chain.nextAroundStream(requestFunctions);
+
+		return new MessageAggregator().aggregateAdvisedResponse(advisedResponseFlux, this::getResponseFunctions);
 	}
 
 	@NotNull
@@ -75,9 +99,7 @@ public class TraceContentAdvisor implements CallAroundAdvisor, StreamAroundAdvis
 			AdvisedRequest advisedRequest
 	) {
 
-		if (!advisedRequest.functionNames().isEmpty()) {
-			sb.append("<functions>").append(advisedRequest.functionNames()).append("</functions>");
-		}
+		System.out.println(advisedRequest.toString());
 
 		return advisedRequest;
 	}
@@ -85,16 +107,7 @@ public class TraceContentAdvisor implements CallAroundAdvisor, StreamAroundAdvis
 	private void getResponseFunctions(
 			AdvisedResponse advisedResponse
 	) {
-		System.out.println("=========================================================================");
-		System.out.println(advisedResponse.response().getResults().get(0).getMetadata().toString());
-		System.out.println(advisedResponse.response().getResults().get(0).getOutput().getMetadata().toString());
-		System.out.println(advisedResponse.response().getResults().get(0).getOutput().getToolCalls());
-		System.out.println(advisedResponse.response().getResults().get(0));
-		System.out.println(advisedResponse.response().toString());
-		System.out.println(advisedResponse.adviseContext());
-		System.out.println(advisedResponse.response().getMetadata().getPromptMetadata().toString());
-		System.out.println(sb.toString());
-		System.out.println("=========================================================================");
+		System.out.println(advisedResponse.toString());
 	}
 
 }
