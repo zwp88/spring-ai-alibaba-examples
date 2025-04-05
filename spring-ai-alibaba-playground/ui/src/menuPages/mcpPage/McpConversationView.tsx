@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import CodeInfo from "./components/CodeInfo";
 import OutputResult from "./components/outputResult";
-import { useStyles } from "./styles";
+import { useStyles } from "./style";
 import { useConversationContext } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
 import { McpMessage, Message } from "./types";

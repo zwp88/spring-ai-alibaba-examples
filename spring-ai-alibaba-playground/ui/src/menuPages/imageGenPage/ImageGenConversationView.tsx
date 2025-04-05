@@ -7,39 +7,12 @@ import GeneratedImage from "./components/generatedImage";
 import BasePage from "../components/BasePage";
 import { useConversationContext } from "../../stores/conversation.store";
 import { getImage } from "../../api/image";
+import {
+  ExtendedChatMessage,
+  GeneratedImageType,
+  ImageResponse,
+} from "./types";
 
-// 定义API响应类型
-interface ImageResponse {
-  blob?: Blob;
-  status?: number;
-}
-
-interface GeneratedImageType {
-  id: string;
-  url: string;
-  prompt: string;
-  blob?: Blob;
-}
-
-// 扩展消息类型，添加加载和错误状态
-interface ExtendedChatMessage {
-  role: "user" | "assistant";
-  content: string;
-  timestamp: number;
-  images?: GeneratedImageType[];
-  isLoading?: boolean;
-  isError?: boolean;
-}
-
-/**
- * ImageGenConversationView - 图像生成会话视图组件
- *
- * 负责:
- * 1. 显示特定会话的图像生成记录
- * 2. 处理图像生成请求和响应
- * 3. 支持重新生成图像
- * 4. 保存生成的图像到历史记录
- */
 const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
   conversationId,
 }) => {
@@ -51,20 +24,16 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
     activeConversation,
     chooseActiveConversation,
     updateActiveConversation,
-    addMessage,
   } = useConversationContext();
 
-  // 跟踪组件是否首次加载，用于处理来自URL的prompt参数
   const isFirstLoad = useRef(true);
   const processedPrompts = useRef(new Set<string>());
   const objectUrlsRef = useRef<string[]>([]);
 
-  // 选择正确的对话
   useEffect(() => {
     chooseActiveConversation(conversationId);
   }, [conversationId, chooseActiveConversation]);
 
-  // 组件卸载时清理创建的Object URL
   useEffect(() => {
     return () => {
       objectUrlsRef.current.forEach((url) => {
@@ -74,7 +43,6 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
     };
   }, []);
 
-  // 处理URL中的prompt参数
   useEffect(() => {
     if (isFirstLoad.current && activeConversation) {
       const queryParams = new URLSearchParams(location.search);
@@ -366,176 +334,172 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
   };
 
   return (
-    <BasePage title="图像生成" conversationId={conversationId}>
-      <div className={styles.container}>
-        {/* 输入框区域 */}
-        <div className={styles.inputArea}>
-          <Sender
-            value={inputContent}
-            onChange={setInputContent}
-            onSubmit={handleGenerateImage}
-            placeholder="请输入图片生成提示词..."
-            className={styles.sender}
-            loading={isGenerating}
-          />
-        </div>
+    <div className={styles.container}>
+      {/* 输入框区域 */}
+      <div className={styles.inputArea}>
+        <Sender
+          value={inputContent}
+          onChange={setInputContent}
+          onSubmit={handleGenerateImage}
+          placeholder="请输入图片生成提示词..."
+          className={styles.sender}
+          loading={isGenerating}
+        />
+      </div>
 
-        {/* 消息和生成的图片展示区域 */}
-        <div style={{ marginTop: "24px" }}>
-          {activeConversation?.messages.map((message: any) => (
-            <div key={message.timestamp}>
-              {/* 用户消息 */}
-              {message.role === "user" && (
-                <div
-                  style={{
-                    marginLeft: "auto",
-                    maxWidth: "80%",
-                    textAlign: "right",
-                    padding: "12px 16px",
-                    background: "#f5f5f5",
-                    borderRadius: "8px",
-                    marginBottom: "16px",
-                  }}
-                >
-                  {message.content}
-                </div>
-              )}
+      {/* 消息和生成的图片展示区域 */}
+      <div style={{ marginTop: "24px" }}>
+        {activeConversation?.messages.map((message: any) => (
+          <div key={message.timestamp}>
+            {/* 用户消息 */}
+            {message.role === "user" && (
+              <div
+                style={{
+                  marginLeft: "auto",
+                  maxWidth: "80%",
+                  textAlign: "right",
+                  padding: "12px 16px",
+                  background: "#f5f5f5",
+                  borderRadius: "8px",
+                  marginBottom: "16px",
+                }}
+              >
+                {message.content}
+              </div>
+            )}
 
-              {/* 占位消息或错误消息 */}
-              {message.role === "assistant" && !message.images && (
-                <div
-                  style={{
-                    maxWidth: "80%",
-                    padding: "12px 16px",
-                    background: (message as ExtendedChatMessage).isError
-                      ? "#fff2f0"
-                      : "#f0f9ff",
-                    borderRadius: "8px",
-                    marginBottom: "16px",
-                    color: (message as ExtendedChatMessage).isError
-                      ? "#cf1322"
-                      : "#000000d9",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  {(message as ExtendedChatMessage).isLoading && (
-                    <div style={{ marginRight: "8px" }}>
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        style={{ animation: "rotate 1s linear infinite" }}
-                      >
-                        <style>
-                          {`
+            {/* 占位消息或错误消息 */}
+            {message.role === "assistant" && !message.images && (
+              <div
+                style={{
+                  maxWidth: "80%",
+                  padding: "12px 16px",
+                  background: (message as ExtendedChatMessage).isError
+                    ? "#fff2f0"
+                    : "#f0f9ff",
+                  borderRadius: "8px",
+                  marginBottom: "16px",
+                  color: (message as ExtendedChatMessage).isError
+                    ? "#cf1322"
+                    : "#000000d9",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {(message as ExtendedChatMessage).isLoading && (
+                  <div style={{ marginRight: "8px" }}>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      style={{ animation: "rotate 1s linear infinite" }}
+                    >
+                      <style>
+                        {`
                             @keyframes rotate {
                               from { transform: rotate(0deg); }
                               to { transform: rotate(360deg); }
                             }
                           `}
-                        </style>
-                        <path
-                          d="M8 1V4"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M8 12V15"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeOpacity="0.4"
-                        />
-                        <path
-                          d="M4 4L5.5 5.5"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeOpacity="0.8"
-                        />
-                        <path
-                          d="M10.5 10.5L12 12"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeOpacity="0.4"
-                        />
-                        <path
-                          d="M1 8H4"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeOpacity="0.6"
-                        />
-                        <path
-                          d="M12 8H15"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeOpacity="0.4"
-                        />
-                        <path
-                          d="M4 12L5.5 10.5"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeOpacity="0.4"
-                        />
-                        <path
-                          d="M10.5 5.5L12 4"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeOpacity="0.4"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                  {message.content}
-                </div>
-              )}
-
-              {/* 生成的图片 */}
-              {message.role === "assistant" && message.images && (
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                    gap: 24,
-                    marginBottom: "32px",
-                    maxWidth: "1200px",
-                  }}
-                >
-                  {message.images.map((image) => (
-                    <Card
-                      key={image.id}
-                      bodyStyle={{ padding: 0 }}
-                      style={{
-                        width: "100%",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                      }}
-                    >
-                      <GeneratedImage
-                        id={image.id}
-                        url={image.url}
-                        prompt={image.prompt}
-                        onReload={(prompt) =>
-                          handleRegenerate(prompt, image.id)
-                        }
+                      </style>
+                      <path
+                        d="M8 1V4"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
                       />
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                      <path
+                        d="M8 12V15"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                      <path
+                        d="M4 4L5.5 5.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.8"
+                      />
+                      <path
+                        d="M10.5 10.5L12 12"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                      <path
+                        d="M1 8H4"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.6"
+                      />
+                      <path
+                        d="M12 8H15"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                      <path
+                        d="M4 12L5.5 10.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                      <path
+                        d="M10.5 5.5L12 4"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                    </svg>
+                  </div>
+                )}
+                {message.content}
+              </div>
+            )}
+
+            {/* 生成的图片 */}
+            {message.role === "assistant" && message.images && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                  gap: 24,
+                  marginBottom: "32px",
+                  maxWidth: "1200px",
+                }}
+              >
+                {message.images.map((image) => (
+                  <Card
+                    key={image.id}
+                    bodyStyle={{ padding: 0 }}
+                    style={{
+                      width: "100%",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                    }}
+                  >
+                    <GeneratedImage
+                      id={image.id}
+                      url={image.url}
+                      prompt={image.prompt}
+                      onReload={(prompt) => handleRegenerate(prompt, image.id)}
+                    />
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
-    </BasePage>
+    </div>
   );
 };
 

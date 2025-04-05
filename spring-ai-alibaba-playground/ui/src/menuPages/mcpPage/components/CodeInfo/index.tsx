@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Steps, Typography, theme } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 import { Card } from "antd";
-import { useStyles } from "../../styles";
+import { useStyles } from "../../style";
 import { motion, AnimatePresence } from "framer-motion";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";

@@ -1,5 +1,5 @@
 import React from "react";
-import { useStyles } from "../../styles";
+import { useStyles } from "../../style";
 import { useParams } from "react-router-dom";
 import { InputResultProps } from "../../types";
 
