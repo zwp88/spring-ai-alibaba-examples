@@ -1,8 +1,16 @@
 import React from "react";
-import BasePage from "../components/BasePage";
+import { useParams } from "react-router-dom";
+import McpConversationView from "./McpConversationView";
+import McpLandingView from "./McpLandingView";
 
 const McpPage: React.FC = () => {
-  return <BasePage title="MCP"></BasePage>;
+  const { conversationId } = useParams<{ conversationId?: string }>();
+
+  if (conversationId) {
+    return <McpConversationView conversationId={conversationId} />;
+  } else {
+    return <McpLandingView />;
+  }
 };
 
 export default McpPage;
