@@ -77,7 +77,8 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
 
   const { currentModel } = useModelConfigContext();
-  const { communicateTypes, updateCommunicateTypes } = useFunctionMenuStore();
+  const { communicateTypes, updateCommunicateTypes, menuCollapsed } =
+    useFunctionMenuStore();
 
   const {
     activeConversation,
@@ -476,20 +477,24 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
           )}
         </div>
 
-        <div className={`${styles.chatPageSender} ${styles.senderContainer}`}>
-          <div>
-            <Sender
-              value={inputContent}
-              header={senderHeader}
-              onSubmit={handleSendMessage}
-              allowSpeech
-              onChange={setInputContent}
-              prefix={attachmentsNode}
-              loading={isLoading}
-              className={styles.sender}
-              placeholder={"您可以问我任何问题..."}
-            />
-          </div>
+        <div
+          className={`${styles.chatPageSender} ${
+            menuCollapsed
+              ? styles.senderContainerCollapsed
+              : styles.senderContainer
+          }`}
+        >
+          <Sender
+            value={inputContent}
+            header={senderHeader}
+            onSubmit={handleSendMessage}
+            allowSpeech
+            onChange={setInputContent}
+            prefix={attachmentsNode}
+            loading={isLoading}
+            className={styles.sender}
+            placeholder={"您可以问我任何问题..."}
+          />
         </div>
       </div>
     </BasePage>

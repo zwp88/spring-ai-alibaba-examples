@@ -33,6 +33,7 @@ export const useStyle = createStyles(({ token, css }) => {
       margin-bottom: 50px;
       position: relative;
       border-radius: 12px;
+      width: 100%;
 
       .ant-sender-textarea {
         transition: height 0.3s ease, max-height 0.3s ease;
@@ -149,6 +150,12 @@ export const useStyle = createStyles(({ token, css }) => {
       left: 324px;
       width: calc(100% - 360px);
     `,
+    senderContainerCollapsed: css`
+      position: fixed;
+      bottom: 32px;
+      width: 100%;
+      padding: 0 16px;
+    `,
     landingContainer: css`
       display: flex;
       flex-direction: column;
@@ -169,6 +176,13 @@ export const useStyle = createStyles(({ token, css }) => {
       left: 324px;
       width: calc(100% - 360px);
     `,
+    landingSenderCollapsed: css`
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translate(-50%);
+    `,
+
     botMessage: css`
       align-self: flex-start;
       max-width: 80%;

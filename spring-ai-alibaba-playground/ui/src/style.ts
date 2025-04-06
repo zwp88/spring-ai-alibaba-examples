@@ -50,33 +50,16 @@ export const useStyle = createStyles(({ token, css }) => {
       transform: translateX(-100%);
     `,
     chooseModel: css`
-      display: flex;
       flex-direction: column;
       color: rgba(0, 0, 0, 0.88);
-      margin: 16px 0;
-      gap: 8px;
-      position: relative;
+      margin: 8px 0 8px;
     `,
-    conversations: css`
-      flex: 1;
-      overflow-y: auto;
-      padding: 8px;
-      cursor: pointer;
-
-      .ant-x-conversations-item {
-        padding: 8px 12px;
-        border-radius: ${token.borderRadius}px;
-
-        &:hover {
-          background-color: ${token.colorBgTextHover};
-        }
-
-        &.active {
-          background-color: ${token.colorPrimaryBg};
-          color: ${token.colorPrimary};
-        }
-      }
-    `,
+    // conversations: css`
+    //   flex: 1;
+    //   padding: 8px;
+    //   cursor: pointer;
+    //   z-index: ;
+    // `,
     footer: css`
       position: fixed;
       left: 0;

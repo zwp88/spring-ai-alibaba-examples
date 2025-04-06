@@ -16,7 +16,7 @@ const ChatLandingView: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const { createConversation } = useConversationContext();
-  const { communicateTypes } = useFunctionMenuStore();
+  const { communicateTypes, menuCollapsed } = useFunctionMenuStore();
 
   const handlePromptClick = (info: { data: { description: string } }) => {
     setInputValue(info.data.description);
@@ -72,7 +72,11 @@ const ChatLandingView: React.FC = () => {
         </div>
 
         {/* 底部发送区域 */}
-        <div className={styles.landingSender}>
+        <div
+          className={`${styles.landingSender} ${
+            menuCollapsed ? styles.landingSenderCollapsed : ""
+          }`}
+        >
           <Sender
             value={inputValue}
             onChange={(value: string) => setInputValue(value)}
