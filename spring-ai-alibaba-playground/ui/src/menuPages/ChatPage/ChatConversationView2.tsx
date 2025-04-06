@@ -241,67 +241,29 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
         const params = getRequestParams();
 
         // TODO: 目前的写法比较丑陋，等功能稳定后，优化下代码
-        //! 启用在线搜索
-        // if (params.onlineSearch) {
-        //   response = await fetch(
-        //     `/api/v1/search?query=${encodeURIComponent(text)}`,
-        //     {
-        //       method: "GET",
-        //       headers: {
-        //         "Content-Type": "application/json",
-        //         chatId: activeConversation.id || "",
-        //         model: params.model || "",
-        //       },
-        //     }
-        //   );
-        // } else if (params.deepThink) {
-        //   response = await fetch(
-        //     `/api/v1/deep-thinking/chat?prompt=${encodeURIComponent(text)}`,
-        //     {
-        //       method: "GET",
-        //       headers: {
-        //         "Content-Type": "application/json",
-        //         chatId: activeConversation.id || "",
-        //         model: params.model || "",
-        //       },
-        //     }
-        //   );
-        // } else {
-        //   response = await fetch(
-        //     `/api/v1/chat?prompt=${encodeURIComponent(text)}`,
-        //     {
-        //       method: "GET",
-        //       headers: {
-        //         "Content-Type": "application/json",
-        //         chatId: activeConversation.id || "",
-        //         model: params.model || "",
-        //       },
-        //     }
-        //   );
-        // }
         response = await getChat(
           text,
           (value) => {
-            responseText = decoder.decode(value);
+            // TODO： 打字机效果
+            const chunk = decoder.decode(value);
+            responseText += chunk;
           },
           params
         );
         console.log("response", response);
-        // 解析响应
-        responseText = await response.text();
-        const data = JSON.parse(responseText);
+        console.log("responseText", responseText);
 
-        if (data.code === 0 && data.data) {
+        if (response.ok && responseText) {
           const assistantTimestamp = Date.now();
           const assistantMessage: ChatMessage = {
             role: "assistant",
-            content: data.data,
+            content: responseText,
             timestamp: assistantTimestamp,
           };
 
           const assistantMessageUI: Message = {
             id: `msg-${assistantTimestamp}`,
-            text: data.data,
+            text: responseText,
             sender: "bot",
             timestamp: new Date(assistantTimestamp),
           };
@@ -317,7 +279,7 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
             messages: finalMessages,
           });
         } else {
-          throw new Error(data.message || "Failed to get response");
+          throw new Error("请求失败");
         }
       } catch (error) {
         console.error("处理聊天请求错误:", error, "响应文本:", responseText);
