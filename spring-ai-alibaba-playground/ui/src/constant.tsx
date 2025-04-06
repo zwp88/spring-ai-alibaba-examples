@@ -96,11 +96,11 @@ export const functionMenuItems: FunctionMenuItem[] = [
     icon: <FormOutlined />,
     label: "文档总结",
   },
-  {
-    key: "multi-modal",
-    icon: <PictureOutlined />,
-    label: "多模态",
-  },
+  // {
+  //   key: "multi-modal",
+  //   icon: <PictureOutlined />,
+  //   label: "多模态",
+  // },
   {
     key: "function-calling",
     icon: <ReadOutlined />,
