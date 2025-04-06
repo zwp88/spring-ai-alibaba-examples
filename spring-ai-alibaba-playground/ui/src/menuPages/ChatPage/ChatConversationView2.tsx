@@ -192,7 +192,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       timestamp: userTimestamp,
     };
 
-    // 创建用户消息的UI表示
     const userMessageUI: Message = {
       id: `msg-${userTimestamp}`,
       text: text,
@@ -208,10 +207,9 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       isLoading: true,
     };
 
-    // 确保UI显示用户消息
     setMessages((prev) => [...prev, userMessageUI]);
 
-    console.log("处理发送消息:", text, "用户ID:", userMessageUI.id);
+    // console.log("处理发送消息:", text, "用户ID:", userMessageUI.id);
 
     // 先只更新用户消息到会话存储，确保即使API调用失败，用户消息也会被保存
     const updatedWithUserMessage = [
@@ -219,14 +217,14 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       userMessage,
     ] as ChatMessage[];
 
-    // 立即保存用户消息到localStorage，即使后续API调用失败
+    // 立即保存用户消息到localStorage(即使后续API调用失败)
     updateActiveConversation({
       ...activeConversation,
       messages: updatedWithUserMessage,
     });
 
     try {
-      // 添加占位消息到会话（不会显示在UI中，仅作为API请求过程中的状态标记）
+      // 添加占位消息到会话(不会显示在UI中，仅作为API请求过程中的状态标记)
       updateActiveConversation({
         ...activeConversation,
         messages: [...updatedWithUserMessage, placeholderMessage],
@@ -240,7 +238,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
         // 获取请求参数
         const params = getRequestParams();
 
-        // 调用适当的API端点
         if (params.onlineSearch) {
           response = await fetch(
             `/api/v1/search?query=${encodeURIComponent(text)}`,
@@ -284,7 +281,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
         const data = JSON.parse(responseText);
 
         if (data.code === 0 && data.data) {
-          // 创建助手消息
           const assistantTimestamp = Date.now();
           const assistantMessage: ChatMessage = {
             role: "assistant",
@@ -292,7 +288,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
             timestamp: assistantTimestamp,
           };
 
-          // 创建助手消息的UI表示
           const assistantMessageUI: Message = {
             id: `msg-${assistantTimestamp}`,
             text: data.data,
@@ -302,7 +297,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
 
           setMessages((prev) => [...prev, assistantMessageUI]);
 
-          // 更新会话，移除占位消息，保留用户消息和添加真实回复
           const finalMessages = activeConversation.messages
             .filter((msg) => !(msg as ChatMessage).isLoading) // 移除所有加载中的消息
             .concat([assistantMessage]);
@@ -321,7 +315,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
     } catch (error) {
       console.error("处理聊天请求错误:", error);
 
-      // 创建错误消息
       const errorTimestamp = Date.now();
       const errorMessage: ChatMessage = {
         role: "assistant",
@@ -450,18 +443,37 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
     <BasePage title="对话" conversationId={conversationId}>
       <div className={styles.container}>
         <div ref={messagesContainerRef} className={styles.messagesContainer}>
-          <Bubble.List
-            items={messages.map((message) => ({
-              key: message.id,
-              role: message.sender === "user" ? "local" : "ai",
-              content: message.text,
-              footer:
-                message.sender === "bot"
-                  ? createMessageFooter(message.text)
-                  : undefined,
-            }))}
-            className={styles.messages}
-          />
+          {messages.length === 0 && !conversationId ? (
+            <div className={styles.botMessage}>
+              <div className={styles.messageSender}>AI</div>
+              <div className={styles.messageText}>
+                你好，请问有什么可以帮你的吗？
+              </div>
+              <div className={styles.messageTime}>
+                {new Date().toLocaleTimeString()}
+              </div>
+            </div>
+          ) : (
+            messages.map((message) => (
+              <div
+                key={message.id}
+                className={
+                  message.sender === "user"
+                    ? styles.userMessage
+                    : styles.botMessage
+                }
+              >
+                <div className={styles.messageSender}>
+                  {message.sender === "user" ? "You" : "AI"}
+                </div>
+                <div className={styles.messageText}>{message.text}</div>
+                <div className={styles.messageTime}>
+                  {message.timestamp.toLocaleTimeString()}
+                </div>
+                {message.sender === "bot" && createMessageFooter(message.text)}
+              </div>
+            ))
+          )}
         </div>
 
         <div className={`${styles.chatPageSender} ${styles.senderContainer}`}>
