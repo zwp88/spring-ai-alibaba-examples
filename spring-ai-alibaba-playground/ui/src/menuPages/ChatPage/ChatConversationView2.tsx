@@ -14,7 +14,7 @@ import {
 } from "@ant-design/icons";
 import { Attachments, Bubble } from "@ant-design/x";
 import { MAX_IMAGE_SIZE } from "../../constant";
-import { litFileSize } from "../../utils";
+import { decoder, litFileSize } from "../../utils";
 import { useFunctionMenuStore } from "../../stores/functionMenu.store";
 import { useModelConfigContext } from "../../stores/modelConfig.store";
 
@@ -167,6 +167,7 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
 
   // 获取请求参数
   const getRequestParams = () => {
+    console.log("currentModel", currentModel);
     return {
       chatId: activeConversation?.id,
       model: currentModel?.value,
@@ -239,44 +240,53 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
         // 获取请求参数
         const params = getRequestParams();
 
-        if (params.onlineSearch) {
-          response = await fetch(
-            `/api/v1/search?query=${encodeURIComponent(text)}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                chatId: activeConversation.id || "",
-                model: params.model || "",
-              },
-            }
-          );
-        } else if (params.deepThink) {
-          response = await fetch(
-            `/api/v1/deep-thinking/chat?prompt=${encodeURIComponent(text)}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                chatId: activeConversation.id || "",
-                model: params.model || "",
-              },
-            }
-          );
-        } else {
-          response = await fetch(
-            `/api/v1/chat?prompt=${encodeURIComponent(text)}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                chatId: activeConversation.id || "",
-                model: params.model || "",
-              },
-            }
-          );
-        }
-
+        // TODO: 目前的写法比较丑陋，等功能稳定后，优化下代码
+        //! 启用在线搜索
+        // if (params.onlineSearch) {
+        //   response = await fetch(
+        //     `/api/v1/search?query=${encodeURIComponent(text)}`,
+        //     {
+        //       method: "GET",
+        //       headers: {
+        //         "Content-Type": "application/json",
+        //         chatId: activeConversation.id || "",
+        //         model: params.model || "",
+        //       },
+        //     }
+        //   );
+        // } else if (params.deepThink) {
+        //   response = await fetch(
+        //     `/api/v1/deep-thinking/chat?prompt=${encodeURIComponent(text)}`,
+        //     {
+        //       method: "GET",
+        //       headers: {
+        //         "Content-Type": "application/json",
+        //         chatId: activeConversation.id || "",
+        //         model: params.model || "",
+        //       },
+        //     }
+        //   );
+        // } else {
+        //   response = await fetch(
+        //     `/api/v1/chat?prompt=${encodeURIComponent(text)}`,
+        //     {
+        //       method: "GET",
+        //       headers: {
+        //         "Content-Type": "application/json",
+        //         chatId: activeConversation.id || "",
+        //         model: params.model || "",
+        //       },
+        //     }
+        //   );
+        // }
+        response = await getChat(
+          text,
+          (value) => {
+            responseText = decoder.decode(value);
+          },
+          params
+        );
+        console.log("response", response);
         // 解析响应
         responseText = await response.text();
         const data = JSON.parse(responseText);

@@ -1,7 +1,6 @@
 import {
   DeleteOutlined,
   EditOutlined,
-  EllipsisOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   CheckOutlined,
@@ -16,7 +15,6 @@ import {
   useConversationContext,
 } from "../../../stores/conversation.store";
 import { functionMenuItems } from "../../../constant";
-import { Conversations, ConversationsProps } from "@ant-design/x";
 import { useFunctionMenuStore } from "../../../stores/functionMenu.store";
 import { useNavigate } from "react-router-dom";
 
@@ -194,10 +192,10 @@ const FunctionMenu = (props: MenuProps) => {
         <div className={styles.chooseModel}>
           <Typography.Text>模型选择</Typography.Text>
           <Select
-            onChange={chooseModel}
+            onChange={(value) => chooseModel(value)}
             options={modelOptionList}
             style={{ width: "100%" }}
-            value={currentModel}
+            value={currentModel?.value}
           />
         </div>
         <div className={styles.conversationsContainer}>

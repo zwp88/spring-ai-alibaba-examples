@@ -9,10 +9,11 @@ interface ChatParams {
 
 export const getChat = async (
   prompt: string,
-  callback: (value: Uint8Array) => void,
+  callback?: (value: Uint8Array) => void,
   params?: ChatParams
 ): Promise<Response> => {
   const { model, chatId, onlineSearch, deepThink } = params || {};
+  console.log("params", params);
 
   let res: Response;
   if (onlineSearch) {
@@ -47,7 +48,7 @@ export const getChat = async (
 
   await reader.read().then(function process({ done, value }) {
     if (done) return;
-    callback(value);
+    callback?.(value);
     return reader.read().then(process);
   });
 
