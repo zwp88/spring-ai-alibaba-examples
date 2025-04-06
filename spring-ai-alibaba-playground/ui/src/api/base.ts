@@ -13,12 +13,10 @@ export interface ModelInfo {
   desc: string;
 }
 
-// 获取支持的模型列表
 export const getModels = async (): Promise<Set<ModelInfo>> => {
   const res = await fetch(BASE_URL + "/dashscope/getModels", {
     method: "GET",
   });
-  console.log("getModels res!!!", res);
 
   const reader = res.body?.getReader();
   if (!reader) {
@@ -31,8 +29,6 @@ export const getModels = async (): Promise<Set<ModelInfo>> => {
     buffer += decoder.decode(value);
     return reader.read().then(process);
   });
-
-  console.log("getModels buffer!!!", buffer);
 
   const result: Result<Set<ModelInfo>> = JSON.parse(buffer);
   return result.data;
