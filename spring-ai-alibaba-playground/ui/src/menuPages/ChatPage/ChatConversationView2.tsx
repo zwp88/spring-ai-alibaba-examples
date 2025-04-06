@@ -12,36 +12,13 @@ import {
   PaperClipOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { Attachments, Bubble } from "@ant-design/x";
+import { Attachments } from "@ant-design/x";
 import { MAX_IMAGE_SIZE } from "../../constant";
 import { decoder, litFileSize } from "../../utils";
 import { useFunctionMenuStore } from "../../stores/functionMenu.store";
 import { useModelConfigContext } from "../../stores/modelConfig.store";
+import { ChatMessage, Message } from "./types";
 
-// 添加全局声明以支持临时图片存储
-declare global {
-  interface Window {
-    tempImageBase64?: string;
-  }
-}
-
-// 定义消息类型
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-  timestamp: number;
-  isLoading?: boolean;
-  isError?: boolean;
-}
-
-interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "bot";
-  timestamp: Date;
-}
-
-// 将存储的消息转换为UI显示的消息
 const mapStoredMessagesToUIMessages = (messages: ChatMessage[]): Message[] => {
   if (!messages || !Array.isArray(messages)) {
     console.warn("无效的消息数组:", messages);
@@ -91,7 +68,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
   const processedPrompts = useRef(new Set<string>());
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  // 选择正确的对话
   useEffect(() => {
     chooseActiveConversation(conversationId);
   }, [conversationId, chooseActiveConversation]);
@@ -165,15 +141,69 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
     }
   }, [location.search, activeConversation, updateCommunicateTypes]);
 
-  // 获取请求参数
   const getRequestParams = () => {
-    console.log("currentModel", currentModel);
     return {
       chatId: activeConversation?.id,
       model: currentModel?.value,
       deepThink: communicateTypes.deepThink,
       onlineSearch: communicateTypes.onlineSearch,
     };
+  };
+
+  const updateConversationMessages = (
+    messageContent: string,
+    role: "assistant" | "assistant",
+    isError: boolean = false,
+    userTimestamp: number,
+    userMessage: ChatMessage
+  ) => {
+    const timestamp = Date.now();
+
+    // 创建消息对象
+    const responseMessage: ChatMessage = {
+      role: role,
+      content: messageContent,
+      timestamp: timestamp,
+      isError: isError,
+    };
+
+    // 创建UI消息对象
+    const responseMessageUI: Message = {
+      id: `msg-${timestamp}`,
+      text: messageContent,
+      sender: "bot",
+      timestamp: new Date(timestamp),
+    };
+
+    // 更新UI消息
+    setMessages((prev) => [...prev, responseMessageUI]);
+
+    // 确保用户消息存在
+    const existingUserMessage = activeConversation?.messages.find(
+      (msg) => msg.timestamp === userTimestamp && msg.role === "user"
+    );
+
+    // 如果用户消息不存在，先添加
+    const baseMessages = existingUserMessage
+      ? activeConversation?.messages
+      : [...(activeConversation?.messages || []), userMessage];
+
+    // 更新会话，移除占位消息，添加新消息
+    const finalMessages = baseMessages
+      ?.filter((msg) => !(msg as ChatMessage).isLoading)
+      .concat([responseMessage]);
+
+    if (isError) {
+      console.log("更新错误后的消息列表:", finalMessages);
+    }
+
+    if (!activeConversation?.id) {
+      throw new Error("会话ID为空!");
+    }
+    updateActiveConversation({
+      ...activeConversation,
+      messages: finalMessages as unknown as ChatMessage[],
+    });
   };
 
   // 发送消息到API并更新会话
@@ -201,24 +231,12 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       timestamp: new Date(userTimestamp),
     };
 
-    // 创建加载中的占位消息
-    const placeholderMessage: ChatMessage = {
-      role: "assistant",
-      content: "生成中...",
-      timestamp: placeholderTimestamp,
-      isLoading: true,
-    };
-
     setMessages((prev) => [...prev, userMessageUI]);
 
-    // console.log("处理发送消息:", text, "用户ID:", userMessageUI.id);
-
-    // 先只更新用户消息到会话存储，确保即使API调用失败，用户消息也会被保存
     const updatedWithUserMessage = [
       ...activeConversation.messages,
       userMessage,
     ] as ChatMessage[];
-
     // 立即保存用户消息到localStorage(即使后续API调用失败)
     updateActiveConversation({
       ...activeConversation,
@@ -226,25 +244,15 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
     });
 
     try {
-      // 添加占位消息到会话(不会显示在UI中，仅作为API请求过程中的状态标记)
-      updateActiveConversation({
-        ...activeConversation,
-        messages: [...updatedWithUserMessage, placeholderMessage],
-      });
+      const params = getRequestParams();
 
-      // 调用聊天API
       let response;
       let responseText = "";
 
       try {
-        // 获取请求参数
-        const params = getRequestParams();
-
-        // TODO: 目前的写法比较丑陋，等功能稳定后，优化下代码
         response = await getChat(
           text,
           (value) => {
-            // TODO： 打字机效果
             const chunk = decoder.decode(value);
             responseText += chunk;
           },
@@ -254,36 +262,26 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
         console.log("responseText", responseText);
 
         if (response.ok && responseText) {
-          const assistantTimestamp = Date.now();
-          const assistantMessage: ChatMessage = {
-            role: "assistant",
-            content: responseText,
-            timestamp: assistantTimestamp,
-          };
-
-          const assistantMessageUI: Message = {
-            id: `msg-${assistantTimestamp}`,
-            text: responseText,
-            sender: "bot",
-            timestamp: new Date(assistantTimestamp),
-          };
-
-          setMessages((prev) => [...prev, assistantMessageUI]);
-
-          const finalMessages = activeConversation.messages
-            .filter((msg) => !(msg as ChatMessage).isLoading) // 移除所有加载中的消息
-            .concat([assistantMessage]);
-
-          updateActiveConversation({
-            ...activeConversation,
-            messages: finalMessages,
-          });
+          updateConversationMessages(
+            responseText,
+            "assistant",
+            false,
+            userTimestamp,
+            userMessage
+          );
         } else {
           throw new Error("请求失败");
         }
       } catch (error) {
         console.error("处理聊天请求错误:", error, "响应文本:", responseText);
-        throw error;
+
+        updateConversationMessages(
+          "抱歉，处理您的请求时出现错误。",
+          "assistant",
+          true,
+          userTimestamp,
+          userMessage
+        );
       }
     } catch (error) {
       console.error("处理聊天请求错误:", error);
@@ -324,6 +322,7 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
 
       console.log("更新错误后的消息列表:", finalMessages);
 
+      if (!activeConversation?.id) return;
       updateActiveConversation({
         ...activeConversation,
         messages: finalMessages,
