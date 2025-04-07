@@ -149,20 +149,18 @@ export const useConversationContext = () => {
 
   // 更新AI能力状态
   const updateCapability = (key: keyof AiCapabilities, value: boolean) => {
-    // 当前逻辑是互斥的（只能启用一种能力）
+    // 当前逻辑是互斥的（只能启用一种能力），但未来可能会支持多种同时启用
     const newCapabilities = Object.keys(aiCapabilities).reduce((acc, k) => {
       acc[k as keyof AiCapabilities] = false;
       return acc;
     }, {} as AiCapabilities);
 
-    // 只有当value为true时才设置，否则全部关闭
     if (value) {
       newCapabilities[key] = true;
     }
 
     setAiCapabilities(newCapabilities);
 
-    // 如果有活跃对话，同时更新对话的能力设置
     if (activeConversation) {
       const updatedConversation = {
         ...activeConversation,
@@ -172,18 +170,15 @@ export const useConversationContext = () => {
     }
   };
 
-  // 切换某个能力的开关状态
   const toggleCapability = (key: keyof AiCapabilities) => {
     const currentValue = aiCapabilities[key];
     updateCapability(key, !currentValue);
   };
 
-  // 当活跃对话变更时，同步其capabilities
   useEffect(() => {
     if (activeConversation?.capabilities) {
       setAiCapabilities(activeConversation.capabilities);
     } else {
-      // 如果活跃对话没有capabilities，重置为默认值
       setAiCapabilities({
         deepThink: false,
         onlineSearch: false,

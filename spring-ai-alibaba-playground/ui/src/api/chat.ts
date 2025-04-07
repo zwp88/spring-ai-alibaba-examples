@@ -13,7 +13,6 @@ export const getChat = async (
   params?: ChatParams
 ): Promise<Response> => {
   const { model, chatId, onlineSearch, deepThink } = params || {};
-  console.log("params", params);
 
   let res: Response;
   if (onlineSearch) {
@@ -27,11 +26,10 @@ export const getChat = async (
     });
     console.log("联网搜索响应状态:", res.status, res.statusText);
   } else if (deepThink) {
-    console.log("deepThink", deepThink);
     res = await fetch(BASE_URL + "/deep-thinking/chat?prompt=" + prompt, {
       method: "GET",
       headers: {
-        model: model || "",
+        // model: model || "",
         chatId: chatId || "",
       },
     });
