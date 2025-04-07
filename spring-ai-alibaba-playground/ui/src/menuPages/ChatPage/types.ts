@@ -4,6 +4,17 @@ declare global {
   }
 }
 
+export interface ChatConversationViewProps {
+  conversationId: string;
+}
+
+export interface Message {
+  id: string;
+  text: string;
+  sender: "user" | "bot";
+  timestamp: Date;
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -12,9 +23,7 @@ export interface ChatMessage {
   isError?: boolean;
 }
 
-export interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "bot";
-  timestamp: Date;
+export interface AiCapabilities {
+  deepThink: boolean;
+  onlineSearch: boolean;
 }

@@ -6,7 +6,14 @@ import {
   BulbOutlined,
   BulbFilled,
 } from "@ant-design/icons";
-import { Button, Tooltip, Layout, theme, ConfigProvider, App as AntdApp } from "antd";
+import {
+  Button,
+  Tooltip,
+  Layout,
+  theme,
+  ConfigProvider,
+  App as AntdApp,
+} from "antd";
 import { useStyle } from "./style";
 import { Space } from "antd";
 import React, { useEffect } from "react";
@@ -22,13 +29,13 @@ import { useTheme } from "./hooks/useTheme";
 import { ThemeProvider } from "antd-style";
 
 // 定义深色主题和浅色主题的算法
-import darkAlgorithm from 'antd/es/theme/themes/dark';
-import defaultAlgorithm from 'antd/es/theme/themes/default';
+import darkAlgorithm from "antd/es/theme/themes/dark";
+import defaultAlgorithm from "antd/es/theme/themes/default";
 
 // 创建自定义主题配置
 const customTheme = {
   token: {
-    colorPrimary: '#1677ff',
+    colorPrimary: "#1677ff",
     borderRadius: 6,
   },
 };
@@ -37,17 +44,17 @@ const Independent: React.FC = () => {
   const { actualTheme, toggleTheme } = useTheme();
   const { token } = theme.useToken();
   const { styles } = useStyle();
-  const isDark = actualTheme === 'dark';
-  
+  const isDark = actualTheme === "dark";
+
   // 根据当前主题设置body背景色
   useEffect(() => {
-    document.body.style.backgroundColor = isDark ? '#141414' : '#ffffff';
-    
+    document.body.style.backgroundColor = isDark ? "#141414" : "#ffffff";
+
     // 如果是暗色主题，添加class
     if (isDark) {
-      document.body.classList.add('dark-theme');
+      document.body.classList.add("dark-theme");
     } else {
-      document.body.classList.remove('dark-theme');
+      document.body.classList.remove("dark-theme");
     }
   }, [isDark]);
 
@@ -161,7 +168,10 @@ const Independent: React.FC = () => {
         </div>
 
         {/* 页脚始终显示 */}
-        <Layout.Footer className={styles.footer}>
+        <Layout.Footer
+          className={styles.footer}
+          style={{ color: token.colorText }}
+        >
           Copyright 2024-2026 By spring-ai-alibaba-community
         </Layout.Footer>
       </div>
@@ -171,7 +181,7 @@ const Independent: React.FC = () => {
 
 const App = () => {
   const { actualTheme } = useTheme();
-  const isDark = actualTheme === 'dark';
+  const isDark = actualTheme === "dark";
 
   return (
     <ConfigProvider

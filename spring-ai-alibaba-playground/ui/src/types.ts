@@ -9,15 +9,6 @@ export interface FunctionMenuItem {
   render?: (props: any) => React.ReactNode;
 }
 
-export interface ActionButtonConfig {
-  key: string;
-  label: string;
-  icon: React.ReactNode;
-  styleClass: string;
-  activeColor: string;
-  description?: string;
-}
-
 export interface CommonOption {
   label: string;
   value: string;

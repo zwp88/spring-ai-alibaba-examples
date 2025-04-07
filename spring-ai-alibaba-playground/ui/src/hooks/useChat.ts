@@ -23,10 +23,10 @@ export const useChat = (conversationId?: string) => {
     chooseActiveConversation,
     addMessage,
     updateActiveConversation,
+    aiCapabilities,
   } = useConversationContext();
 
-  const { inputtingContent, updateInputtingContent, communicateTypes } =
-    useFunctionMenuStore();
+  const { inputtingContent, updateInputtingContent } = useFunctionMenuStore();
 
   const { currentModel } = useModelConfigContext();
 
@@ -53,10 +53,10 @@ export const useChat = (conversationId?: string) => {
       image: attachedFiles?.[0]?.originFileObj,
       chatId: activeConversation?.id,
       model: currentModel?.value,
-      deepThink: communicateTypes.deepThink,
-      onlineSearch: communicateTypes.onlineSearch,
+      deepThink: aiCapabilities.deepThink,
+      onlineSearch: aiCapabilities.onlineSearch,
     };
-  }, [attachedFiles, activeConversation, currentModel, communicateTypes]);
+  }, [attachedFiles, activeConversation, currentModel, aiCapabilities]);
 
   // 创建带有依赖的请求处理函数
   const handleRequest = useCallback(
@@ -505,10 +505,10 @@ export const useChat = (conversationId?: string) => {
           params.append("prompt", content);
 
           // 添加多模态相关参数 (TODO: 未来根据API需求添加其他参数)
-          if (communicateTypes.onlineSearch) {
+          if (aiCapabilities.onlineSearch) {
             params.append("onlineSearch", "true");
           }
-          if (communicateTypes.deepThink) {
+          if (aiCapabilities.deepThink) {
             params.append("deepThink", "true");
           }
 
@@ -581,7 +581,7 @@ export const useChat = (conversationId?: string) => {
       attachedFiles,
       setIsFileUploadEnabled,
       setAttachedFiles,
-      communicateTypes,
+      aiCapabilities,
     ]
   );
 

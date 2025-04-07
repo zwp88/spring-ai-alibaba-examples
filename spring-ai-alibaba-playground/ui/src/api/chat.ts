@@ -15,16 +15,19 @@ export const getChat = async (
   const { model, chatId, onlineSearch, deepThink } = params || {};
   console.log("params", params);
 
-  // TODO: 联网搜索和深度思考
   let res: Response;
   if (onlineSearch) {
+    console.log("onlineSearch", onlineSearch);
     res = await fetch(BASE_URL + "/search?query=" + prompt, {
       method: "GET",
       headers: {
+        model: model || "",
         chatId: chatId || "",
       },
     });
+    console.log("联网搜索响应状态:", res.status, res.statusText);
   } else if (deepThink) {
+    console.log("deepThink", deepThink);
     res = await fetch(BASE_URL + "/deep-thinking/chat?prompt=" + prompt, {
       method: "GET",
       headers: {
@@ -40,7 +43,6 @@ export const getChat = async (
         chatId: chatId || "",
       },
     });
-    console.log("res???", res);
   }
 
   const reader = res.body?.getReader();

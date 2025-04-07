@@ -26,9 +26,12 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   const { token } = theme.useToken();
   const { styles } = useStyle();
   const location = useLocation();
-  const { updateCommunicateTypes } = useFunctionMenuStore();
-  const { updateActiveConversation, activeConversation, addMessage } =
-    useConversationContext();
+  const {
+    updateActiveConversation,
+    activeConversation,
+    addMessage,
+    updateCapability,
+  } = useConversationContext();
 
   // 控制输入
   const [localInputValue, setLocalInputValue] = useState("");
@@ -60,12 +63,11 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     const onlineSearch = params.get("onlineSearch") === "true";
     const deepThink = params.get("deepThink") === "true";
 
-    // 更新通信类型
-    if (onlineSearch || deepThink) {
-      updateCommunicateTypes({
-        onlineSearch,
-        deepThink,
-      });
+    // 更新能力设置
+    if (onlineSearch) {
+      updateCapability("onlineSearch", true);
+    } else if (deepThink) {
+      updateCapability("deepThink", true);
     }
 
     // 如果有prompt参数，自动发送
@@ -107,7 +109,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   }, [
     location.search,
     handleSubmit,
-    updateCommunicateTypes,
+    updateCapability,
     activeConversation,
     updateActiveConversation,
   ]);

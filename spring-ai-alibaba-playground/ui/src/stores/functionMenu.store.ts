@@ -3,10 +3,6 @@ import { FunctionMenuItem } from "../types";
 
 const activeMenuPageAtom = atom<string | null>(null);
 const inputtingContentAtom = atom<string | null>(null);
-const communicateTypesAtom = atom({
-  onlineSearch: false,
-  deepThink: false,
-});
 const menuCollapsedAtom = atom(false);
 
 export enum MenuPage {
@@ -23,7 +19,6 @@ export enum MenuPage {
 export const useFunctionMenuStore = () => {
   const [activeMenuPage, setActiveMenuPage] = useAtom(activeMenuPageAtom);
   const [inputtingContent, setInputtingContent] = useAtom(inputtingContentAtom);
-  const [communicateTypes, setCommunicateTypes] = useAtom(communicateTypesAtom);
   const [menuCollapsed, setMenuCollapsed] = useAtom(menuCollapsedAtom);
 
   const updateInputtingContent = (content: string) => {
@@ -41,13 +36,6 @@ export const useFunctionMenuStore = () => {
     setActiveMenuPage(key);
   };
 
-  const updateCommunicateTypes = (communicateTypes: {
-    onlineSearch: boolean;
-    deepThink: boolean;
-  }) => {
-    setCommunicateTypes(communicateTypes);
-  };
-
   const toggleMenuCollapsed = () => {
     setMenuCollapsed(!menuCollapsed);
   };
@@ -55,12 +43,10 @@ export const useFunctionMenuStore = () => {
   return {
     activeMenuPage,
     inputtingContent,
-    communicateTypes,
     menuCollapsed,
     updateActiveMenuPage,
     chooseActiveMenuPage,
     updateInputtingContent,
-    updateCommunicateTypes,
     toggleMenuCollapsed,
   };
 };
