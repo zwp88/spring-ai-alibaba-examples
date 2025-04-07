@@ -12,6 +12,9 @@ import { actionButtonConfig, MAX_IMAGE_SIZE } from "../../constant";
 import { litFileSize } from "../../utils";
 import { useFunctionMenuStore } from "../../stores/functionMenu.store";
 import { useChat } from "../../hooks/useChat";
+import { useLocation } from "react-router-dom";
+import BasePage from "../components/BasePage";
+import { useConversationContext } from "../../stores/conversation.store";
 
 interface ChatConversationViewProps {
   conversationId: string;
@@ -22,21 +25,16 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
 }) => {
   const { token } = theme.useToken();
   const { styles } = useStyle();
-  const {
-    inputtingContent,
-    updateInputtingContent,
-    communicateTypes,
-    updateCommunicateTypes,
-  } = useFunctionMenuStore();
+  const location = useLocation();
+  const { updateCommunicateTypes } = useFunctionMenuStore();
+  const { updateActiveConversation, activeConversation, addMessage } =
+    useConversationContext();
 
   // 控制输入
   const [localInputValue, setLocalInputValue] = useState("");
 
-  // 跟踪本组件是否已经处理了初始消息
-  const hasHandledInitialMessageRef = useRef(false);
-
-  // 防止重复发送
-  const submittedMessagesRef = useRef(new Set<string>());
+  // 处理URL参数的引用
+  const processedPromptRef = useRef(false);
 
   // 用于滚动到底部的引用
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -53,15 +51,66 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     setAttachedFiles,
   } = useChat(conversationId);
 
-  // 在组件挂载时，如果有来自landing页面的输入内容，同步到本地状态
+  // 处理URL中的初始参数
   useEffect(() => {
-    // 只在第一次加载时同步，避免覆盖用户正在输入的内容
-    if (inputtingContent && !hasHandledInitialMessageRef.current) {
-      console.log("同步初始输入内容到本地状态:", inputtingContent);
-      setLocalInputValue(inputtingContent);
-      hasHandledInitialMessageRef.current = true;
+    if (processedPromptRef.current || !activeConversation) return;
+
+    const params = new URLSearchParams(location.search);
+    const prompt = params.get("prompt");
+    const onlineSearch = params.get("onlineSearch") === "true";
+    const deepThink = params.get("deepThink") === "true";
+
+    // 更新通信类型
+    if (onlineSearch || deepThink) {
+      updateCommunicateTypes({
+        onlineSearch,
+        deepThink,
+      });
     }
-  }, [inputtingContent]);
+
+    // 如果有prompt参数，自动发送
+    if (prompt && !processedPromptRef.current) {
+      // 清除URL参数，防止刷新页面重复发送
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      // 标记已处理，避免重复发送
+      processedPromptRef.current = true;
+
+      console.log("从URL参数获取提示词:", prompt);
+
+      // 主动添加用户消息到存储，确保消息被显示和持久化
+      const userTimestamp = Date.now();
+      const userMessage = {
+        role: "user" as "user",
+        content: prompt,
+        timestamp: userTimestamp,
+      };
+
+      // 更新会话，添加用户消息
+      if (activeConversation) {
+        const updatedUserMessages = [
+          ...activeConversation.messages,
+          userMessage,
+        ];
+        updateActiveConversation({
+          ...activeConversation,
+          messages: updatedUserMessages,
+        });
+      }
+
+      // 设置延迟确保所有状态都已准备好
+      setTimeout(() => {
+        setLocalInputValue("");
+        handleSubmit(prompt);
+      }, 300);
+    }
+  }, [
+    location.search,
+    handleSubmit,
+    updateCommunicateTypes,
+    activeConversation,
+    updateActiveConversation,
+  ]);
 
   // 滚动到底部
   const scrollToBottom = useCallback(() => {
@@ -83,34 +132,30 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
 
   // 处理消息提交
   const handleMessageSubmit = (content: string) => {
-    if (!content.trim()) return;
-
-    // 检查是否已提交过相同内容的消息
-    const messageKey = `${content.trim()}_${Date.now()}`;
-    if (submittedMessagesRef.current.has(messageKey)) {
-      console.log("消息已提交，跳过:", content);
-      return;
-    }
-    submittedMessagesRef.current.add(messageKey);
+    if (!content.trim() || isRequesting || !activeConversation) return;
 
     // 清空本地输入
     setLocalInputValue("");
 
+    // 主动添加用户消息到存储，确保消息被显示和持久化
+    const userTimestamp = Date.now();
+    const userMessage = {
+      role: "user" as "user",
+      content: content,
+      timestamp: userTimestamp,
+    };
+
+    // 更新会话，添加用户消息
+    const updatedUserMessages = [...activeConversation.messages, userMessage];
+    updateActiveConversation({
+      ...activeConversation,
+      messages: updatedUserMessages,
+    });
+
     // 发送消息
     console.log("提交用户消息:", content);
     handleSubmit(content);
-
-    // 手动消息提交后，标记初始消息已处理，避免重复处理
-    hasHandledInitialMessageRef.current = true;
   };
-
-  // 组件卸载时清除资源
-  useEffect(() => {
-    return () => {
-      // 清除任何可能的资源
-      submittedMessagesRef.current.clear();
-    };
-  }, []);
 
   // 处理文件上传变化
   const handleFileChange = (info: any) => {
@@ -133,29 +178,6 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       setAttachedFiles(info.fileList);
     }
   };
-
-  // 创建操作按钮区域
-  const actionButtonsNode = (
-    <div className={styles.actionButtons}>
-      {actionButtonConfig.map((button) => (
-        <div
-          key={button.key}
-          className={`${styles.actionButton} ${styles[button.styleClass]} ${
-            communicateTypes[button.key] ? `${styles.activeButton} active` : ""
-          }`}
-          onClick={() => {
-            updateCommunicateTypes({
-              ...communicateTypes,
-              [button.key]: !communicateTypes[button.key],
-            });
-          }}
-        >
-          {button.icon}
-          <span>{button.label}</span>
-        </div>
-      ))}
-    </div>
-  );
 
   // 创建附件上传区域
   const senderHeader = (
@@ -194,9 +216,6 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       <Button
         type="text"
         icon={<PaperClipOutlined />}
-        disabled={
-          !!communicateTypes.onlineSearch || !!communicateTypes.deepThink
-        }
         onClick={() => setIsFileUploadEnabled(!isFileUploadEnabled)}
       />
     </Badge>
@@ -227,37 +246,41 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   );
 
   return (
-    <div className={styles.container}>
-      <div ref={messagesContainerRef} className={styles.messagesContainer}>
-        <Bubble.List
-          items={items.map((item, index) => ({
-            ...item,
-            footer:
-              item.role === "ai" || item.role === "aiHistory"
-                ? createMessageFooter(item.content, index === items.length - 1)
-                : undefined,
-          }))}
-          className={styles.messages}
-        />
-      </div>
-
-      <div className={`${styles.chatPageSender} ${styles.senderContainer}`}>
-        {actionButtonsNode}
-        <div>
-          <Sender
-            value={localInputValue}
-            header={senderHeader}
-            onSubmit={handleMessageSubmit}
-            allowSpeech
-            onChange={handleInputChange}
-            prefix={attachmentsNode}
-            loading={isRequesting}
-            className={styles.sender}
-            placeholder={"您可以问我任何问题..."}
+    <BasePage title="对话" conversationId={conversationId}>
+      <div className={styles.container}>
+        <div ref={messagesContainerRef} className={styles.messagesContainer}>
+          <Bubble.List
+            items={items.map((item, index) => ({
+              ...item,
+              footer:
+                item.role === "ai" || item.role === "aiHistory"
+                  ? createMessageFooter(
+                      item.content,
+                      index === items.length - 1
+                    )
+                  : undefined,
+            }))}
+            className={styles.messages}
           />
         </div>
+
+        <div className={`${styles.chatPageSender} ${styles.senderContainer}`}>
+          <div>
+            <Sender
+              value={localInputValue}
+              header={senderHeader}
+              onSubmit={handleMessageSubmit}
+              allowSpeech
+              onChange={handleInputChange}
+              prefix={attachmentsNode}
+              loading={isRequesting}
+              className={styles.sender}
+              placeholder={"您可以问我任何问题..."}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </BasePage>
   );
 };
 

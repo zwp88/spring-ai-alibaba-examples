@@ -33,6 +33,7 @@ export const useStyle = createStyles(({ token, css }) => {
       margin-bottom: 50px;
       position: relative;
       border-radius: 12px;
+      width: 100%;
 
       .ant-sender-textarea {
         transition: height 0.3s ease, max-height 0.3s ease;
@@ -137,17 +138,23 @@ export const useStyle = createStyles(({ token, css }) => {
       height: 100%;
       position: relative;
     `,
-    messagesContainer: css`
-      height: calc(100% - 60px);
-      overflow-y: auto;
-      padding: 0 20px;
-      margin-bottom: 60px;
-    `,
+    // messagesContainer: css`
+    //   height: calc(100% - 60px);
+    //   overflow-y: auto;
+    //   padding: 0 20px;
+    //   margin-bottom: 60px;
+    // `,
     senderContainer: css`
       position: fixed;
       bottom: 32px;
       left: 324px;
       width: calc(100% - 360px);
+    `,
+    senderContainerCollapsed: css`
+      position: fixed;
+      bottom: 32px;
+      width: 100%;
+      padding: 0 16px;
     `,
     landingContainer: css`
       display: flex;
@@ -168,6 +175,58 @@ export const useStyle = createStyles(({ token, css }) => {
       bottom: 80px;
       left: 324px;
       width: calc(100% - 360px);
+    `,
+    landingSenderCollapsed: css`
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translate(-50%);
+    `,
+
+    botMessage: css`
+      align-self: flex-start;
+      max-width: 80%;
+      background-color: ${token.colorBgElevated};
+      padding: 12px 16px;
+      border-radius: 12px 12px 12px 0;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    `,
+    userMessage: css`
+      align-self: flex-end;
+      max-width: 80%;
+      background-color: ${token.colorPrimary};
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px 12px 0 12px;
+      margin-bottom: 16px;
+    `,
+    messageSender: css`
+      font-size: 12px;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: ${token.colorTextSecondary};
+    `,
+    messageText: css`
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    `,
+    messageTime: css`
+      font-size: 10px;
+      color: ${token.colorTextQuaternary};
+      margin-top: 4px;
+      text-align: right;
+    `,
+    messagesContainer: css`
+      height: calc(100vh - 258px);
+      margin: 48px 16px 0;
+      padding: 32px 16px 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     `,
   };
 });
