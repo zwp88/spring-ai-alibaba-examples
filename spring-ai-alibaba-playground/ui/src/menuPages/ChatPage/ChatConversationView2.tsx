@@ -10,36 +10,22 @@ import {
   CloudUploadOutlined,
   CopyOutlined,
   PaperClipOutlined,
-  SyncOutlined,
 } from "@ant-design/icons";
 import { Attachments } from "@ant-design/x";
-import { MAX_IMAGE_SIZE } from "../../constant";
-import { decoder, litFileSize } from "../../utils";
+import { actionButtonConfig, MAX_IMAGE_SIZE } from "../../constant";
+import {
+  decoder,
+  litFileSize,
+  mapStoredMessagesToUIMessages,
+} from "../../utils";
 import { useFunctionMenuStore } from "../../stores/functionMenu.store";
 import { useModelConfigContext } from "../../stores/modelConfig.store";
-import { ChatMessage, Message } from "./types";
-
-const mapStoredMessagesToUIMessages = (messages: ChatMessage[]): Message[] => {
-  if (!messages || !Array.isArray(messages)) {
-    console.warn("无效的消息数组:", messages);
-    return [];
-  }
-
-  return messages
-    .filter((msg) => !msg.isLoading) // 过滤掉加载中的消息
-    .map((msg) => {
-      return {
-        id: `msg-${msg.timestamp}`,
-        text: msg.content || "",
-        sender: msg.role === "user" ? "user" : "bot",
-        timestamp: new Date(msg.timestamp),
-      };
-    });
-};
-
-interface ChatConversationViewProps {
-  conversationId: string;
-}
+import {
+  AiCapabilities,
+  ChatConversationViewProps,
+  ChatMessage,
+  Message,
+} from "./types";
 
 const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
   conversationId,
@@ -54,13 +40,15 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
 
   const { currentModel } = useModelConfigContext();
-  const { communicateTypes, updateCommunicateTypes, menuCollapsed } =
-    useFunctionMenuStore();
+  const { menuCollapsed } = useFunctionMenuStore();
 
   const {
     activeConversation,
     chooseActiveConversation,
     updateActiveConversation,
+    aiCapabilities,
+    toggleCapability,
+    updateCapability,
   } = useConversationContext();
 
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数
@@ -115,11 +103,10 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       const deepThink = queryParams.get("deepThink") === "true";
 
       // 更新通信类型
-      if (onlineSearch || deepThink) {
-        updateCommunicateTypes({
-          onlineSearch,
-          deepThink,
-        });
+      if (onlineSearch) {
+        updateCapability("onlineSearch", true);
+      } else if (deepThink) {
+        updateCapability("deepThink", true);
       }
 
       if (urlPrompt && !processedPrompts.current.has(urlPrompt)) {
@@ -139,16 +126,7 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
 
       isFirstLoad.current = false;
     }
-  }, [location.search, activeConversation, updateCommunicateTypes]);
-
-  const getRequestParams = () => {
-    return {
-      chatId: activeConversation?.id,
-      model: currentModel?.value,
-      deepThink: communicateTypes.deepThink,
-      onlineSearch: communicateTypes.onlineSearch,
-    };
-  };
+  }, [location.search, activeConversation, updateCapability]);
 
   const updateConversationMessages = (
     messageContent: string,
@@ -158,31 +136,21 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
     userMessage: ChatMessage
   ) => {
     const timestamp = Date.now();
-
-    // 创建消息对象
     const responseMessage: ChatMessage = {
       role: role,
       content: messageContent,
       timestamp: timestamp,
       isError: isError,
     };
-
-    // 创建UI消息对象
-    const responseMessageUI: Message = {
-      id: `msg-${timestamp}`,
-      text: messageContent,
-      sender: "bot",
-      timestamp: new Date(timestamp),
-    };
-
-    // 更新UI消息
+    const responseMessageUI: Message = mapStoredMessagesToUIMessages([
+      responseMessage,
+    ])[0];
     setMessages((prev) => [...prev, responseMessageUI]);
 
     // 确保用户消息存在
     const existingUserMessage = activeConversation?.messages.find(
       (msg) => msg.timestamp === userTimestamp && msg.role === "user"
     );
-
     // 如果用户消息不存在，先添加
     const baseMessages = existingUserMessage
       ? activeConversation?.messages
@@ -196,7 +164,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
     if (isError) {
       console.log("更新错误后的消息列表:", finalMessages);
     }
-
     if (!activeConversation?.id) {
       throw new Error("会话ID为空!");
     }
@@ -215,7 +182,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
 
     // 记录当前时间戳，确保消息顺序
     const userTimestamp = Date.now();
-    const placeholderTimestamp = userTimestamp + 1;
 
     // 创建用户消息
     const userMessage: ChatMessage = {
@@ -223,14 +189,9 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       content: text,
       timestamp: userTimestamp,
     };
-
-    const userMessageUI: Message = {
-      id: `msg-${userTimestamp}`,
-      text: text,
-      sender: "user",
-      timestamp: new Date(userTimestamp),
-    };
-
+    const userMessageUI: Message = mapStoredMessagesToUIMessages([
+      userMessage,
+    ])[0];
     setMessages((prev) => [...prev, userMessageUI]);
 
     const updatedWithUserMessage = [
@@ -244,8 +205,12 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
     });
 
     try {
-      const params = getRequestParams();
-
+      const params = {
+        chatId: activeConversation?.id,
+        model: currentModel?.value,
+        deepThink: aiCapabilities.deepThink,
+        onlineSearch: aiCapabilities.onlineSearch,
+      };
       let response;
       let responseText = "";
 
@@ -258,8 +223,7 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
           },
           params
         );
-        console.log("response", response);
-        console.log("responseText", responseText);
+        console.log("响应的", response);
 
         if (response.ok && responseText) {
           updateConversationMessages(
@@ -293,19 +257,11 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
         timestamp: errorTimestamp,
         isError: true,
       };
-
-      // 创建错误消息的UI表示
-      const errorMessageUI: Message = {
-        id: `msg-${errorTimestamp}`,
-        text: "抱歉，处理您的请求时出现错误。",
-        sender: "bot",
-        timestamp: new Date(errorTimestamp),
-      };
-
-      // 添加错误消息到UI显示
+      const errorMessageUI: Message = mapStoredMessagesToUIMessages([
+        errorMessage,
+      ])[0];
       setMessages((prev) => [...prev, errorMessageUI]);
 
-      // 确保用户消息依然存在
       const existingUserMessage = activeConversation.messages.find(
         (msg) => msg.timestamp === userTimestamp && msg.role === "user"
       );
@@ -319,8 +275,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       const finalMessages = baseMessages
         .filter((msg) => !(msg as ChatMessage).isLoading) // 移除所有加载中的消息
         .concat([errorMessage]);
-
-      console.log("更新错误后的消息列表:", finalMessages);
 
       if (!activeConversation?.id) return;
       updateActiveConversation({
@@ -361,6 +315,9 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       open={isFileUploadEnabled}
       onOpenChange={setIsFileUploadEnabled}
       styles={{
+        header: {
+          background: token.colorBgElevated,
+        },
         content: {
           padding: 0,
         },
@@ -455,6 +412,31 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
               : styles.senderContainer
           }`}
         >
+          <div className={styles.actionButtons}>
+            {actionButtonConfig.map((button) => {
+              const isActive =
+                aiCapabilities[button.key as keyof AiCapabilities];
+              return (
+                <Button
+                  key={button.key}
+                  type="text"
+                  icon={button.icon}
+                  style={{
+                    color: isActive ? "#fff" : button.baseColor,
+                    background: isActive
+                      ? button.activeColor
+                      : token.colorBgElevated,
+                    border: "2px solid #eee3",
+                  }}
+                  onClick={() => {
+                    toggleCapability(button.key as keyof AiCapabilities);
+                  }}
+                >
+                  {button.label}
+                </Button>
+              );
+            })}
+          </div>
           <Sender
             value={inputContent}
             header={senderHeader}

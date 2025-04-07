@@ -147,8 +147,8 @@ export const useStyle = createStyles(({ token, css }) => {
     senderContainer: css`
       position: fixed;
       bottom: 32px;
-      left: 324px;
-      width: calc(100% - 360px);
+      left: 314px;
+      width: calc(100% - 350px);
     `,
     senderContainerCollapsed: css`
       position: fixed;

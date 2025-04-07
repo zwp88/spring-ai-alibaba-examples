@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sender, Bubble } from "@ant-design/x";
-import { PlaceholderNode } from "../../constant";
+import { actionButtonConfig, PlaceholderNode } from "../../constant";
 import { useStyle } from "./style";
 import {
   MenuPage,
@@ -9,14 +9,17 @@ import {
 } from "../../stores/functionMenu.store";
 import { useConversationContext } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
+import { Button, theme } from "antd";
 
 const ChatLandingView: React.FC = () => {
   const { styles } = useStyle();
+  const { token } = theme.useToken();
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const { createConversation } = useConversationContext();
-  const { communicateTypes, menuCollapsed } = useFunctionMenuStore();
+  const { createConversation, aiCapabilities, toggleCapability } =
+    useConversationContext();
+  const { menuCollapsed } = useFunctionMenuStore();
 
   const handlePromptClick = (info: { data: { description: string } }) => {
     setInputValue(info.data.description);
@@ -35,10 +38,10 @@ const ChatLandingView: React.FC = () => {
       let params = new URLSearchParams();
       params.append("prompt", content);
 
-      if (communicateTypes.onlineSearch) {
+      if (aiCapabilities.onlineSearch) {
         params.append("onlineSearch", "true");
       }
-      if (communicateTypes.deepThink) {
+      if (aiCapabilities.deepThink) {
         params.append("deepThink", "true");
       }
 
@@ -77,6 +80,31 @@ const ChatLandingView: React.FC = () => {
             menuCollapsed ? styles.landingSenderCollapsed : ""
           }`}
         >
+          <div className={styles.actionButtons}>
+            {actionButtonConfig.map((button) => {
+              const isActive =
+                aiCapabilities[button.key as keyof typeof aiCapabilities];
+              return (
+                <Button
+                  key={button.key}
+                  type="text"
+                  icon={button.icon}
+                  style={{
+                    color: isActive ? "#fff" : button.baseColor,
+                    background: isActive
+                      ? button.activeColor
+                      : token.colorBgElevated,
+                    border: "2px solid #eee3",
+                  }}
+                  onClick={() => {
+                    toggleCapability(button.key as keyof typeof aiCapabilities);
+                  }}
+                >
+                  {button.label}
+                </Button>
+              );
+            })}
+          </div>
           <Sender
             value={inputValue}
             onChange={(value: string) => setInputValue(value)}
