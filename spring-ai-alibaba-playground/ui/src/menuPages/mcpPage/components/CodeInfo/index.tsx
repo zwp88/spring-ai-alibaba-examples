@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Steps, Typography, theme } from "antd";
+import { Steps, Typography, theme, Tabs } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 import { Card } from "antd";
 import { useStyles } from "../../style";
@@ -9,7 +9,8 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const { Step } = Steps;
-const { Paragraph } = Typography;
+const { Paragraph, Title } = Typography;
+const { TabPane } = Tabs;
 
 const codeSummaries: { [key: string]: { code: string; language: string } } = {
   frontend: {
@@ -456,21 +457,11 @@ const CustomDot = ({ index }: { index: number }) => {
   );
 };
 
-const CodeInfo: React.FC = () => {
+const ArchitectureFlow: React.FC = () => {
   const { styles } = useStyles();
-  const { token } = theme.useToken();
 
   return (
-    <Card
-      title="MCP 架构流程"
-      bordered={false}
-      className={styles.codeInfoContainer}
-      bodyStyle={{
-        flex: 1,
-        overflow: "auto",
-        padding: "16px 24px",
-      }}
-    >
+    <>
       <Typography>
         <Paragraph className={styles.codeInfoIntro}>
           Model Context Protocol (MCP) 架构中关键实现
@@ -540,6 +531,77 @@ const CodeInfo: React.FC = () => {
           className={styles.codeInfoStepItem}
         />
       </Steps>
+    </>
+  );
+};
+
+const Documentation: React.FC = () => {
+  const { styles } = useStyles();
+
+  return (
+    <div className={styles.documentationContainer}>
+      <Title level={4}>什么是 Spring AI Alibaba MCP?</Title>
+      <Paragraph>
+        Spring AI Alibaba MCP (Model Context Protocol) 是基于 Spring AI
+        框架实现的智能交互系统，它通过整合大语言模型（LLM）与工具调用能力，使 AI
+        可以在对话中访问各种外部工具和服务，从而增强模型的功能和实用性。
+      </Paragraph>
+
+      <Title level={4}>如何使用 Spring AI Alibaba MCP?</Title>
+      <Paragraph>
+        要使用 Spring AI Alibaba MCP，您可以通过配置 Spring Boot
+        应用程序并注入相关依赖来启用它。系统提供了简单的 API 接口，如{" "}
+        <code>/api/v1/mcp</code>
+        ，您可以向该接口发送提示（prompt），系统会自动处理用户输入并通过大语言模型生成回复，同时能够调用已配置的工具来执行特定任务。
+      </Paragraph>
+
+      <Title level={4}>关键特性</Title>
+      <ul>
+        <li>基于 Spring 生态系统的无缝集成</li>
+        <li>易于配置和扩展的工具调用能力</li>
+        <li>对话历史记录管理和上下文保持</li>
+        <li>支持温度等参数的模型输出控制</li>
+        <li>内置的日志和监控能力</li>
+      </ul>
+
+      <Title level={4}>使用场景</Title>
+      <ul>
+        <li>构建具有工具调用能力的智能聊天应用</li>
+        <li>开发需要与外部服务交互的智能代理</li>
+        <li>实现基于上下文的问答系统</li>
+        <li>创建能够处理复杂任务的对话式应用</li>
+      </ul>
+    </div>
+  );
+};
+
+const CodeInfo: React.FC = () => {
+  const { styles } = useStyles();
+  const [activeTab, setActiveTab] = useState("documentation");
+
+  return (
+    <Card
+      title="Spring AI Alibaba MCP"
+      bordered={false}
+      className={styles.codeInfoContainer}
+      bodyStyle={{
+        flex: 1,
+        overflow: "auto",
+        padding: "16px 24px",
+      }}
+    >
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        className={styles.codeInfoTabs}
+      >
+        <TabPane tab="文档说明" key="documentation">
+          <Documentation />
+        </TabPane>
+        <TabPane tab="架构流程" key="architecture">
+          <ArchitectureFlow />
+        </TabPane>
+      </Tabs>
     </Card>
   );
 };

@@ -9,7 +9,6 @@ export interface GeneratedImage {
   url: string;
   prompt: string;
   blob?: Blob;
-  // 用于localStorage持久化
   dataUrl?: string;
 }
 
@@ -20,12 +19,18 @@ export interface ChatMessage {
   images?: GeneratedImage[];
 }
 
+export interface AiCapabilities {
+  deepThink: boolean;
+  onlineSearch: boolean;
+}
+
 export interface Conversation {
   id: string;
   title: string;
   type: MenuPage;
   messages: ChatMessage[];
   createdAt: number;
+  capabilities?: AiCapabilities;
 }
 
 // 存储键名
@@ -97,12 +102,17 @@ const initialConversations = loadConversationsFromStorage();
 
 const conversationsAtom = atom<Conversation[]>(initialConversations);
 const activeConversationAtom = atom<Conversation | null>(null);
+const aiCapabilitiesAtom = atom<AiCapabilities>({
+  deepThink: false,
+  onlineSearch: false,
+});
 
 export const useConversationContext = () => {
   const [conversations, setConversations] = useAtom(conversationsAtom);
   const [activeConversation, setActiveConversation] = useAtom(
     activeConversationAtom
   );
+  const [aiCapabilities, setAiCapabilities] = useAtom(aiCapabilitiesAtom);
 
   // 跟踪是否有待保存的更改
   const pendingSaveRef = useRef<number | null>(null);
@@ -137,6 +147,45 @@ export const useConversationContext = () => {
     };
   }, [conversations]);
 
+  // 更新AI能力状态
+  const updateCapability = (key: keyof AiCapabilities, value: boolean) => {
+    // 当前逻辑是互斥的（只能启用一种能力），但未来可能会支持多种同时启用
+    const newCapabilities = Object.keys(aiCapabilities).reduce((acc, k) => {
+      acc[k as keyof AiCapabilities] = false;
+      return acc;
+    }, {} as AiCapabilities);
+
+    if (value) {
+      newCapabilities[key] = true;
+    }
+
+    setAiCapabilities(newCapabilities);
+
+    if (activeConversation) {
+      const updatedConversation = {
+        ...activeConversation,
+        capabilities: newCapabilities,
+      };
+      updateActiveConversation(updatedConversation);
+    }
+  };
+
+  const toggleCapability = (key: keyof AiCapabilities) => {
+    const currentValue = aiCapabilities[key];
+    updateCapability(key, !currentValue);
+  };
+
+  useEffect(() => {
+    if (activeConversation?.capabilities) {
+      setAiCapabilities(activeConversation.capabilities);
+    } else {
+      setAiCapabilities({
+        deepThink: false,
+        onlineSearch: false,
+      });
+    }
+  }, [activeConversation?.id]);
+
   const createConversation = (
     type: MenuPage,
     items: GetProp<typeof Bubble.List, "items">
@@ -163,6 +212,7 @@ export const useConversationContext = () => {
       type,
       messages: [],
       createdAt: timestamp,
+      capabilities: { ...aiCapabilities }, // 保存当前能力设置
     };
     setConversations([...conversations, newConversation]);
     setActiveConversation(newConversation);
@@ -288,6 +338,9 @@ export const useConversationContext = () => {
   return {
     conversations,
     activeConversation,
+    aiCapabilities,
+    updateCapability,
+    toggleCapability,
     createConversation,
     deleteConversation,
     updateConversations,

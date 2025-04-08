@@ -7,6 +7,7 @@ import { useStyles } from "./style";
 import { useConversationContext } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
 import { McpMessage, Message } from "./types";
+import { getMcp } from "../../api/mcp";
 
 // 将存储的消息转换为UI显示的消息
 const mapStoredMessagesToUIMessages = (messages: McpMessage[]): Message[] => {
@@ -18,7 +19,6 @@ const mapStoredMessagesToUIMessages = (messages: McpMessage[]): Message[] => {
   return messages
     .filter((msg) => !(msg as McpMessage).isLoading) // 过滤掉加载中的消息
     .map((msg) => {
-      console.log("映射消息:", msg);
       return {
         id: `msg-${msg.timestamp}`,
         text: msg.content || "",
@@ -58,7 +58,6 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
   // 从存储的会话中加载消息
   useEffect(() => {
     if (activeConversation) {
-      console.log("加载会话消息:", activeConversation.messages);
       // 确保消息数组存在并且有内容
       if (
         activeConversation.messages &&
@@ -68,12 +67,10 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
           (msg) => !(msg as McpMessage).isLoading
         );
 
-        console.log("过滤后的消息:", filteredMessages);
         if (filteredMessages.length > 0) {
           const uiMessages = mapStoredMessagesToUIMessages(
             filteredMessages as McpMessage[]
           );
-          console.log("最终UI显示消息:", uiMessages);
           setMessages(uiMessages);
         } else {
           setMessages([]);
@@ -167,49 +164,41 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
         messages: [...updatedWithUserMessage, placeholderMessage],
       });
 
-      const response = await fetch(
-        `/api/v1/mcp?prompt=${encodeURIComponent(text)}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      // 使用getMcp函数替换直接的fetch调用
+      const response = await getMcp(text, conversationId);
 
-      const data = await response.json();
-
-      if (data.code === 0 && data.data) {
-        // 创建助手消息
-        const assistantTimestamp = Date.now();
-        const assistantMessage: McpMessage = {
-          role: "assistant",
-          content: data.data,
-          timestamp: assistantTimestamp,
-        };
-
-        // 创建助手消息的UI表示
-        const assistantMessageUI: Message = {
-          id: `msg-${assistantTimestamp}`,
-          text: data.data,
-          sender: "bot",
-          timestamp: new Date(assistantTimestamp),
-        };
-
-        setMessages((prev) => [...prev, assistantMessageUI]);
-
-        // 更新会话，移除占位消息，保留用户消息和添加真实回复
-        const finalMessages = activeConversation.messages
-          .filter((msg) => !(msg as McpMessage).isLoading) // 移除所有加载中的消息
-          .concat([assistantMessage]);
-
-        updateActiveConversation({
-          ...activeConversation,
-          messages: finalMessages,
-        });
-      } else {
-        throw new Error(data.message || "Failed to get response");
+      // 检查响应状态码
+      if (response.code !== 0 || !response.data) {
+        throw new Error(response.message || "Failed to get response");
       }
+
+      // 创建助手消息
+      const assistantTimestamp = Date.now();
+      const assistantMessage: McpMessage = {
+        role: "assistant",
+        content: response.data,
+        timestamp: assistantTimestamp,
+      };
+
+      // 创建助手消息的UI表示
+      const assistantMessageUI: Message = {
+        id: `msg-${assistantTimestamp}`,
+        text: response.data,
+        sender: "bot",
+        timestamp: new Date(assistantTimestamp),
+      };
+
+      setMessages((prev) => [...prev, assistantMessageUI]);
+
+      // 更新会话，移除占位消息，保留用户消息和添加真实回复
+      const finalMessages = activeConversation.messages
+        .filter((msg) => !(msg as McpMessage).isLoading) // 移除所有加载中的消息
+        .concat([assistantMessage]);
+
+      updateActiveConversation({
+        ...activeConversation,
+        messages: finalMessages,
+      });
     } catch (error) {
       console.error("处理MCP请求错误:", error);
 

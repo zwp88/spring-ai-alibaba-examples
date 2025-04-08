@@ -50,32 +50,16 @@ export const useStyle = createStyles(({ token, css }) => {
       transform: translateX(-100%);
     `,
     chooseModel: css`
-      display: flex;
       flex-direction: column;
       color: rgba(0, 0, 0, 0.88);
-      margin: 16px 0;
-      gap: 8px;
+      margin: 8px 0 8px;
     `,
-    conversations: css`
-      flex: 1;
-      overflow-y: auto;
-      padding: 8px;
-      cursor: pointer;
-
-      .ant-x-conversations-item {
-        padding: 8px 12px;
-        border-radius: ${token.borderRadius}px;
-
-        &:hover {
-          background-color: ${token.colorBgTextHover};
-        }
-
-        &.active {
-          background-color: ${token.colorPrimaryBg};
-          color: ${token.colorPrimary};
-        }
-      }
-    `,
+    // conversations: css`
+    //   flex: 1;
+    //   padding: 8px;
+    //   cursor: pointer;
+    //   z-index: ;
+    // `,
     footer: css`
       position: fixed;
       left: 0;
@@ -168,6 +152,7 @@ export const useStyle = createStyles(({ token, css }) => {
       gap: 8px;
       flex: 1;
       overflow: hidden;
+      position: relative;
     `,
     collapsedMenuBtn: css`
       position: fixed;
@@ -218,6 +203,78 @@ export const useStyle = createStyles(({ token, css }) => {
         display: block;
         opacity: 1;
       }
+    `,
+    conversationItem: css`
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      margin: 4px 0;
+      cursor: pointer;
+      border-radius: ${token.borderRadius}px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: ${token.colorBgTextHover};
+      }
+
+      &.active {
+        background-color: rgba(22, 119, 255, 0.1);
+      }
+    `,
+    conversationTitle: css`
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    `,
+    actionButtonsContainer: css`
+      display: flex;
+      gap: 4px;
+      visibility: hidden;
+
+      .active & {
+        visibility: visible;
+      }
+
+      .conversationItem:hover & {
+        visibility: visible;
+      }
+    `,
+    conversationsScrollContainer: css`
+      height: 100%;
+      overflow: auto;
+      padding-right: 2px;
+    `,
+    editButton: css`
+      &.ant-btn {
+        padding: 0 4px;
+        min-width: 24px;
+        height: 24px;
+      }
+    `,
+    deleteButton: css`
+      &.ant-btn {
+        padding: 0 4px;
+        min-width: 24px;
+        height: 24px;
+      }
+    `,
+    titleEditContainer: css`
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 4px;
+    `,
+    titleInput: css`
+      flex: 1;
+      font-size: 14px;
+    `,
+
+    titleEditButton: css`
+      padding: 0 4px;
+      font-size: 12px;
+      height: 22px;
+      min-width: 22px;
     `,
   };
 });

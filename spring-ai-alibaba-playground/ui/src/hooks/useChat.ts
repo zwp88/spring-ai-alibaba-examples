@@ -23,10 +23,10 @@ export const useChat = (conversationId?: string) => {
     chooseActiveConversation,
     addMessage,
     updateActiveConversation,
+    aiCapabilities,
   } = useConversationContext();
 
-  const { inputtingContent, updateInputtingContent, communicateTypes } =
-    useFunctionMenuStore();
+  const { inputtingContent, updateInputtingContent } = useFunctionMenuStore();
 
   const { currentModel } = useModelConfigContext();
 
@@ -53,14 +53,17 @@ export const useChat = (conversationId?: string) => {
       image: attachedFiles?.[0]?.originFileObj,
       chatId: activeConversation?.id,
       model: currentModel?.value,
-      deepThink: communicateTypes.deepThink,
-      onlineSearch: communicateTypes.onlineSearch,
+      deepThink: aiCapabilities.deepThink,
+      onlineSearch: aiCapabilities.onlineSearch,
     };
-  }, [attachedFiles, activeConversation, currentModel, communicateTypes]);
+  }, [attachedFiles, activeConversation, currentModel, aiCapabilities]);
 
-  // 定义 Agent
-  const [agent] = useXAgent({
-    request: async ({ message }, { onSuccess, onUpdate }) => {
+  // 创建带有依赖的请求处理函数
+  const handleRequest = useCallback(
+    async (info: any, callbacks: any) => {
+      const { message } = info;
+      const { onSuccess, onUpdate } = callbacks;
+
       setIsRequesting(true);
       let buffer = "";
       const timestamp = Date.now();
@@ -82,31 +85,114 @@ export const useChat = (conversationId?: string) => {
         if (res?.status === 200) {
           value = buffer;
 
-          // 保存 AI 回复到历史记录
-          addMessage({
-            role: "assistant",
-            content: value,
-            timestamp: timestamp,
-          });
-
           // 确保AI回复作为ai角色而不是aiHistory保存在UI上
           onSuccess(JSON.stringify({ role: "ai", value }));
+
+          // 检查activeConversation是否存在再添加消息
+          if (activeConversation) {
+            // 保存 AI 回复到历史记录
+            const assistantMessage = {
+              role: "assistant" as "assistant",
+              content: value,
+              timestamp: timestamp,
+            };
+
+            // 更新对话历史，确保包含最新的消息
+            const updatedConversationMessages = [
+              ...activeConversation.messages,
+            ];
+            // 检查最后一条消息是否是助手消息，如果是则替换，否则添加
+            const lastMessageIndex = updatedConversationMessages.length - 1;
+            if (
+              lastMessageIndex >= 0 &&
+              updatedConversationMessages[lastMessageIndex].role === "assistant"
+            ) {
+              // 替换最后一条助手消息
+              updatedConversationMessages[lastMessageIndex] = assistantMessage;
+            } else {
+              // 添加新的助手消息
+              updatedConversationMessages.push(assistantMessage);
+            }
+
+            // 更新对话历史
+            updateActiveConversation({
+              ...activeConversation,
+              messages: updatedConversationMessages,
+            });
+          }
         } else {
-          value = "请求失败." + (res?.statusText ? " " + res?.statusText : "");
-          onSuccess(JSON.stringify({ role: "ai", value }));
+          // 记录错误响应详情，便于调试
+          console.error("API响应错误:", {
+            status: res?.status,
+            statusText: res?.statusText,
+            responseText: buffer,
+          });
+
+          // 创建错误消息
+          const errorMessage =
+            "请求失败." + (res?.statusText ? " " + res?.statusText : "");
+
+          // 保存错误消息到UI
+          onSuccess(JSON.stringify({ role: "ai", value: errorMessage }));
+
+          // 如果activeConversation存在，保存错误消息到历史记录
+          if (activeConversation) {
+            const assistantErrorMessage = {
+              role: "assistant" as "assistant",
+              content: errorMessage,
+              timestamp: timestamp,
+            };
+
+            // 更新对话历史
+            updateActiveConversation({
+              ...activeConversation,
+              messages: [...activeConversation.messages, assistantErrorMessage],
+            });
+          }
         }
       } catch (error) {
         console.error("AI请求错误:", error);
+
+        // 创建错误消息
+        const errorMessage = "抱歉，处理您的请求时出现错误。";
+
+        // 保存错误消息到UI
         onSuccess(
           JSON.stringify({
             role: "ai",
-            value: "抱歉，处理您的请求时出现错误。",
+            value: errorMessage,
           })
         );
+
+        // 如果activeConversation存在，保存错误消息到历史记录
+        if (activeConversation) {
+          const assistantErrorMessage = {
+            role: "assistant" as "assistant",
+            content: errorMessage,
+            timestamp: timestamp,
+          };
+
+          // 更新对话历史
+          updateActiveConversation({
+            ...activeConversation,
+            messages: [...activeConversation.messages, assistantErrorMessage],
+          });
+        }
       } finally {
         setIsRequesting(false);
       }
     },
+    [
+      activeConversation,
+      updateActiveConversation,
+      getRequestParams,
+      setIsRequesting,
+    ]
+  );
+
+  // 定义 Agent
+  const [agent] = useXAgent({
+    request: handleRequest,
   });
 
   // 使用 XChat hook
@@ -125,7 +211,7 @@ export const useChat = (conversationId?: string) => {
         // 解析消息
         const parsedMessage = JSON.parse(message);
 
-        // 保存用户消息到历史记录
+        // 保存用户消息到历史记录 (仅当是由useChat内部直接调用onRequest添加的消息)
         if (parsedMessage.role === "local" && parsedMessage.value) {
           // 生成消息唯一ID (组合用户内容和时间)
           const timestamp = Date.now();
@@ -142,15 +228,9 @@ export const useChat = (conversationId?: string) => {
               status: "success" as const,
             };
 
-            // 更新UI显示的消息
+            // 更新UI显示的消息，但不会添加到历史记录
+            // 用户消息已经在ChatConversationView中手动添加过，这里不再重复添加
             setMessages((prev) => [...prev, localMessage]);
-
-            // 保存到历史记录
-            addMessage({
-              role: "user",
-              content: parsedMessage.value,
-              timestamp: timestamp,
-            });
           }
         }
 
@@ -161,7 +241,7 @@ export const useChat = (conversationId?: string) => {
         originalOnRequest(message);
       }
     },
-    [originalOnRequest, addMessage, setMessages]
+    [originalOnRequest, setMessages]
   );
 
   // 当组件加载时选择正确的对话，添加依赖检查避免不必要的更新
@@ -205,7 +285,6 @@ export const useChat = (conversationId?: string) => {
       isInitialLoadRef.current = false;
 
       // 设置一个小延迟，防止可能的反复触发
-      // 注意：此处延迟时间增加以确保组件有时间处理初始状态
       setTimeout(() => {
         // 在发送前检查是否有重复
         const timestamp = Date.now();
@@ -378,6 +457,7 @@ export const useChat = (conversationId?: string) => {
 
       // 处理图片上传
       if (attachedFiles.length > 0) {
+        // TODO: 未来根据多模态API实现完整的图片上传功能
         setMessages([
           ...messages,
           {
@@ -395,7 +475,7 @@ export const useChat = (conversationId?: string) => {
         // 保存图片到历史记录
         if (activeConversation) {
           addMessage({
-            role: "user",
+            role: "user" as "user",
             content: "图片上传",
             timestamp: timestamp,
             images: [
@@ -414,23 +494,77 @@ export const useChat = (conversationId?: string) => {
 
       setAttachedFiles([]);
 
-      // 如果没有 conversationId，说明是类页面，需要创建新对话并跳转
+      // 如果没有 conversationId，说明是landing页面，需要创建新对话并跳转
       if (!conversationId) {
-        // 创建新对话
-        const newConversation = createConversation(MenuPage.Chat, []);
-        updateInputtingContent(content);
-        // 跳转到新创建的对话页面，让新页面处理消息发送
-        console.log("useChat: 导航到新会话", newConversation.id);
-        navigate(`/chat/${newConversation.id}`);
+        try {
+          // 创建新对话
+          const newConversation = createConversation(MenuPage.Chat, []);
+
+          // 构建URL参数
+          let params = new URLSearchParams();
+          params.append("prompt", content);
+
+          // 添加多模态相关参数 (TODO: 未来根据API需求添加其他参数)
+          if (aiCapabilities.onlineSearch) {
+            params.append("onlineSearch", "true");
+          }
+          if (aiCapabilities.deepThink) {
+            params.append("deepThink", "true");
+          }
+
+          // 导航到会话页面并传递参数
+          console.log("useChat: 导航到新会话", newConversation.id);
+          navigate(`/chat/${newConversation.id}?${params.toString()}`);
+        } catch (error) {
+          console.error("创建聊天对话错误:", error);
+        }
       } else {
-        // 如果有 conversationId，说明是实例页面，直接发送消息
+        // 如果有 conversationId，说明是会话页面，直接发送消息
         console.log("useChat: 发送消息", content);
-        onRequest(
-          JSON.stringify({
-            role: "local",
-            value: content,
-          })
-        );
+
+        try {
+          // 添加UI消息到显示列表
+          const localMessage = {
+            id: `msg_${timestamp}`,
+            message: JSON.stringify({
+              role: "local",
+              value: content,
+            }),
+            status: "success" as const,
+          };
+          setMessages((prev) => [...prev, localMessage]);
+
+          // 更新前端的消息显示
+          onRequest(
+            JSON.stringify({
+              role: "local",
+              value: content,
+            })
+          );
+        } catch (error) {
+          console.error("发送消息错误:", error);
+          // 在UI中显示错误
+          setMessages([
+            ...messages,
+            {
+              id: `msg_error_${timestamp}`,
+              message: JSON.stringify({
+                role: "ai",
+                value: "发送消息失败，请重试。",
+              }),
+              status: "success" as const,
+            },
+          ]);
+
+          // 添加错误消息到历史记录
+          if (activeConversation) {
+            addMessage({
+              role: "assistant" as "assistant",
+              content: "发送消息失败，请重试。",
+              timestamp: timestamp,
+            });
+          }
+        }
         updateInputtingContent("");
       }
     },
@@ -447,6 +581,7 @@ export const useChat = (conversationId?: string) => {
       attachedFiles,
       setIsFileUploadEnabled,
       setAttachedFiles,
+      aiCapabilities,
     ]
   );
 

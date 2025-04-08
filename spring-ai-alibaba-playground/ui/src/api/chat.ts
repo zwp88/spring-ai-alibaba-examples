@@ -9,24 +9,27 @@ interface ChatParams {
 
 export const getChat = async (
   prompt: string,
-  callback: (value: Uint8Array) => void,
+  callback?: (value: Uint8Array) => void,
   params?: ChatParams
 ): Promise<Response> => {
   const { model, chatId, onlineSearch, deepThink } = params || {};
 
   let res: Response;
   if (onlineSearch) {
+    console.log("onlineSearch", onlineSearch);
     res = await fetch(BASE_URL + "/search?query=" + prompt, {
       method: "GET",
       headers: {
+        model: model || "",
         chatId: chatId || "",
       },
     });
+    console.log("联网搜索响应状态:", res.status, res.statusText);
   } else if (deepThink) {
     res = await fetch(BASE_URL + "/deep-thinking/chat?prompt=" + prompt, {
       method: "GET",
       headers: {
-        model: model || "",
+        // model: model || "",
         chatId: chatId || "",
       },
     });
@@ -45,9 +48,10 @@ export const getChat = async (
     throw new Error("Failed to get response reader");
   }
 
+  console.log("reader", reader);
   await reader.read().then(function process({ done, value }) {
     if (done) return;
-    callback(value);
+    callback?.(value); // TODO: 支持打字机效果
     return reader.read().then(process);
   });
 

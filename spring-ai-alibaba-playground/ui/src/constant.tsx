@@ -3,7 +3,6 @@ import {
   ThunderboltOutlined,
   SearchOutlined,
   FormOutlined,
-  PictureOutlined,
   ReadOutlined,
   CodeOutlined,
   PhoneOutlined,
@@ -22,13 +21,12 @@ import ImageGenPage from "./menuPages/ImageGenPage";
 import McpPage from "./menuPages/McpPage";
 import MultiModalPage from "./menuPages/MultiModalPage";
 import RagPage from "./menuPages/RagPage";
-import { ActionButtonConfig, FunctionMenuItem } from "./types";
-import { Attachments, Bubble, Prompts, Sender, Welcome } from "@ant-design/x";
+import { FunctionMenuItem } from "./types";
+import { Bubble, Prompts, Welcome } from "@ant-design/x";
 import { Space, GetProp, Tag, message, Typography, Image, Button } from "antd";
 import ReactMarkdown from "react-markdown";
 import ChatPage from "./menuPages/ChatPage";
 import { MenuPage } from "./stores/functionMenu.store";
-import { useConversationContext } from "./stores/conversation.store";
 
 export const BASE_URL = "/api/v1";
 export const DEFAULT_MODEL = "qwen-plus";
@@ -46,12 +44,14 @@ export const pageComponents = {
 } as const;
 
 // 按钮配置列表
-export const actionButtonConfig: ActionButtonConfig[] = [
+export const actionButtonConfig = [
   {
     key: "onlineSearch",
     label: "在线搜索",
     icon: <GlobalOutlined />,
     styleClass: "searchButton",
+    baseColor: "#4096ff",
+    bgColor: "#e6f4ff",
     activeColor: "#1677ff",
     description: "使用网络搜索获取最新信息",
   },
@@ -60,6 +60,8 @@ export const actionButtonConfig: ActionButtonConfig[] = [
     label: "深度思考",
     icon: <ThunderboltOutlined />,
     styleClass: "thinkButton",
+    baseColor: "#9254de",
+    bgColor: "#f9f0ff",
     activeColor: "#722ed1",
     description: "深度分析问题并给出详细回答",
   },
@@ -96,11 +98,11 @@ export const functionMenuItems: FunctionMenuItem[] = [
     icon: <FormOutlined />,
     label: "文档总结",
   },
-  {
-    key: "multi-modal",
-    icon: <PictureOutlined />,
-    label: "多模态",
-  },
+  // {
+  //   key: "multi-modal",
+  //   icon: <PictureOutlined />,
+  //   label: "多模态",
+  // },
   {
     key: "function-calling",
     icon: <ReadOutlined />,
