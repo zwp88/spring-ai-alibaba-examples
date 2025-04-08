@@ -17,12 +17,12 @@
 
 package com.alibaba.cloud.ai.application.config;
 
-import com.alibaba.cloud.ai.application.advisor.TraceContentAdvisor;
 import com.alibaba.cloud.ai.memory.jdbc.SQLiteChatMemory;
 
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -61,9 +61,9 @@ public class AppConfiguration {
 	}
 
 	@Bean
-	public TraceContentAdvisor traceContentAdvisor() {
+	public ToolCallingManager toolCallingManager() {
 
-		return new TraceContentAdvisor(1);
+		return ToolCallingManager.builder().build();
 	}
 
 }

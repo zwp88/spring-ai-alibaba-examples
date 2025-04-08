@@ -17,7 +17,6 @@
 
 package com.alibaba.cloud.ai.application.service;
 
-import com.alibaba.cloud.ai.application.advisor.TraceContentAdvisor;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import reactor.core.publisher.Flux;
@@ -48,7 +47,6 @@ public class SAAChatService {
 	public SAAChatService(
 			ChatModel chatModel,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
-			TraceContentAdvisor traceContentAdvisor,
 			MessageChatMemoryAdvisor messageChatMemoryAdvisor,
 			@Qualifier("systemPromptTemplate") PromptTemplate systemPromptTemplate,
 			@Qualifier("deepThinkPromptTemplate") PromptTemplate deepThinkPromptTemplate
@@ -58,7 +56,6 @@ public class SAAChatService {
 				.defaultSystem(
 					systemPromptTemplate.getTemplate()
 				).defaultAdvisors(
-						traceContentAdvisor,
 						simpleLoggerAdvisor,
 						messageChatMemoryAdvisor
 				).build();
