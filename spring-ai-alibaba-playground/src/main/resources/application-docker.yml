@@ -37,6 +37,14 @@ spring:
             enabled: true
             api-key: ${BAIDU_MAP_API_KEY}
 
+    # openai api 接入通义模型
+    openai:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode
+      api-key: ${AI_DASHSCOPE_API_KEY}
+      chat:
+        options:
+          model: qwen-max-latest
+
     # 注意：观测数据可能存在敏感信息！
     chat:
       client:

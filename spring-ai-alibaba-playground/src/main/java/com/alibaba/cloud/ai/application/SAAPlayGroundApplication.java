@@ -36,7 +36,12 @@ public class SAAPlayGroundApplication {
 	public static void main(String[] args) {
 
 		SpringApplication.run(SAAPlayGroundApplication.class, args);
-		logger.info("SAAPlayGroundApplication started successfully. port: {}, swagger: {}", 8080, "http://localhost:8080/doc.html");
+		logger.info(
+				"SAAPlayGroundApplication started successfully. port: {}, swagger: {}, frontend: {}",
+				8080,
+				"http://localhost:8080/doc.html",
+				"http://localhost:8080"
+		);
 	}
 
 }

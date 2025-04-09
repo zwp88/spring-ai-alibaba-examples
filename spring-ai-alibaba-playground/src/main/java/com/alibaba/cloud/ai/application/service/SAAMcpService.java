@@ -24,6 +24,7 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
@@ -39,10 +40,10 @@ public class SAAMcpService {
 	private final ChatClient defaultChatClient;
 
 	public SAAMcpService(
-			ChatModel chatModel,
 			ToolCallbackProvider tools,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
-			MessageChatMemoryAdvisor messageChatMemoryAdvisor
+			MessageChatMemoryAdvisor messageChatMemoryAdvisor,
+			@Qualifier("dashscopeChatModel") ChatModel chatModel
 	) {
 
 		// Initialize chat client with non-blocking configuration

@@ -40,6 +40,7 @@ import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.model.Media;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -69,8 +70,8 @@ public class SAAImageService {
 	private final ChatClient daschScopeChatClient;
 
 	public SAAImageService(
-			ChatModel chatModel,
-			ImageModel imageModel
+			@Qualifier("dashscopeChatModel") ChatModel chatModel,
+			@Qualifier("dashScopeImageModel") ImageModel imageModel
 	) {
 
 		this.imageModel = imageModel;

@@ -45,9 +45,9 @@ public class SAAChatService {
 	private final PromptTemplate deepThinkPromptTemplate;
 
 	public SAAChatService(
-			ChatModel chatModel,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
 			MessageChatMemoryAdvisor messageChatMemoryAdvisor,
+			@Qualifier("dashscopeChatModel") ChatModel chatModel,
 			@Qualifier("systemPromptTemplate") PromptTemplate systemPromptTemplate,
 			@Qualifier("deepThinkPromptTemplate") PromptTemplate deepThinkPromptTemplate
 	) {

@@ -1,7 +1,6 @@
 package com.alibaba.cloud.ai.application.entity.tools;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @author yuluo
@@ -18,7 +17,7 @@ public class ToolCallResp {
 	/**
 	 * Tool Name
 	 */
-	private List<String> toolName;
+	private String toolName;
 
 	/**
 	 * Tool 执行参数
@@ -82,11 +81,11 @@ public class ToolCallResp {
 		this.status = status;
 	}
 
-	public List<String> getToolName() {
+	public String getToolName() {
 		return toolName;
 	}
 
-	public void setToolName(List<String> toolName) {
+	public void setToolName(String toolName) {
 		this.toolName = toolName;
 	}
 
@@ -138,11 +137,11 @@ public class ToolCallResp {
 		this.toolInput = toolInput;
 	}
 
-	Long getToolCostTime() {
+	public Long getToolCostTime() {
 		return toolCostTime;
 	}
 
-	void setToolCostTime(Long toolCostTime) {
+	public void setToolCostTime(Long toolCostTime) {
 		this.toolCostTime = toolCostTime;
 	}
 
@@ -160,23 +159,18 @@ public class ToolCallResp {
 				+ '}';
 	}
 
-	public static ToolCallResp builderTCR(List<String> toolName, String toolParameters) {
-
-		var res = new ToolCallResp();
-		res.setToolName(toolName);
-		res.setToolParameters(toolParameters);
-		return res;
-	}
-
 	// return a null ToolCallResp
 	public static ToolCallResp TCR() {
 
 		return new ToolCallResp();
 	}
 
-	public static ToolCallResp startExecute(String toolInput) {
+	public static ToolCallResp startExecute(String toolInput, String toolName, String toolParameters) {
 
 		var res = new ToolCallResp();
+
+		res.setToolName(toolName);
+		res.setToolParameters(toolParameters);
 		res.setToolInput(toolInput);
 		res.setToolStartTime(LocalDateTime.now());
 		res.setStatus(ToolState.RUNNING);
@@ -192,20 +186,6 @@ public class ToolCallResp {
 		res.setToolCostTime(
 				(long) (res.getToolEndTime().getNano() - toolStartTime.getNano())
 		);
-
-		return res;
-	}
-
-	public static ToolCallResp merge(ToolCallResp tcr1, ToolCallResp tcr2) {
-
-		var res = new ToolCallResp();
-
-		res.setToolName(tcr1.getToolName().isEmpty() ? tcr2.getToolName() : tcr1.getToolName());
-		res.setToolParameters(tcr1.getToolParameters() == null ? tcr2.getToolParameters() : tcr1.getToolParameters());
-		res.setToolResult(tcr2.getToolResult() == null ? tcr1.getToolResult() : tcr2.getToolResult());
-		res.setToolInput(tcr1.getToolInput() == null ? tcr2.getToolInput() : tcr1.getToolInput());
-		res.setToolParameters(tcr1.getToolParameters() == null ? tcr2.getToolParameters() : tcr1.getToolParameters());
-		res.setToolCostTime(tcr1.getToolCostTime() == null ? tcr2.getToolCostTime() : tcr1.getToolCostTime());
 
 		return res;
 	}

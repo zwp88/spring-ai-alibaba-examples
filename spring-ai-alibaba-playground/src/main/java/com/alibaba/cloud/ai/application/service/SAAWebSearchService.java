@@ -29,6 +29,7 @@ import reactor.core.publisher.Flux;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.rag.postretrieval.ranking.DocumentRanker;
 import org.springframework.ai.rag.preretrieval.query.expansion.QueryExpander;
@@ -67,8 +68,8 @@ public class SAAWebSearchService {
 			IQSSearchEngine searchEngine,
 			DocumentRanker documentRanker,
 			QueryTransformer queryTransformer,
-			ChatClient.Builder chatClientBuilder,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
+			@Qualifier("dashscopeChatModel") ChatModel chatModel,
 			@Qualifier("queryArgumentPromptTemplate") PromptTemplate queryArgumentPromptTemplate
 	) {
 
@@ -80,7 +81,7 @@ public class SAAWebSearchService {
 		this.reasoningContentAdvisor = new ReasoningContentAdvisor(1);
 
 		// Build chatClient
-		this.chatClient = chatClientBuilder
+		this.chatClient = ChatClient.builder(chatModel)
 				.defaultOptions(
 						DashScopeChatOptions.builder()
 								.withModel(DEFAULT_WEB_SEARCH_MODEL)

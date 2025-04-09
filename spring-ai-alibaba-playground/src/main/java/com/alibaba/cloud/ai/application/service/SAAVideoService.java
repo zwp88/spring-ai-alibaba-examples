@@ -40,6 +40,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.Media;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
@@ -57,7 +58,7 @@ public class SAAVideoService  {
     private final ChatClient daschScopeChatClient;
 
     public SAAVideoService(
-            ChatModel chatModel
+            @Qualifier("dashscopeChatModel") ChatModel chatModel
     ) {
 
         this.daschScopeChatClient = ChatClient
