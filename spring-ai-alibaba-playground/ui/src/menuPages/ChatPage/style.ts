@@ -134,38 +134,38 @@ export const useStyle = createStyles(({ token, css }) => {
       padding: 0;
       margin-top: 2px;
     `,
-    container: {
-      display: "flex",
-      flexDirection: "column",
-      margin: "40px 0 80px",
-      height: "calc(100vh - 200px)",
-      width: "100%",
-      position: "relative",
-      overflow: "hidden",
-    },
-    messagesContainer: {
-      flex: 1,
-      overflowY: "auto",
-      padding: "16px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "16px",
-      scrollBehavior: "smooth",
-      height: "calc(100vh - 200px)",
-      "&::-webkit-scrollbar": {
-        width: "6px",
-      },
-      "&::-webkit-scrollbar-track": {
-        background: "transparent",
-      },
-      "&::-webkit-scrollbar-thumb": {
-        background: token.colorTextTertiary,
-        borderRadius: "3px",
-      },
-      "&::-webkit-scrollbar-thumb:hover": {
-        background: token.colorTextSecondary,
-      },
-    },
+    container: css`
+      display: flex;
+      flex-direction: column;
+      margin: 40px 0 80px;
+      height: calc(100vh - 224px);
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    `,
+    messagesContainer: css`
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+      height: calc(100vh - 200px);
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: ${token.colorTextTertiary};
+        border-radius: 3px;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background: ${token.colorTextSecondary};
+      }
+    `,
     senderContainer: css`
       position: fixed;
       bottom: 32px;

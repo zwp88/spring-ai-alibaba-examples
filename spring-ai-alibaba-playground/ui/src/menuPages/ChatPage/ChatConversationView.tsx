@@ -37,8 +37,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFileUploadEnabled, setIsFileUploadEnabled] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
-  const scrollInterval = useRef<number>();
-  const isScrolling = useRef(false);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { currentModel } = useModelConfigContext();
   const { menuCollapsed } = useFunctionMenuStore();
@@ -55,14 +54,13 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数
   const isFirstLoad = useRef(true);
   const processedPrompts = useRef(new Set<string>());
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     chooseActiveConversation(conversationId);
   }, [conversationId, chooseActiveConversation]);
 
-  // 滚动到最后一条消息
-  const scrollToBottom = useCallback(() => {
+  // 立即滚动到底部
+  const immediateScrollToBottom = useCallback(() => {
     if (!messagesContainerRef.current) return;
     const container = messagesContainerRef.current;
     const lastMessage = container.lastElementChild as HTMLElement;
@@ -70,77 +68,15 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     if (lastMessage) {
       const lastMessageTop = lastMessage.offsetTop;
       const lastMessageHeight = lastMessage.clientHeight;
-      const targetScroll =
+      container.scrollTop =
         lastMessageTop + lastMessageHeight - container.clientHeight;
-
-      // 使用缓动效果
-      const currentScroll = container.scrollTop;
-      const distance = targetScroll - currentScroll;
-      const newScroll = currentScroll + distance * 0.3;
-
-      container.scrollTop = newScroll;
-    }
-  }, []);
-
-  // 组件挂载时滚动到底部
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (messagesContainerRef.current) {
-        const container = messagesContainerRef.current;
-        const lastMessage = container.lastElementChild as HTMLElement;
-        if (lastMessage) {
-          container.scrollTop =
-            lastMessage.offsetTop + lastMessage.clientHeight;
-        }
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
-
-  // 开始滚动
-  const startScroll = useCallback(() => {
-    if (isScrolling.current) return;
-    isScrolling.current = true;
-    scrollToBottom();
-
-    // 每100ms检查一次是否需要滚动
-    scrollInterval.current = setInterval(() => {
-      scrollToBottom();
-    }, 100);
-  }, [scrollToBottom]);
-
-  // 停止滚动
-  const stopScroll = useCallback(() => {
-    isScrolling.current = false;
-    if (scrollInterval.current) {
-      clearInterval(scrollInterval.current);
-      scrollInterval.current = undefined;
     }
   }, []);
 
   // 监听消息变化，触发滚动
   useEffect(() => {
-    if (messages.length > 0) {
-      startScroll();
-    }
-    return stopScroll;
-  }, [messages.length, startScroll, stopScroll]);
-
-  // 监听消息流式响应结束
-  useEffect(() => {
-    if (!isLoading && messages.length > 0) {
-      stopScroll();
-      // 确保最后滚动到底部
-      if (messagesContainerRef.current) {
-        const container = messagesContainerRef.current;
-        const lastMessage = container.lastElementChild as HTMLElement;
-        if (lastMessage) {
-          container.scrollTop =
-            lastMessage.offsetTop + lastMessage.clientHeight;
-        }
-      }
-    }
-  }, [isLoading, messages.length, stopScroll]);
+    immediateScrollToBottom();
+  }, [messages, immediateScrollToBottom]);
 
   // 从存储的会话中加载消息
   useEffect(() => {
@@ -271,15 +207,6 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     ])[0];
     setMessages((prev) => [...prev, userMessageUI]);
 
-    // 立即滚动到底部
-    if (messagesContainerRef.current) {
-      const container = messagesContainerRef.current;
-      const lastMessage = container.lastElementChild as HTMLElement;
-      if (lastMessage) {
-        container.scrollTop = lastMessage.offsetTop + lastMessage.clientHeight;
-      }
-    }
-
     const updatedWithUserMessage = [
       ...activeConversation.messages,
       userMessage,
@@ -289,6 +216,8 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       ...activeConversation,
       messages: updatedWithUserMessage,
     });
+
+    immediateScrollToBottom();
 
     try {
       const params = {
