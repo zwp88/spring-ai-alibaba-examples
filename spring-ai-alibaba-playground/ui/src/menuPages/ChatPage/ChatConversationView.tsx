@@ -235,14 +235,18 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
           (value) => {
             const chunk = decoder.decode(value);
             responseText += chunk;
-            // 实时更新UI显示
-            updateConversationMessages(
-              responseText,
-              "assistant",
-              false,
-              userTimestamp,
-              userMessage
-            );
+
+            // 降低更新频率，防止抖动
+            const isLastChunk = value.length === 0;
+            if (isLastChunk || responseText.length % 3 === 0) {
+              updateConversationMessages(
+                responseText,
+                "assistant",
+                false,
+                userTimestamp,
+                userMessage
+              );
+            }
           },
           params
         );
