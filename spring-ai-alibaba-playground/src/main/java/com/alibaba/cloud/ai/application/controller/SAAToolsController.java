@@ -18,11 +18,11 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.service.SAAFunctionService;
+import com.alibaba.cloud.ai.application.entity.result.Result;
+import com.alibaba.cloud.ai.application.entity.tools.ToolCallResp;
+import com.alibaba.cloud.ai.application.service.SAAToolsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
-import reactor.core.publisher.Flux;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,11 +39,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name = "Tool Calling APIs")
 @RequestMapping("/api/v1")
-public class SAAFunctionController {
+public class SAAToolsController {
 
-	private final SAAFunctionService functionService;
+	private final SAAToolsService functionService;
 
-	public SAAFunctionController(SAAFunctionService functionService) {
+	public SAAToolsController(SAAToolsService functionService) {
 		this.functionService = functionService;
     }
 
@@ -54,14 +54,12 @@ public class SAAFunctionController {
 	@UserIp
 	@GetMapping("/tool-call")
 	@Operation(summary = "DashScope ToolCall Chat")
-	public Flux<String> chat(
-			HttpServletResponse response,
+	public Result<ToolCallResp> chat(
 			@Validated @RequestParam("prompt") String prompt,
 			@RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-playground-functions") String chatId
 	) {
 
-		response.setCharacterEncoding("UTF-8");
-		return functionService.chat(chatId, prompt);
+		return Result.success(functionService.chat(chatId, prompt));
 	}
 
 }
