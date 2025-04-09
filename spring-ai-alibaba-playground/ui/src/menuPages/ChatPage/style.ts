@@ -134,16 +134,38 @@ export const useStyle = createStyles(({ token, css }) => {
       padding: 0;
       margin-top: 2px;
     `,
-    container: css`
-      height: 100%;
-      position: relative;
-    `,
-    // messagesContainer: css`
-    //   height: calc(100% - 60px);
-    //   overflow-y: auto;
-    //   padding: 0 20px;
-    //   margin-bottom: 60px;
-    // `,
+    container: {
+      display: "flex",
+      flexDirection: "column",
+      margin: "40px 0 80px",
+      height: "calc(100vh - 200px)",
+      width: "100%",
+      position: "relative",
+      overflow: "hidden",
+    },
+    messagesContainer: {
+      flex: 1,
+      overflowY: "auto",
+      padding: "16px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "16px",
+      scrollBehavior: "smooth",
+      height: "calc(100vh - 200px)",
+      "&::-webkit-scrollbar": {
+        width: "6px",
+      },
+      "&::-webkit-scrollbar-track": {
+        background: "transparent",
+      },
+      "&::-webkit-scrollbar-thumb": {
+        background: token.colorTextTertiary,
+        borderRadius: "3px",
+      },
+      "&::-webkit-scrollbar-thumb:hover": {
+        background: token.colorTextSecondary,
+      },
+    },
     senderContainer: css`
       position: fixed;
       bottom: 32px;
@@ -218,15 +240,6 @@ export const useStyle = createStyles(({ token, css }) => {
       color: ${token.colorTextQuaternary};
       margin-top: 4px;
       text-align: right;
-    `,
-    messagesContainer: css`
-      height: calc(100vh - 258px);
-      margin: 48px 16px 0;
-      padding: 32px 16px 0;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
     `,
   };
 });

@@ -10,9 +10,10 @@ export interface ChatConversationViewProps {
 
 export interface Message {
   id: string;
-  text: string;
   sender: "user" | "bot";
-  timestamp: Date;
+  text: string;
+  timestamp: number;
+  isError?: boolean;
 }
 
 export interface ChatMessage {
