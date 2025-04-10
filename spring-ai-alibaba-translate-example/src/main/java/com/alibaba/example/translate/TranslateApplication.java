@@ -52,6 +52,6 @@ public class TranslateApplication {
                 .withModel(DashScopeApi.ChatModel.QWEN_PLUS.getModel())
                 .build();
         
-        return new DashScopeChatModel(apiKey, options);
+        return new DashScopeChatModel(new DashScopeApi(apiKey), options);
     }
 }
