@@ -99,18 +99,6 @@
 
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter-tool-calling-baidumap</artifactId>
-			<version>${spring-ai-alibaba.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter-tool-calling-baidutranslate</artifactId>
-			<version>${spring-ai-alibaba.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-jdbc-memory</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
