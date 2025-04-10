@@ -70,6 +70,7 @@ export const useStyle = createStyles(({ token, css }) => {
       color: rgba(0, 0, 0, 0.45);
       background-color: rgba(0, 0, 0, 0.02);
       border-top: 1px solid rgba(0, 0, 0, 0.06);
+      /* background-color: ${token.colorBgElevated}; */
     `,
     logo: css`
       display: flex;
