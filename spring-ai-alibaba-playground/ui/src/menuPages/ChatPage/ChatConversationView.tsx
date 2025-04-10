@@ -5,12 +5,8 @@ import { useStyle } from "./style";
 import { useConversationContext } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
 import { getChat } from "../../api/chat";
-import { Badge, Button, Space, theme } from "antd";
-import {
-  CloudUploadOutlined,
-  CopyOutlined,
-  PaperClipOutlined,
-} from "@ant-design/icons";
+import { Badge, Button, theme } from "antd";
+import { CloudUploadOutlined, PaperClipOutlined } from "@ant-design/icons";
 import { Attachments } from "@ant-design/x";
 import { actionButtonConfig, MAX_IMAGE_SIZE } from "../../constant";
 import {
@@ -26,8 +22,11 @@ import {
   ChatMessage,
   Message,
 } from "./types";
+import ResponseBubble from "../components/ResponseBubble";
+import RequestBubble from "../components/RequestBubble";
+import { useCallback } from "react";
 
-const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
+const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   conversationId,
 }) => {
   const { token } = theme.useToken();
@@ -38,6 +37,7 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFileUploadEnabled, setIsFileUploadEnabled] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { currentModel } = useModelConfigContext();
   const { menuCollapsed } = useFunctionMenuStore();
@@ -54,16 +54,33 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数
   const isFirstLoad = useRef(true);
   const processedPrompts = useRef(new Set<string>());
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     chooseActiveConversation(conversationId);
   }, [conversationId, chooseActiveConversation]);
 
+  // 立即滚动到底部
+  const immediateScrollToBottom = useCallback(() => {
+    if (!messagesContainerRef.current) return;
+    const container = messagesContainerRef.current;
+    const lastMessage = container.lastElementChild as HTMLElement;
+
+    if (lastMessage) {
+      const lastMessageTop = lastMessage.offsetTop;
+      const lastMessageHeight = lastMessage.clientHeight;
+      container.scrollTop =
+        lastMessageTop + lastMessageHeight - container.clientHeight;
+    }
+  }, []);
+
+  // 监听消息变化，触发滚动
+  useEffect(() => {
+    immediateScrollToBottom();
+  }, [messages, immediateScrollToBottom]);
+
   // 从存储的会话中加载消息
   useEffect(() => {
     if (activeConversation) {
-      // 确保消息数组存在并且有内容
       if (
         activeConversation.messages &&
         activeConversation.messages.length > 0
@@ -85,14 +102,6 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       }
     }
   }, [activeConversation?.id, activeConversation?.messages]);
-
-  // 滚动到底部
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
 
   // 处理URL中的prompt参数
   useEffect(() => {
@@ -119,9 +128,13 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
         window.history.replaceState({}, document.title, newUrl);
 
         // 设置输入内容并自动发送
-        setTimeout(() => {
+        const timeId = setTimeout(() => {
           handleSendMessage(urlPrompt);
+          clearTimeout(timeId);
         }, 300);
+        return () => {
+          clearTimeout(timeId);
+        };
       }
 
       isFirstLoad.current = false;
@@ -204,6 +217,8 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
       messages: updatedWithUserMessage,
     });
 
+    immediateScrollToBottom();
+
     try {
       const params = {
         chatId: activeConversation?.id,
@@ -220,12 +235,24 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
           (value) => {
             const chunk = decoder.decode(value);
             responseText += chunk;
+
+            // 降低更新频率，防止抖动
+            const isLastChunk = value.length === 0;
+            if (isLastChunk || responseText.length % 3 === 0) {
+              updateConversationMessages(
+                responseText,
+                "assistant",
+                false,
+                userTimestamp,
+                userMessage
+              );
+            }
           },
           params
         );
-        console.log("响应的", response);
 
         if (response.ok && responseText) {
+          // 最终更新一次，确保完整内容被保存
           updateConversationMessages(
             responseText,
             "assistant",
@@ -354,54 +381,46 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
   );
 
   // 创建消息底部控件
-  const createMessageFooter = (value: string) => (
-    <Space size={token.paddingXXS}>
-      <Button
-        color="default"
-        variant="text"
-        size="small"
-        onClick={() => {
-          navigator.clipboard.writeText(value);
-        }}
-        icon={<CopyOutlined />}
-      />
-    </Space>
-  );
+  // const createMessageFooter = (value: string) => (
+  //   <Space size={token.paddingXXS}>
+  //     <Button
+  //       color="default"
+  //       variant="text"
+  //       size="small"
+  //       onClick={() => {
+  //         navigator.clipboard.writeText(value);
+  //       }}
+  //       icon={<CopyOutlined />}
+  //     />
+  //   </Space>
+  // );
 
   return (
     <BasePage title="对话" conversationId={conversationId}>
       <div className={styles.container}>
         <div ref={messagesContainerRef} className={styles.messagesContainer}>
           {messages.length === 0 && !conversationId ? (
-            <div className={styles.botMessage}>
-              <div className={styles.messageSender}>AI</div>
-              <div className={styles.messageText}>
-                你好，请问有什么可以帮你的吗？
-              </div>
-              <div className={styles.messageTime}>
-                {new Date().toLocaleTimeString()}
-              </div>
-            </div>
+            <ResponseBubble
+              content="你好，请问有什么可以帮你的吗？"
+              timestamp={Date.now()}
+            />
           ) : (
-            messages.map((message) => (
-              <div
-                key={message.id}
-                className={
-                  message.sender === "user"
-                    ? styles.userMessage
-                    : styles.botMessage
-                }
-              >
-                <div className={styles.messageSender}>
-                  {message.sender === "user" ? "You" : "AI"}
-                </div>
-                <div className={styles.messageText}>{message.text}</div>
-                <div className={styles.messageTime}>
-                  {message.timestamp.toLocaleTimeString()}
-                </div>
-                {message.sender === "bot" && createMessageFooter(message.text)}
-              </div>
-            ))
+            messages.map((message) =>
+              message.sender === "user" ? (
+                <RequestBubble
+                  key={message.id}
+                  content={message.text}
+                  timestamp={message.timestamp}
+                />
+              ) : (
+                <ResponseBubble
+                  key={message.id}
+                  content={message.text}
+                  timestamp={message.timestamp}
+                  isError={message.isError}
+                />
+              )
+            )
           )}
         </div>
 
@@ -454,4 +473,4 @@ const ChatConversationView2: React.FC<ChatConversationViewProps> = ({
   );
 };
 
-export default ChatConversationView2;
+export default ChatConversationView;
