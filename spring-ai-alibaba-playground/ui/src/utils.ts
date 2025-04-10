@@ -41,14 +41,60 @@ export const mapStoredMessagesToUIMessages = (
     return [];
   }
 
-  return messages
-    .filter((msg) => !msg.isLoading) // 过滤掉加载中的消息
-    .map((msg) => {
-      return {
-        id: `msg-${msg.timestamp}`,
-        text: msg.content || "",
-        sender: msg.role === "user" ? "user" : "bot",
-        timestamp: new Date(msg.timestamp),
-      };
-    });
+  return (
+    messages
+      ?.filter((msg) => !msg.isLoading) // 过滤掉加载中的消息
+      ?.map((msg) => {
+        return {
+          id: `msg-${msg.timestamp}`,
+          text: msg.content || "",
+          sender: msg.role === "user" ? "user" : "bot",
+          timestamp: msg.timestamp,
+        };
+      }) ?? []
+  );
+};
+
+export const createTagMerger = (startTag: string, endTag: string) => {
+  const queue: { content: string }[] = [];
+  let currentContent = "";
+  let lastProcessedLength = 0;
+
+  const tagMerger = (fullText: string) => {
+    // 计算新增的部分
+    const newPart = fullText.slice(lastProcessedLength);
+    lastProcessedLength = fullText.length;
+
+    // 如果遇到纯文本，说明标签区域结束，清空队列
+    if (!newPart.includes(startTag) || !newPart.includes(endTag)) {
+      if (currentContent) {
+        queue.push({ content: currentContent });
+        currentContent = "";
+      }
+      return newPart;
+    }
+
+    // 提取内容
+    const content = newPart.replace(startTag, "").replace(endTag, "");
+
+    // 合并内容
+    currentContent += content;
+
+    // null表示这个chunk已经被处理
+    return null;
+  };
+
+  const getResult = () => {
+    if (currentContent) {
+      queue.push({ content: currentContent });
+    }
+    return queue
+      .map(({ content }) => `${startTag}${content}${endTag}`)
+      .join("");
+  };
+
+  return {
+    tagMerger,
+    getResult,
+  };
 };
