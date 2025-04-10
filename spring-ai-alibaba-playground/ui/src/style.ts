@@ -111,8 +111,7 @@ export const useStyle = createStyles(({ token, css }) => {
       border-bottom: 1px solid ${token.colorBorderSecondary};
       margin-bottom: 16px;
       img {
-        padding-top: 4px;
-        height: 30px;
+        height: 121px;
       }
     `,
     newChatBtn: css`
