@@ -21,13 +21,13 @@
     <parent>
         <groupId>com.alibaba.cloud.ai</groupId>
         <artifactId>spring-ai-alibaba-scene-example</artifactId>
-        <version>1.0.0</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.alibaba</groupId>
     <artifactId>multi-model-chat</artifactId>
-    <version>1.0.0</version>
+    <version>${revision}</version>
     <name>MultiModelChat</name>
     <description>MultiModelChat</description>
 
