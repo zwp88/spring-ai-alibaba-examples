@@ -147,7 +147,7 @@ const FunctionMenu = (props: MenuProps) => {
         {/* 🌟 顶部信息 */}
         <div className={styles.userProfile}>
           <Space align="center">
-            <img src="/saa_logo.png" alt="Spring AI Alibaba" />
+            <img src="/logo.svg" alt="Spring AI Alibaba PlayGround" />
           </Space>
           <Button
             type="text"
