@@ -19,7 +19,10 @@ package com.alibaba.example.translate.controller;
 
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.alibaba.example.translate.controller.service.MarkdownTranslationService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.model.ChatModel;
@@ -31,6 +34,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * DashScope翻译服务控制器
  * 提供基于DashScope大模型的文本翻译API
@@ -40,11 +48,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class DashScopeTranslateController {
 
 	private static final String TRANSLATION_PROMPT_TEMPLATE = "请将以下文本从%s翻译成%s：\n\n%s";
+	private final MarkdownTranslationService markdownTranslationService;
 
 	private final ChatModel dashScopeChatModel;
 
-	public DashScopeTranslateController(@Qualifier("dashScopeChatModel") ChatModel chatModel) {
+	public DashScopeTranslateController(@Qualifier("dashScopeChatModel") ChatModel chatModel,
+										MarkdownTranslationService markdownTranslationService) {
 		this.dashScopeChatModel = chatModel;
+		this.markdownTranslationService = markdownTranslationService;
 	}
 
 	/**
@@ -123,4 +134,37 @@ public class DashScopeTranslateController {
         
         return new TranslateResponse(translatedText);
 	}
+
+	/**
+	 * Markdown文件翻译服务
+	 * @param file 需要翻译的md文件
+	 * @param sourceLanguage 源语言
+	 * @param targetLanguage 目标语言
+	 * @return 翻译后的md文件
+     */
+	@PostMapping("/markdown-file")
+	public TranslateResponse translateMarkdownFile(
+			@RequestParam("file") MultipartFile file,
+			@RequestParam(defaultValue = "英文") String sourceLanguage,
+			@RequestParam(defaultValue = "中文") String targetLanguage) throws IOException {
+
+		Path tempFile = Files.createTempFile("markdown_", ".md");
+		file.transferTo(tempFile);
+
+		try {
+			String translatedPath = markdownTranslationService.translateMarkdownFile(
+					tempFile.toString(),
+					sourceLanguage,
+					targetLanguage
+			);
+			String translatedContent = Files.readString(Paths.get(translatedPath));
+			System.out.println(translatedContent);
+			return new TranslateResponse(
+					"success"
+			);
+		} finally {
+			Files.deleteIfExists(tempFile);
+		}
+	}
+
 } 
