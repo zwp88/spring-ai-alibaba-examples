@@ -122,24 +122,21 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
         // 标记此prompt已处理，避免重复处理
         processedPrompts.current.add(urlPrompt);
         console.log("从URL参数获取提示词:", urlPrompt);
-
         // 清除URL中的prompt参数，防止刷新页面重复发送
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
 
-        // 设置输入内容并自动发送
         const timeId = setTimeout(() => {
-          handleSendMessage(urlPrompt);
+          if (activeConversation && !isLoading) {
+            handleSendMessage(urlPrompt);
+          }
           clearTimeout(timeId);
-        }, 300);
-        return () => {
-          clearTimeout(timeId);
-        };
+        }, 100);
       }
 
       isFirstLoad.current = false;
     }
-  }, [location.search, activeConversation, updateCapability]);
+  }, [location.search, activeConversation, updateCapability, isLoading]);
 
   const updateConversationMessages = (
     messageContent: string,
@@ -238,7 +235,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
 
             // 降低更新频率，防止抖动
             const isLastChunk = value.length === 0;
-            if (isLastChunk || responseText.length % 3 === 0) {
+            if (isLastChunk || responseText.length % 6 === 0) {
               updateConversationMessages(
                 responseText,
                 "assistant",

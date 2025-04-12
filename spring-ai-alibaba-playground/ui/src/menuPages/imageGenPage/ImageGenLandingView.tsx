@@ -50,7 +50,7 @@ const ImageGenLandingView: React.FC = () => {
     if (!prompt.trim()) return;
     setIsLoading(true);
     try {
-      const newConversation = createConversation(MenuPage.ImageGen, []);
+      const newConversation = createConversation(MenuPage.ImageGen, [], prompt);
       navigate(
         `/image-gen/${newConversation.id}?prompt=${encodeURIComponent(prompt)}`
       );

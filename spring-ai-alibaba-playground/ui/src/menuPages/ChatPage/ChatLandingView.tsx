@@ -31,8 +31,8 @@ const ChatLandingView: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // 创建新对话，初始无消息
-      const newConversation = createConversation(MenuPage.Chat, []);
+      // 创建新对话，传递内容用于生成标题
+      const newConversation = createConversation(MenuPage.Chat, [], content);
 
       // 构建URL参数
       let params = new URLSearchParams();
