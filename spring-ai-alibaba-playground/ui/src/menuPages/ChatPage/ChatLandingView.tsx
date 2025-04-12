@@ -109,7 +109,7 @@ const ChatLandingView: React.FC = () => {
             value={inputValue}
             onChange={(value: string) => setInputValue(value)}
             onSubmit={handleCreateConversation}
-            allowSpeech
+            // allowSpeech
             placeholder="您可以问我任何问题..."
             loading={isLoading}
           />
