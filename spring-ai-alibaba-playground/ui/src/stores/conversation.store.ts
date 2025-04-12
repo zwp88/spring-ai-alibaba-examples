@@ -321,36 +321,36 @@ export const useConversationContext = () => {
     }
   };
 
-  /**
-   * 向当前活跃的对话添加新消息
-   * @param message - 要添加的消息对象
-   */
-  const addMessage = (message: ChatMessage) => {
-    if (!activeConversation) {
-      console.error("No active conversation to add message to");
-      return;
-    }
-    // 创建更新后的对话对象
-    const updatedConversation = {
-      ...activeConversation,
-      messages: [...activeConversation.messages, message],
-    };
-    // 更新 conversations 数组
-    const updatedConversations = conversations.map((conv) =>
-      conv.id === activeConversation.id ? updatedConversation : conv
-    );
+  // /**
+  //  * 向当前活跃的对话添加新消息
+  //  * @param message - 要添加的消息对象
+  //  */
+  // const addMessage = (message: ChatMessage) => {
+  //   if (!activeConversation) {
+  //     console.error("No active conversation to add message to");
+  //     return;
+  //   }
+  //   // 创建更新后的对话对象
+  //   const updatedConversation = {
+  //     ...activeConversation,
+  //     messages: [...activeConversation.messages, message],
+  //   };
+  //   // 更新 conversations 数组
+  //   const updatedConversations = conversations.map((conv) =>
+  //     conv.id === activeConversation.id ? updatedConversation : conv
+  //   );
 
-    // 更新状态
-    setConversations(updatedConversations);
-    setActiveConversation(updatedConversation);
+  //   // 更新状态
+  //   setConversations(updatedConversations);
+  //   setActiveConversation(updatedConversation);
 
-    // 直接更新到 localStorage 确保保存
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedConversations));
-    } catch (error) {
-      console.error("addMessage: Failed to save to localStorage:", error);
-    }
-  };
+  //   // 直接更新到 localStorage 确保保存
+  //   try {
+  //     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedConversations));
+  //   } catch (error) {
+  //     console.error("addMessage: Failed to save to localStorage:", error);
+  //   }
+  // };
 
   /**
    * 更新对话的标题
@@ -408,7 +408,6 @@ export const useConversationContext = () => {
     updateConversationWithoutLocalStorage,
     chooseActiveConversation,
     clearActiveConversation,
-    addMessage,
     updateConversationTitle,
   };
 };

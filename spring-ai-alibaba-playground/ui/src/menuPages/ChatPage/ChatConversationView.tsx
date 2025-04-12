@@ -121,7 +121,6 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       if (urlPrompt && !processedPrompts.current.has(urlPrompt)) {
         // 标记此prompt已处理，避免重复处理
         processedPrompts.current.add(urlPrompt);
-        console.log("从URL参数获取提示词:", urlPrompt);
         // 清除URL中的prompt参数，防止刷新页面重复发送
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
@@ -171,9 +170,9 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       ?.filter((msg) => !(msg as ChatMessage).isLoading)
       .concat([responseMessage]);
 
-    if (isError) {
-      console.log("更新错误后的消息列表:", finalMessages);
-    }
+    // if (isError) {
+    //   console.log("更新错误后的消息列表:", finalMessages);
+    // }
     if (!activeConversation?.id) {
       throw new Error("会话ID为空!");
     }

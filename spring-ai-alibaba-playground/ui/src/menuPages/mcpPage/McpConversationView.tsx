@@ -2,14 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import CodeInfo from "./components/CodeInfo";
-import OutputResult from "./components/OutputResult";
 import { useStyles } from "./style";
-import { useConversationContext } from "../../stores/conversation.store";
+import {
+  ChatMessage,
+  useConversationContext,
+} from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
-import { McpMessage, Message } from "./types";
 import { getMcp } from "../../api/mcp";
 import { mapStoredMessagesToUIMessages } from "../../utils";
-
+// 导入通用气泡组件
+import ResponseBubble from "../components/ResponseBubble";
+import RequestBubble from "../components/RequestBubble";
+import { McpUiMessage } from "./types";
+import { Message } from "../ChatPage/types";
 interface McpConversationViewProps {
   conversationId: string;
 }
@@ -25,7 +30,6 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
     activeConversation,
     chooseActiveConversation,
     updateActiveConversation,
-    addMessage,
   } = useConversationContext();
 
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数
@@ -46,19 +50,14 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
         activeConversation.messages.length > 0
       ) {
         const filteredMessages = activeConversation.messages.filter(
-          (msg) => !(msg as McpMessage).isLoading
+          (msg) => !(msg as McpUiMessage).isLoading
         );
 
         if (filteredMessages.length > 0) {
           const uiMessages = mapStoredMessagesToUIMessages(
-            filteredMessages as McpMessage[]
+            filteredMessages as ChatMessage[]
           );
-          setMessages(
-            uiMessages.map((msg) => ({
-              ...msg,
-              timestamp: new Date(msg.timestamp),
-            }))
-          );
+          setMessages(uiMessages);
         } else {
           setMessages([]);
         }
@@ -93,49 +92,38 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
     }
   }, [location.search, activeConversation]);
 
-  // 处理消息更新的辅助函数，确保消息持久化
   const updateConversationMessages = (
     messageContent: string,
     role: "assistant",
     isError: boolean = false,
     userTimestamp: number,
-    userMessage: McpMessage
+    userMessage: McpUiMessage
   ) => {
     if (!activeConversation) return;
 
     const assistantTimestamp = Date.now();
-    const assistantMessage: McpMessage = {
+    const assistantMessage: McpUiMessage = {
       role: role,
       content: messageContent,
       timestamp: assistantTimestamp,
       isError: isError,
     };
-
     const assistantUiMessage = mapStoredMessagesToUIMessages([
       assistantMessage,
     ])[0];
 
-    const assistantMessageUI: Message = {
-      ...assistantUiMessage,
-      timestamp: new Date(assistantUiMessage.timestamp),
-    };
+    setMessages((prev) => [...prev, assistantUiMessage]);
 
-    // 使用函数式更新确保基于最新状态
-    setMessages((prev) => [...prev, assistantMessageUI]);
-
-    // 确保用户消息依然存在
     const existingUserMessage = activeConversation.messages.find(
       (msg) => msg.timestamp === userTimestamp && msg.role === "user"
     );
 
-    // 如果用户消息不存在，先添加
     const baseMessages = existingUserMessage
       ? activeConversation.messages
       : [...activeConversation.messages, userMessage];
 
-    // 更新会话，移除占位消息，添加新消息
     const finalMessages = baseMessages
-      .filter((msg) => !(msg as McpMessage).isLoading)
+      .filter((msg) => !(msg as McpUiMessage).isLoading)
       .concat([assistantMessage]);
 
     if (isError) {
@@ -144,7 +132,7 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
 
     updateActiveConversation({
       ...activeConversation,
-      messages: finalMessages as McpMessage[],
+      messages: finalMessages as McpUiMessage[],
     });
   };
 
@@ -153,23 +141,19 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
     setIsLoading(true);
     setInputContent("");
     const userTimestamp = Date.now();
-    const userMessage: McpMessage = {
+    const userMessage: McpUiMessage = {
       role: "user",
       content: text,
       timestamp: userTimestamp,
     };
 
     const userUiMessage = mapStoredMessagesToUIMessages([userMessage])[0];
-    const userMessageUI: Message = {
-      ...userUiMessage,
-      timestamp: new Date(userUiMessage.timestamp),
-    };
-    setMessages((prev) => [...prev, userMessageUI]);
+    setMessages((prev) => [...prev, userUiMessage]);
 
     const updatedWithUserMessage = [
       ...activeConversation.messages,
       userMessage,
-    ] as McpMessage[];
+    ] as McpUiMessage[];
     updateActiveConversation({
       ...activeConversation,
       messages: updatedWithUserMessage,
@@ -219,9 +203,36 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
           </div>
         </div>
 
-        {/* 右侧面板 - 对话记录展示 */}
+        {/* 右侧面板  */}
         <div className={styles.rightPanel}>
-          <OutputResult messages={messages} title="MCP 对话" />
+          <div className={`${styles.card} ${styles.resultPanel}`}>
+            <h2 className={styles.panelTitle}>MCP 对话</h2>
+            <div className={styles.messagesContainer}>
+              {messages.length === 0 && !conversationId ? (
+                <ResponseBubble
+                  content="你好，请问有什么可以帮你的吗？"
+                  timestamp={Date.now()}
+                />
+              ) : (
+                messages.map((message) =>
+                  message.sender === "user" ? (
+                    <RequestBubble
+                      key={message.id}
+                      content={message.text}
+                      timestamp={message.timestamp}
+                    />
+                  ) : (
+                    <ResponseBubble
+                      key={message.id}
+                      content={message.text}
+                      timestamp={message.timestamp}
+                      isError={message.isError}
+                    />
+                  )
+                )
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </BasePage>
