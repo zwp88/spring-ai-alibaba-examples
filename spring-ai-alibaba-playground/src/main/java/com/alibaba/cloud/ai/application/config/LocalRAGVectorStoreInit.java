@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.alibaba.cloud.ai.vectorstore.opensearch.OpenSearchVectorStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
-import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -45,11 +45,11 @@ public class LocalRAGVectorStoreInit implements ApplicationRunner {
 
 	private final Logger logger = LoggerFactory.getLogger(LocalRAGVectorStoreInit.class);
 
-	private final MilvusVectorStore vectorStore;
+	private final OpenSearchVectorStore vectorStore;
 
 	private final List<MarkdownDocumentReader> markdownDocumentReaderList;
 
-	public LocalRAGVectorStoreInit(MilvusVectorStore vectorStore) throws IOException {
+	public LocalRAGVectorStoreInit(OpenSearchVectorStore vectorStore) throws IOException {
 
 		this.vectorStore = vectorStore;
 		this.markdownDocumentReaderList = loadMarkdownDocuments();
