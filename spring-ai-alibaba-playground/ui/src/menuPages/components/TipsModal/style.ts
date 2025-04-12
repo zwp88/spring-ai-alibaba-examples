@@ -4,15 +4,15 @@ export const modalStyles = {
   },
   modal: {
     display: 'flex',
-    justifyContent: 'center', // 水平居中
-    alignItems: 'center',     // 垂直居中
+    justifyContent: 'center', 
+    alignItems: 'center',    
   },
   imageContainer: {
-    padding: '0 30px',       // 左右留出空隙
+    padding: '0 30px',     
   },
   image: {
-    maxWidth: '100%',        // 限制图片最大宽度
-    maxHeight: '400px',      // 限制图片最大高度
+    maxWidth: '100%',        
+    maxHeight: '400px',      
     borderRadius: '10px',
   },
 };
