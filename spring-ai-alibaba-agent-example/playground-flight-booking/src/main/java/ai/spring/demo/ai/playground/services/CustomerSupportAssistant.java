@@ -34,6 +34,11 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 
 /**
  * * @author Christian Tzolov
+ * 模拟的是一个航空公司 Funnair 的客户支持助手，具备：
+ * 自然语言交互（ChatClient）
+ * 记忆能力（ChatMemory）
+ * 知识检索（RAG via VectorStore）
+ * 函数调用（Function Calling）
  */
 @Service
 public class CustomerSupportAssistant {
@@ -57,6 +62,7 @@ public class CustomerSupportAssistant {
 					   请讲中文。
 					   今天的日期是 {current_date}.
 					""")
+				// 插件组合
 				.defaultAdvisors(
 						new PromptChatMemoryAdvisor(chatMemory), // Chat Memory
 						// new VectorStoreChatMemoryAdvisor(vectorStore)),
@@ -80,7 +86,7 @@ public class CustomerSupportAssistant {
 		return this.chatClient.prompt()
 			.system(s -> s.param("current_date", LocalDate.now().toString()))
 			.user(userMessageContent)
-			.advisors(a -> a.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId).param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
+			.advisors(a -> a.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId).param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)) // 设置advisor参数， 记忆使用chatId， 拉取最近的100条记录
 			.stream()
 			.content();
 	}
