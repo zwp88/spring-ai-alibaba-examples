@@ -2,14 +2,14 @@ import * as React from "react";
 import { useState } from "react";
 import { Steps, Typography, theme, Tabs } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
-import { Card } from "antd";
+import { Card, Image } from "antd";
 import { useStyles } from "../../style";
 import { motion, AnimatePresence } from "framer-motion";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const { Step } = Steps;
-const { Paragraph, Title } = Typography;
+const { Paragraph, Title, Link } = Typography;
 const { TabPane } = Tabs;
 
 const codeSummaries: { [key: string]: { code: string; language: string } } = {
@@ -464,7 +464,7 @@ const ArchitectureFlow: React.FC = () => {
     <>
       <Typography>
         <Paragraph className={styles.codeInfoIntro}>
-          Model Context Protocol (MCP) 架构中关键实现
+          Spring AI Tool Calling 关键实现
         </Paragraph>
       </Typography>
 
@@ -472,18 +472,18 @@ const ArchitectureFlow: React.FC = () => {
         direction="vertical"
         current={4}
         className={styles.codeInfoSteps}
-        progressDot={(iconDot, { index }) => iconDot}
+        progressDot={(iconDot) => iconDot}
       >
         <Step
           title={
             <div className={styles.codeInfoStepTitle}>
-              <span className={styles.codeInfoTitleText}>前端</span>
+              <span className={styles.codeInfoTitleText}>用户侧</span>
               <CustomDot index={0} />
             </div>
           }
           description={
             <div className={styles.codeInfoStepDesc}>
-              React 应用发送用户输入到后端 API
+              输入能够触发工具调用的 Prompt 提示词，对应工具函数的 Description 描述；
             </div>
           }
           className={styles.codeInfoStepItem}
@@ -491,13 +491,13 @@ const ArchitectureFlow: React.FC = () => {
         <Step
           title={
             <div className={styles.codeInfoStepTitle}>
-              <span className={styles.codeInfoTitleText}>WebServer</span>
+              <span className={styles.codeInfoTitleText}>AI 大模型</span>
               <CustomDot index={1} />
             </div>
           }
           description={
             <div className={styles.codeInfoStepDesc}>
-              Spring Boot 控制器接收请求并传递给服务层
+              AI 大模型判断是否调用函数，此时的 finish_reason 字段为 `TOOL_CALL`；
             </div>
           }
           className={styles.codeInfoStepItem}
@@ -505,13 +505,13 @@ const ArchitectureFlow: React.FC = () => {
         <Step
           title={
             <div className={styles.codeInfoStepTitle}>
-              <span className={styles.codeInfoTitleText}>MCP Client</span>
+              <span className={styles.codeInfoTitleText}>Spring AI</span>
               <CustomDot index={2} />
             </div>
           }
           description={
             <div className={styles.codeInfoStepDesc}>
-              服务层使用 ChatClient 将请求传递给语言模型
+              Spring AI 在已经注册工具函数元数据中查找对应的函数，并组装参数发起调用；
             </div>
           }
           className={styles.codeInfoStepItem}
@@ -519,18 +519,21 @@ const ArchitectureFlow: React.FC = () => {
         <Step
           title={
             <div className={styles.codeInfoStepTitle}>
-              <span className={styles.codeInfoTitleText}>MCP Server</span>
+              <span className={styles.codeInfoTitleText}>AI 大模型</span>
               <CustomDot index={3} />
             </div>
           }
           description={
             <div className={styles.codeInfoStepDesc}>
-              根据配置启动的独立进程，提供实际工具实现
+              接受工具函数调用响应，并返回最终结果给用户。
             </div>
           }
           className={styles.codeInfoStepItem}
         />
       </Steps>
+      <Paragraph className={styles.codeInfoIntro}>
+        至此，Spring AI 中工具调用流程结束。通过 Spring AI，开发者可以很方便的注册和管理工具元数据信息，开发自己的 AI 应用。
+      </Paragraph>
     </>
   );
 };
@@ -540,8 +543,35 @@ const Documentation: React.FC = () => {
 
   return (
     <div className={styles.documentationContainer}>
-      <Title level={4}>什么是 Function Calling?</Title>
-      TODO
+      <Title level={4}>什么是 Tool Calling?</Title>
+      <Image
+        src="https://docs.spring.io/spring-ai/reference/_images/function-calling-basic-flow.jpg"
+      />
+      <Paragraph>
+        Spring AI 允许开发者注册自定义 Java 函数，以便 AI 模型能够通过生成 JSON 来调用这些函数。
+        开发者只需实现相应的函数，并通过简单的 @Bean 定义进行注册，从而简化与 AI 模型的交互过程。
+        这样，开发者可以更轻松地将 AI 能力与外部服务连接，实现灵活的功能调用。
+      </Paragraph>
+      <Title level={4}>Tool Calling 执行流程?</Title>
+      <Paragraph>
+        Spring AI 通过提供函数元数据，使 AI 模型能够在需要时调用自定义函数获取信息，例如当前温度。
+        开发者只需将函数定义为 @Bean，AI 模型会自动处理函数调用的请求和响应，从而简化了代码的编写。
+        此外，开发者可以在提示中引用多个函数 bean 名称，以提供更灵活的信息检索能力。
+      </Paragraph>
+      <Title level={4}>参考文档</Title>
+      <Paragraph>
+      <ul>
+        <li>
+          <Link href="https://docs.spring.io/spring-ai/reference/api/functions.html">Spring AI Function Calling</Link>
+        </li>
+        <li>
+          <Link href="https://docs.spring.io/spring-ai/reference/api/tools.html">Spring AI Tool Calling</Link>
+        </li>
+        <li>
+          <Link href="https://java2ai.com/docs/dev/tutorials/basics/function-calling/">Spring AI Alibaba Tools</Link>
+        </li>
+      </ul>
+    </Paragraph>
     </div>
   );
 };
