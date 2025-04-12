@@ -159,39 +159,27 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
       timestamp: userTimestamp,
     };
 
-    // 创建用户消息的UI表示
     const userUiMessage = mapStoredMessagesToUIMessages([userMessage])[0];
-
     const userMessageUI: Message = {
       ...userUiMessage,
       timestamp: new Date(userUiMessage.timestamp),
     };
-
-    // 使用函数式更新确保基于最新状态
     setMessages((prev) => [...prev, userMessageUI]);
 
-    // 先只更新用户消息到会话存储，确保即使API调用失败，用户消息也会被保存
     const updatedWithUserMessage = [
       ...activeConversation.messages,
       userMessage,
     ] as McpMessage[];
-
-    // 立即保存用户消息到localStorage，即使后续API调用失败
     updateActiveConversation({
       ...activeConversation,
       messages: updatedWithUserMessage,
     });
 
     try {
-      // 使用getMcp函数替换直接的fetch调用
       const response = await getMcp(text, conversationId);
-
-      // 检查响应状态码
       if (response.code !== 0 || !response.data) {
         throw new Error(response.message || "Failed to get response");
       }
-
-      // 使用辅助函数更新助手消息
       updateConversationMessages(
         response.data,
         "assistant",
@@ -201,8 +189,6 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
       );
     } catch (error) {
       console.error("处理MCP请求错误:", error);
-
-      // 使用辅助函数添加错误消息
       updateConversationMessages(
         "抱歉，处理您的请求时出现错误。",
         "assistant",
