@@ -79,18 +79,6 @@ export const useStyles = createStyles(({ token, css }) => ({
     &:hover {
       transform: translateY(-4px);
     }
-
-    &:hover .overlay {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    img {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
-    }
   `,
   overlay: css`
     position: absolute;

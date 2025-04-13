@@ -44,7 +44,6 @@ const McpLandingView = () => {
   const navigate = useNavigate();
   const { createConversation } = useConversationContext();
 
-  // Sample configuration code to display
   const configJson = `{
   "mcpservers": {
     "": {
@@ -249,6 +248,7 @@ const McpLandingView = () => {
               </div>
             </TabPane>
             <TabPane tab="Streamable HTTP" key="streamable">
+              {/* TODO: */}
               <div className={styles.tokenInputSection}>
                 <div className={styles.tokenLabel}>
                   GITHUB_PERSONAL_ACCESS_TOKEN

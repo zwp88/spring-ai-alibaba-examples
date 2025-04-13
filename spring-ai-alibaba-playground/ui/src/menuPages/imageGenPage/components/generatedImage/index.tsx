@@ -67,16 +67,17 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
     <Card
       bodyStyle={{
         padding: 0,
+        height: "350px",
       }}
       style={{
         position: "relative",
-        // height: "400px",
         width: "100%",
         overflow: "hidden",
         padding: 0,
         borderRadius: token.borderRadiusLG,
-        height: "350px",
+        maxWidth: "450px",
         margin: "0 auto",
+        height: "350px",
       }}
       onMouseEnter={(e) => {
         const overlay = e.currentTarget.querySelector(
@@ -102,10 +103,10 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            height: "350px",
+            height: "100%",
+            width: "100%",
             backgroundColor: token.colorBgElevated,
             color: token.colorText,
-            padding: token.padding,
             border: `1px dashed ${token.colorBorder}`,
             borderRadius: token.borderRadiusLG,
           }}
@@ -134,8 +135,7 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
             style={{
               width: "100%",
               height: "350px",
-              objectFit: "contain",
-              backgroundColor: token.colorBgContainer,
+              objectFit: "cover",
             }}
             preview={{
               visible: previewVisible,

@@ -4,7 +4,6 @@ export const useStyles = createStyles(({ token, css }) => {
   return {
     container: css`
       display: flex;
-      background: red;
       height: calc(100vh - 116px);
       padding: 48px 12px 12px;
       background: ${token.colorBgLayout};
