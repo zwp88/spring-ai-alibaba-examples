@@ -38,7 +38,7 @@ import org.springframework.ai.chat.model.ToolContext;
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
-public class BaiduMapTools implements BiFunction<BaiduMapTools.BaiduMapToolRequest, ToolContext, BaiduMapTools.BaiduMapToolResponse> {
+public class BaiduMapTools implements BiFunction<BaiduMapTools.Request, ToolContext, BaiduMapTools.BaiduMapToolResponse> {
 
 	private final String ak;
 
@@ -51,12 +51,12 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.BaiduMapToolReque
 	}
 
 	@Override
-	public BaiduMapToolResponse apply(BaiduMapToolRequest baiduMapToolRequest, ToolContext toolContext) {
+	public BaiduMapToolResponse apply(BaiduMapTools.Request baiduMapToolRequest, ToolContext toolContext) {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		try {
 			ObjectNode jsonObject = objectMapper.createObjectNode();
-			String addressCityCodeResponse = getAddressCityCode(baiduMapToolRequest.input.address);
+			String addressCityCodeResponse = getAddressCityCode(baiduMapToolRequest.address);
 			JsonNode cityCodeJson = objectMapper.readTree(addressCityCodeResponse);
 			JsonNode districtsArray = cityCodeJson.path("districts");
 
@@ -71,7 +71,7 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.BaiduMapToolReque
 					}
 				}
 
-				String facilityJsonStr = getFacilityInformation(baiduMapToolRequest.input.address, baiduMapToolRequest.input.facilityType);
+				String facilityJsonStr = getFacilityInformation(baiduMapToolRequest.address, baiduMapToolRequest.facilityType);
 				JsonNode facilityJson = objectMapper.readTree(facilityJsonStr);
 				JsonNode resultsArray = facilityJson.path("results");
 
@@ -133,11 +133,12 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.BaiduMapToolReque
 		return HttpRequest.newBuilder().uri(uri).GET().build();
 	}
 
-	public record BaiduMapToolRequest(@JsonProperty("Request") BaiduMapTools.Request input) {
-		public BaiduMapToolRequest(BaiduMapTools.Request input) {
-			this.input = input;
-		}
-	}
+	// 模型的构造参数为：{"address": "杭州", "facilityType": "银行"} 因此这里不需要 Request 包装。
+	// public record BaiduMapToolRequest(@JsonProperty("Request") BaiduMapTools.Request input) {
+	// 	public BaiduMapToolRequest(BaiduMapTools.Request input) {
+	// 		this.input = input;
+	// 	}
+	// }
 
 	public record BaiduMapToolResponse(@JsonProperty("Response") BaiduMapTools.Response output) {
 		public BaiduMapToolResponse(BaiduMapTools.Response output) {

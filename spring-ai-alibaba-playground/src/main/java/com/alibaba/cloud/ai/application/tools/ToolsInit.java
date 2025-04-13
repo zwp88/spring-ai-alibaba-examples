@@ -159,7 +159,7 @@ public class ToolsInit {
 									"required": ["Request", "Response"]
 								}
 								"""
-				).inputType(BaiduMapTools.BaiduMapToolRequest.class)
+				).inputType(BaiduMapTools.Request.class)
 				.toolMetadata(ToolMetadata.builder().returnDirect(false).build())
 				.build();
 	}
