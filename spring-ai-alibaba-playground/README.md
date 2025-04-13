@@ -21,7 +21,6 @@ Spring AI Alibaba Playground 被设计为一个独立的项目，这意味你需
 3. swagger 接口：http://localhost:8080/doc.html；
 4. ~~如果服务启动时报 McpClient 相关错误，需要在 resources 目录下将 mcp-servers-config.json 中的 jar 改为本机的绝对路径；~~，playground 中已经做了增强处理，改为使用 Yaml 配置；
 5. 点击启动类启动项目，项目启动之后，浏览器访问 http://localhost:8080 查看前端页面；
-6. Playground 暂时使用 Malivus 作为向量数据库服务，因此在启动需要准备一个 Malivus 服务，并配置相关参数。如果不启动，可以注释 `com/alibaba/cloud/ai/application/config/LocalRAGVectorStoreInit.java` 类文件。
 
 ## 项目打包
 
