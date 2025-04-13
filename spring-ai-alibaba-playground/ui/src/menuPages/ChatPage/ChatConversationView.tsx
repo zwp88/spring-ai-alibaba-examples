@@ -199,7 +199,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     // 创建用户消息
     const userMessage: ChatMessage = {
       role: "user",
-      content: text,
+      content: decodeURIComponent(text),
       timestamp: userTimestamp,
     };
     const userMessageUI: Message = mapStoredMessagesToUIMessages([
