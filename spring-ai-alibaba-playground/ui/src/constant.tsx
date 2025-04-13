@@ -1,11 +1,7 @@
 import {
   GlobalOutlined,
   ThunderboltOutlined,
-  SearchOutlined,
-  FormOutlined,
   ReadOutlined,
-  CodeOutlined,
-  PhoneOutlined,
   CommentOutlined,
   FireOutlined,
   HeartOutlined,
@@ -13,6 +9,10 @@ import {
   RobotFilled,
   UserOutlined,
   PlusOutlined,
+  PictureOutlined,
+  DatabaseOutlined,
+  ApiOutlined,
+  ToolOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import DocSummaryPage from "./menuPages/docSummaryPage";
@@ -90,12 +90,12 @@ export const functionMenuItems: FunctionMenuItem[] = [
   },
   {
     key: "image-gen",
-    icon: <SearchOutlined />,
+    icon: <PictureOutlined />,
     label: "图像生成",
   },
   {
     key: "doc-summary",
-    icon: <FormOutlined />,
+    icon: <ReadOutlined />,
     label: "文档总结",
   },
   // {
@@ -105,17 +105,17 @@ export const functionMenuItems: FunctionMenuItem[] = [
   // },
   {
     key: "tool-calling",
-    icon: <ReadOutlined />,
+    icon: <ToolOutlined />,
     label: "Tool Calling",
   },
   {
     key: "rag",
-    icon: <CodeOutlined />,
+    icon: <DatabaseOutlined />,
     label: "RAG",
   },
   {
     key: "mcp",
-    icon: <PhoneOutlined />,
+    icon: <ApiOutlined />,
     label: "MCP",
   },
   // {

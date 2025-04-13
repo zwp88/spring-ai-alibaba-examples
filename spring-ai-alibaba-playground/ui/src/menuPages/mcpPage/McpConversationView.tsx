@@ -1,3 +1,4 @@
+// TODO: 可能不需要这个文件了
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
@@ -43,7 +44,6 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
     activeConversation,
     chooseActiveConversation,
     updateActiveConversation,
-    addMessage,
   } = useConversationContext();
 
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数

@@ -134,7 +134,7 @@ const McpLandingView = () => {
         <div className={styles.selectionPanel}>
           <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>MCP Servers</span>
-            <Dropdown
+            {/* <Dropdown
               overlay={
                 <Menu>
                   <Menu.Item key="settings">Settings</Menu.Item>
@@ -143,7 +143,7 @@ const McpLandingView = () => {
               trigger={["click"]}
             >
               <Button type="text" icon={<SettingOutlined />} />
-            </Dropdown>
+            </Dropdown> */}
           </div>
           <div className={styles.serverList}>
             {MCP_SERVERS.map((server) => (
@@ -173,7 +173,6 @@ const McpLandingView = () => {
               </span>
               <span className={styles.serverName}>{selectedServer}</span>
             </div>
-            <Button type="text" icon={<ExportOutlined />} />
           </div>
           <div className={styles.serverDescription}>{serverDescription}</div>
 
@@ -200,7 +199,6 @@ const McpLandingView = () => {
         <div className={styles.connectPanel}>
           <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>连接 MCP 服务器</span>
-            <Button type="text" icon={<EditOutlined />} />
           </div>
           <Tabs
             activeKey={activeTab}

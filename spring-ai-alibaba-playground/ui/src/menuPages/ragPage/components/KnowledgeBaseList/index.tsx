@@ -1,29 +1,15 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Card,
-  Input,
-  List,
-  Modal,
-  Upload,
-  message,
-  Popconfirm,
-  Empty,
-  Tooltip,
-} from "antd";
+import { Button, Card, List, message, Popconfirm, Empty, Tooltip } from "antd";
 import {
   PlusOutlined,
-  EditOutlined,
   DeleteOutlined,
-  UploadOutlined,
-  FolderOpenOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
 import { useStyles } from "../../style";
 import { KnowledgeBase } from "../../types";
-import { createKnowledgeBase, deleteKnowledgeBase } from "../../../../api/rag";
+import { createKnowledgeBase } from "../../../../api/rag";
 import { useKnowledgeBaseStore } from "../../../../stores/knowledgeBase.store";
-import CreateKnowledgeBaseModal from "../CreateKnowledgeBaseModal";
+import CreateKnowledgeBaseModal from "../../../../menuPages/ragPage/components/CreateKnowledgeBaseModal";
 
 interface KnowledgeBaseListProps {
   knowledgeBases: KnowledgeBase[];

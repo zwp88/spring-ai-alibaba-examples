@@ -5,13 +5,15 @@ import KnowledgeBaseList from "./components/KnowledgeBaseList";
 import { RagMessage } from "./types";
 import { useStyles } from "./style";
 import { ragQuery } from "../../api/rag";
-import { useKnowledgeBaseStore } from "../../stores/knowledgeBase.store";
+import {
+  KnowledgeBase,
+  useKnowledgeBaseStore,
+} from "../../stores/knowledgeBase.store";
 import RequestBubble from "../components/RequestBubble";
 import ResponseBubble from "../components/ResponseBubble";
 import { Empty } from "antd";
-import { DatabaseOutlined } from "@ant-design/icons";
 
-const RagPage: React.FC = () => {
+const RagPage = () => {
   const { styles } = useStyles();
   const { activeKnowledgeBase } = useKnowledgeBaseStore();
   const [messages, setMessages] = useState<RagMessage[]>([]);
@@ -189,7 +191,13 @@ const RagPage: React.FC = () => {
     <BasePage title="RAG">
       <div className={styles.container}>
         <div className={styles.leftPanel}>
-          <KnowledgeBaseList />
+          <KnowledgeBaseList
+            knowledgeBases={[]}
+            activeKnowledgeBaseId={null}
+            // TODO: 需要和服务端商量下 RAG 的流程和规范
+            onSelect={() => {}}
+            onUpdate={() => {}}
+          />
           <div className={styles.senderWrapper}>
             <Sender
               value={inputValue}

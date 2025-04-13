@@ -62,7 +62,6 @@ export const useStyles = createStyles(({ token, css }) => {
       overflow: hidden;
     `,
     panelHeader: css`
-      display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 12px 16px;

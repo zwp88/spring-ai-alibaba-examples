@@ -11,11 +11,11 @@ interface CreateKnowledgeBaseModalProps {
   onSuccess: () => void;
 }
 
-const CreateKnowledgeBaseModal: React.FC<CreateKnowledgeBaseModalProps> = ({
+const CreateKnowledgeBaseModal = ({
   visible,
   onClose,
   onSuccess,
-}) => {
+}: CreateKnowledgeBaseModalProps) => {
   const { styles } = useStyles();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -28,6 +28,7 @@ const CreateKnowledgeBaseModal: React.FC<CreateKnowledgeBaseModalProps> = ({
     onClose();
   };
 
+  // TODO: 需要和服务端商量下 RAG 的流程和规范
   // 提交表单
   const handleSubmit = async () => {
     try {

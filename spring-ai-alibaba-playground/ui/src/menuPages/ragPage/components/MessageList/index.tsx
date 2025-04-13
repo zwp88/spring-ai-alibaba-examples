@@ -1,17 +1,45 @@
 import React, { useRef, useEffect } from "react";
 import { Empty } from "antd";
-import { DatabaseOutlined } from "@ant-design/icons";
-import { RagMessage } from "../../types";
-import { useStyles } from "../../style";
+import { createStyles } from "antd-style";
 import RequestBubble from "../../../components/RequestBubble";
 import ResponseBubble from "../../../components/ResponseBubble";
+
+// Define the message type locally
+interface RagMessage {
+  id: string;
+  text: string;
+  sender: "user" | "bot";
+  timestamp: number;
+  isError?: boolean;
+}
 
 interface MessageListProps {
   messages: RagMessage[];
 }
 
+// Create local styles
+const useLocalStyles = createStyles(({ token }) => ({
+  emptyContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    padding: "24px",
+    color: token.colorTextSecondary,
+  },
+  messagesContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    padding: "24px",
+    overflowY: "auto",
+    height: "100%",
+  },
+}));
+
 const MessageList: React.FC<MessageListProps> = ({ messages }) => {
-  const { styles } = useStyles();
+  const { styles } = useLocalStyles();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // 自动滚动到最新消息
