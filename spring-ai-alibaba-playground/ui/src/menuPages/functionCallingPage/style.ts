@@ -13,12 +13,11 @@ export const useStyles = createStyles(({ token, css }) => {
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding-right: 16px;
     `,
     rightPanel: css`
       width: 67%;
       height: 100%;
-      padding-left: 16px;
+      padding-left: 8px;
     `,
     card: css`
       background: ${token.colorBgContainer};
@@ -145,7 +144,7 @@ export const useStyles = createStyles(({ token, css }) => {
 
     /* CodeInfo 组件样式 */
     codeInfoContainer: css`
-      margin-bottom: 20px;
+      margin-bottom: 8px;
       height: 100%;
       display: flex;
       flex-direction: column;
