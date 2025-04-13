@@ -246,5 +246,127 @@ export const useStyles = createStyles(({ token, css }) => {
         font-size: 0.9em;
       }
     `,
+    linkList: css`
+      list-style-type: none;
+      padding-left: 0;
+      margin: 12px 0;
+
+      li {
+        margin-bottom: 12px;
+        padding: 0;
+        border-radius: 4px;
+      }
+    `,
+    linkCard: css`
+      background: ${token.colorBgContainer};
+      border: 1px solid ${token.colorBorderSecondary};
+      border-radius: 8px;
+      transition: all 0.3s;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02);
+
+      &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-color: ${token.colorPrimaryBorderHover};
+        transform: translateY(-1px);
+      }
+    `,
+    externalLink: css`
+      display: flex;
+      align-items: center;
+      color: ${token.colorPrimary};
+      text-decoration: none;
+      transition: color 0.3s;
+      padding: 12px 16px;
+      border-radius: 8px;
+      justify-content: space-between;
+
+      &:hover {
+        color: ${token.colorPrimaryHover};
+      }
+
+      span {
+        flex: 1;
+        font-size: 15px;
+      }
+    `,
+    linkIconWrapper: css`
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: ${token.colorPrimaryBg};
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      margin-left: 12px;
+      transition: all 0.3s;
+
+      .anticon {
+        font-size: 14px;
+      }
+
+      &:hover {
+        background-color: ${token.colorPrimaryBgHover};
+      }
+    `,
+
+    // New document link button styles
+    docLinkButton: css`
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      text-align: left !important;
+      height: auto !important;
+      padding: 16px 20px !important;
+      border-radius: 8px !important;
+      border: 1px solid ${token.colorBorderSecondary} !important;
+      background: ${token.colorBgContainer} !important;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02) !important;
+      transition: all 0.3s !important;
+
+      &:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        border-color: ${token.colorPrimaryBorderHover} !important;
+      }
+
+      .link-icon {
+        font-size: 18px !important;
+        color: ${token.colorPrimary} !important;
+        margin-right: 16px !important;
+      }
+
+      .arrow-icon {
+        font-size: 16px !important;
+        color: ${token.colorTextSecondary} !important;
+        transition: transform 0.3s !important;
+      }
+
+      &:hover .arrow-icon {
+        transform: translateX(4px) !important;
+        color: ${token.colorPrimary} !important;
+      }
+    `,
+    docLinkContent: css`
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    `,
+    docLinkTitle: css`
+      font-size: 16px;
+      font-weight: 500;
+      color: ${token.colorTextHeading};
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    `,
+    docLinkDescription: css`
+      font-size: 14px;
+      color: ${token.colorTextSecondary};
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    `,
   };
 });

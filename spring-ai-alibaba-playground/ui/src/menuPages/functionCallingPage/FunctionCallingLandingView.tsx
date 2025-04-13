@@ -21,7 +21,7 @@ const FunctionCallingLandingView = () => {
     try {
       const newConversation = createConversation(MenuPage.Mcp, [], content);
       navigate(
-        `/function-calling/${newConversation.id}?prompt=${encodeURIComponent(
+        `/tool-calling/${newConversation.id}?prompt=${encodeURIComponent(
           content
         )}`
       );
@@ -40,7 +40,7 @@ const FunctionCallingLandingView = () => {
             value={inputContent}
             onChange={setInputContent}
             onSubmit={handleCreateConversation}
-            placeholder="开始对话..."
+            placeholder="请输入您想查询的地区和日期，例如：北京今天的天气..."
             className={styles.sender}
             loading={isLoading}
           />
@@ -48,7 +48,7 @@ const FunctionCallingLandingView = () => {
       </div>
 
       <div className={styles.rightPanel}>
-        <OutputResult messages={[]} title="Function Calling 案例" />
+        <OutputResult messages={[]} title="天气查询功能演示" />
       </div>
     </div>
   );

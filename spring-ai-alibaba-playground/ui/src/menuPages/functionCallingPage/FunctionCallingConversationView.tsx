@@ -190,7 +190,7 @@ const FunctionCallingConversationView = ({
   };
 
   return (
-    <BasePage title="Function Calling" conversationId={conversationId}>
+    <BasePage title="天气查询 Function Calling" conversationId={conversationId}>
       <div className={styles.container}>
         {/* 左侧面板 - 代码展示和输入框 */}
         <div className={styles.leftPanel}>
@@ -200,7 +200,7 @@ const FunctionCallingConversationView = ({
               value={inputContent}
               onChange={setInputContent}
               onSubmit={handleSendMessage}
-              placeholder="开始对话..."
+              placeholder="请输入您想查询的地区和日期，例如：北京今天的天气..."
               className={styles.sender}
               loading={isLoading}
             />
@@ -210,11 +210,11 @@ const FunctionCallingConversationView = ({
         {/* 右侧面板  */}
         <div className={styles.rightPanel}>
           <div className={`${styles.card} ${styles.resultPanel}`}>
-            <h2 className={styles.panelTitle}>Function Calling 案例</h2>
+            <h2 className={styles.panelTitle}>天气查询功能演示</h2>
             <div className={styles.messagesContainer}>
               {messages.length === 0 && !conversationId ? (
                 <ResponseBubble
-                  content="你好，请问有什么可以帮你的吗？"
+                  content="你好！我可以帮你查询全球各地的天气信息。例如，你可以问我北京今天的天气怎么样？或上海明天会下雨吗？或纽约本周末的气温如何？请告诉我你想了解哪个地区的天气信息。"
                   timestamp={Date.now()}
                 />
               ) : (

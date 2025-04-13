@@ -12,19 +12,19 @@ export const useStyles = createStyles(({ token, css }) => ({
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding-right: 16px;
+    margin-right: 12px;
     background: ${token.colorBgContainer};
     border-radius: ${token.borderRadiusLG}px;
-    box-shadow: ${token.boxShadow};
+    /* box-shadow: ${token.boxShadow}; */
     overflow: hidden;
   `,
   rightPanel: css`
-    width: 60%;
+    width: calc(60% - 12px);
     height: 100%;
     padding-left: 16px;
     background: ${token.colorBgContainer};
     border-radius: ${token.borderRadiusLG}px;
-    box-shadow: ${token.boxShadow};
+    /* box-shadow: ${token.boxShadow}; */
     overflow: hidden;
     display: flex;
     flex-direction: column;

@@ -9,6 +9,7 @@ import {
   message,
   Popconfirm,
   Empty,
+  Tooltip,
 } from "antd";
 import {
   PlusOutlined,
@@ -16,10 +17,13 @@ import {
   DeleteOutlined,
   UploadOutlined,
   FolderOpenOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import { useStyles } from "../../style";
 import { KnowledgeBase } from "../../types";
 import { createKnowledgeBase, deleteKnowledgeBase } from "../../../../api/rag";
+import { useKnowledgeBaseStore } from "../../../../stores/knowledgeBase.store";
+import CreateKnowledgeBaseModal from "../CreateKnowledgeBaseModal";
 
 interface KnowledgeBaseListProps {
   knowledgeBases: KnowledgeBase[];
@@ -35,7 +39,14 @@ const KnowledgeBaseList: React.FC<KnowledgeBaseListProps> = ({
   onUpdate,
 }) => {
   const { styles } = useStyles();
+  const {
+    knowledgeBases: storeKnowledgeBases,
+    activeKnowledgeBase,
+    selectKnowledgeBase,
+    deleteKnowledgeBase,
+  } = useKnowledgeBaseStore();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [knowledgeBaseName, setKnowledgeBaseName] = useState("");
   const [fileList, setFileList] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,6 +88,7 @@ const KnowledgeBaseList: React.FC<KnowledgeBaseListProps> = ({
   };
 
   const handleDelete = async (id: string) => {
+    setIsDeleting(true);
     try {
       await deleteKnowledgeBase(id);
       message.success("知识库删除成功");
@@ -84,7 +96,17 @@ const KnowledgeBaseList: React.FC<KnowledgeBaseListProps> = ({
     } catch (error) {
       console.error("删除知识库失败:", error);
       message.error("删除知识库失败");
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleSelect = (id: string) => {
+    selectKnowledgeBase(id);
+  };
+
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString();
   };
 
   return (
@@ -96,12 +118,8 @@ const KnowledgeBaseList: React.FC<KnowledgeBaseListProps> = ({
         </Button>
       </div>
       <div className={styles.knowledgeBaseList}>
-        {knowledgeBases.length === 0 ? (
+        {knowledgeBases?.length === 0 ? (
           <div className={styles.emptyContainer}>
-            {/* <FolderOpenOutlined
-              style={{ fontSize: 64, opacity: 0.6 }}
-              className={styles.placeholderImage}
-            /> */}
             <Empty
               description="暂无知识库"
               image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -128,52 +146,40 @@ const KnowledgeBaseList: React.FC<KnowledgeBaseListProps> = ({
                 extra={
                   <Popconfirm
                     title="确定要删除这个知识库吗?"
+                    description="删除后将无法恢复"
                     onConfirm={() => handleDelete(item.id)}
-                    okText="是"
-                    cancelText="否"
+                    okText="删除"
+                    cancelText="取消"
+                    disabled={isDeleting}
                   >
                     <Button
                       type="text"
                       danger
                       icon={<DeleteOutlined />}
                       onClick={(e) => e.stopPropagation()}
+                      loading={isDeleting}
                     />
                   </Popconfirm>
                 }
-                onClick={() => onSelect(item)}
+                onClick={() => handleSelect(item.id)}
               >
-                <p>点击选择此知识库进行RAG查询</p>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Tooltip title={`创建时间: ${formatDate(item.createdAt)}`}>
+                    <CalendarOutlined style={{ marginRight: 8 }} />
+                    {formatDate(item.createdAt)}
+                  </Tooltip>
+                </div>
               </Card>
             )}
           />
         )}
       </div>
 
-      <Modal
-        title="新建知识库"
-        open={isModalVisible}
-        onOk={handleCreate}
-        onCancel={handleCancel}
-        confirmLoading={isSubmitting}
-        className={styles.uploadModal}
-      >
-        <Input
-          placeholder="请输入知识库名称"
-          value={knowledgeBaseName}
-          onChange={(e) => setKnowledgeBaseName(e.target.value)}
-          style={{ marginBottom: 16 }}
-        />
-        <Upload
-          multiple
-          beforeUpload={() => false}
-          onChange={(info) => setFileList(info.fileList)}
-          fileList={fileList}
-        >
-          <Button icon={<UploadOutlined />}>
-            上传文件(支持PDF、DOCX、TXT)
-          </Button>
-        </Upload>
-      </Modal>
+      <CreateKnowledgeBaseModal
+        visible={isModalVisible}
+        onClose={handleCancel}
+        onSuccess={handleCreate}
+      />
     </>
   );
 };

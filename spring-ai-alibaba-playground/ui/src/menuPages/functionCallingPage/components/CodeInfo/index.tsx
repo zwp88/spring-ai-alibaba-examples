@@ -1,7 +1,11 @@
 import * as React from "react";
 import { useState } from "react";
-import { Steps, Typography, theme, Tabs } from "antd";
-import { EyeOutlined } from "@ant-design/icons";
+import { Steps, Typography, theme, Tabs, Button, Space } from "antd";
+import {
+  EyeOutlined,
+  LinkOutlined,
+  ArrowRightOutlined,
+} from "@ant-design/icons";
 import { Card, Image } from "antd";
 import { useStyles } from "../../style";
 import { motion, AnimatePresence } from "framer-motion";
@@ -544,6 +548,7 @@ const ArchitectureFlow: React.FC = () => {
 
 const Documentation: React.FC = () => {
   const { styles } = useStyles();
+  const { token } = theme.useToken();
 
   return (
     <div className={styles.documentationContainer}>
@@ -565,25 +570,77 @@ const Documentation: React.FC = () => {
         名称，以提供更灵活的信息检索能力。
       </Paragraph>
       <Title level={4}>参考文档</Title>
-      <Paragraph>
-        <ul>
-          <li>
-            <Link href="https://docs.spring.io/spring-ai/reference/api/functions.html">
+      <Space
+        direction="vertical"
+        size="middle"
+        style={{ width: "100%", marginTop: "16px" }}
+      >
+        <Button
+          type="default"
+          block
+          className={styles.docLinkButton}
+          onClick={() =>
+            window.open(
+              "https://docs.spring.io/spring-ai/reference/api/functions.html",
+              "_blank"
+            )
+          }
+        >
+          <LinkOutlined className="link-icon" />
+          <div className={styles.docLinkContent}>
+            <div className={styles.docLinkTitle}>
+              {" "}
               Spring AI Function Calling
-            </Link>
-          </li>
-          <li>
-            <Link href="https://docs.spring.io/spring-ai/reference/api/tools.html">
-              Spring AI Tool Calling
-            </Link>
-          </li>
-          <li>
-            <Link href="https://java2ai.com/docs/dev/tutorials/basics/function-calling/">
-              Spring AI Alibaba Tools
-            </Link>
-          </li>
-        </ul>
-      </Paragraph>
+            </div>
+            <div className={styles.docLinkDescription}>
+              如何注册和使用函数调用 API
+            </div>
+          </div>
+          <ArrowRightOutlined className="arrow-icon" />
+        </Button>
+
+        <Button
+          type="default"
+          block
+          className={styles.docLinkButton}
+          onClick={() =>
+            window.open(
+              "https://docs.spring.io/spring-ai/reference/api/tools.html",
+              "_blank"
+            )
+          }
+        >
+          <LinkOutlined className="link-icon" />
+          <div className={styles.docLinkContent}>
+            <div className={styles.docLinkTitle}>Spring AI Tool Calling</div>
+            <div className={styles.docLinkDescription}>
+              工具调用 API 的技术规范与实现
+            </div>
+          </div>
+          <ArrowRightOutlined className="arrow-icon" />
+        </Button>
+
+        <Button
+          type="default"
+          block
+          className={styles.docLinkButton}
+          onClick={() =>
+            window.open(
+              "https://java2ai.com/docs/dev/tutorials/basics/function-calling/",
+              "_blank"
+            )
+          }
+        >
+          <LinkOutlined className="link-icon" />
+          <div className={styles.docLinkContent}>
+            <div className={styles.docLinkTitle}>Spring AI Alibaba Tools</div>
+            <div className={styles.docLinkDescription}>
+              通义千问/百炼等模型的函数调用与工具集成教程
+            </div>
+          </div>
+          <ArrowRightOutlined className="arrow-icon" />
+        </Button>
+      </Space>
     </div>
   );
 };

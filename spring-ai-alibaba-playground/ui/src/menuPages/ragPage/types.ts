@@ -1,7 +1,4 @@
-export interface KnowledgeBase {
-  id: string;
-  name: string;
-}
+import { KnowledgeBase } from "../../stores/knowledgeBase.store";
 
 export interface RagMessage {
   id: string;
@@ -10,3 +7,5 @@ export interface RagMessage {
   timestamp: number;
   isError?: boolean;
 }
+
+export type { KnowledgeBase };

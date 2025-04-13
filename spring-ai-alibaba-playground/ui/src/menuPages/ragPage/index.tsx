@@ -1,54 +1,92 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Sender } from "@ant-design/x";
 import BasePage from "../components/BasePage";
 import KnowledgeBaseList from "./components/KnowledgeBaseList";
-import MessageList from "./components/MessageList";
-import { KnowledgeBase, RagMessage } from "./types";
+import { RagMessage } from "./types";
 import { useStyles } from "./style";
-import { getKnowledgeBases, ragQuery } from "../../api/rag";
-import {
-  createUserMessage,
-  createAssistantMessage,
-  loadRagMessages,
-  saveRagMessages,
-  decoder,
-} from "./helpers";
+import { ragQuery } from "../../api/rag";
+import { useKnowledgeBaseStore } from "../../stores/knowledgeBase.store";
+import RequestBubble from "../components/RequestBubble";
+import ResponseBubble from "../components/ResponseBubble";
+import { Empty } from "antd";
+import { DatabaseOutlined } from "@ant-design/icons";
 
 const RagPage: React.FC = () => {
   const { styles } = useStyles();
-  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([]);
-  const [activeKnowledgeBase, setActiveKnowledgeBase] =
-    useState<KnowledgeBase | null>(null);
+  const { activeKnowledgeBase } = useKnowledgeBaseStore();
   const [messages, setMessages] = useState<RagMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingKnowledgeBases, setIsLoadingKnowledgeBases] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const decoder = new TextDecoder();
 
-  // 加载知识库列表
-  const loadKnowledgeBases = async () => {
-    setIsLoadingKnowledgeBases(true);
-    try {
-      const data = await getKnowledgeBases();
-      setKnowledgeBases(data);
-    } catch (error) {
-      console.error("加载知识库失败:", error);
-    } finally {
-      setIsLoadingKnowledgeBases(false);
+  // 当知识库改变时，加载对话历史
+  useEffect(() => {
+    if (activeKnowledgeBase) {
+      loadMessages(activeKnowledgeBase.id);
+    } else {
+      setMessages([]);
+    }
+  }, [activeKnowledgeBase?.id]);
+
+  // 当消息更新时，滚动到底部
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // 滚动到底部
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  // 初始加载知识库列表
-  useEffect(() => {
-    loadKnowledgeBases();
-  }, []);
-
-  // 选择知识库
-  const handleSelectKnowledgeBase = (kb: KnowledgeBase) => {
-    setActiveKnowledgeBase(kb);
-    // 加载该知识库的历史消息
-    const historicalMessages = loadRagMessages(kb.id);
-    setMessages(historicalMessages);
+  // 加载消息历史
+  const loadMessages = (knowledgeBaseId: string) => {
+    try {
+      const stored = localStorage.getItem(`rag_messages_${knowledgeBaseId}`);
+      if (stored) {
+        setMessages(JSON.parse(stored));
+      } else {
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error("加载消息历史失败:", error);
+      setMessages([]);
+    }
   };
+
+  // 保存消息历史
+  const saveMessages = (knowledgeBaseId: string, messages: RagMessage[]) => {
+    try {
+      localStorage.setItem(
+        `rag_messages_${knowledgeBaseId}`,
+        JSON.stringify(messages)
+      );
+    } catch (error) {
+      console.error("保存消息历史失败:", error);
+    }
+  };
+
+  // 创建用户消息
+  const createUserMessage = (text: string): RagMessage => ({
+    id: `user_${Date.now()}`,
+    sender: "user",
+    text,
+    timestamp: Date.now(),
+  });
+
+  // 创建AI响应消息
+  const createAssistantMessage = (
+    text: string,
+    isError: boolean = false
+  ): RagMessage => ({
+    id: `assistant_${Date.now()}`,
+    sender: "assistant",
+    text,
+    timestamp: Date.now(),
+    isError,
+  });
 
   // 发送消息
   const handleSendMessage = async (text: string) => {
@@ -89,7 +127,7 @@ const RagPage: React.FC = () => {
       setMessages(finalMessages);
 
       // 保存消息到localStorage
-      saveRagMessages(activeKnowledgeBase.id, finalMessages);
+      saveMessages(activeKnowledgeBase.id, finalMessages);
     } catch (error) {
       console.error("RAG查询错误:", error);
 
@@ -101,22 +139,57 @@ const RagPage: React.FC = () => {
       const finalMessages = [...updatedMessages, errorMessage];
 
       setMessages(finalMessages);
-      saveRagMessages(activeKnowledgeBase.id, finalMessages);
+      saveMessages(activeKnowledgeBase.id, finalMessages);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 渲染消息列表
+  const renderMessages = () => {
+    if (messages.length === 0) {
+      return (
+        <div className={styles.emptyContainer}>
+          {/* <DatabaseOutlined
+            style={{ fontSize: 64, opacity: 0.6 }}
+            className={styles.placeholderImage}
+          /> */}
+          <Empty
+            description="选择一个知识库，开始RAG对话"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.messagesContainer}>
+        {messages.map((message) =>
+          message.sender === "user" ? (
+            <RequestBubble
+              key={message.id}
+              content={message.text}
+              timestamp={message.timestamp}
+            />
+          ) : (
+            <ResponseBubble
+              key={message.id}
+              content={message.text}
+              timestamp={message.timestamp}
+              isError={message.isError}
+            />
+          )
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+    );
   };
 
   return (
     <BasePage title="RAG">
       <div className={styles.container}>
         <div className={styles.leftPanel}>
-          <KnowledgeBaseList
-            knowledgeBases={knowledgeBases}
-            activeKnowledgeBaseId={activeKnowledgeBase?.id || null}
-            onSelect={handleSelectKnowledgeBase}
-            onUpdate={loadKnowledgeBases}
-          />
+          <KnowledgeBaseList />
           <div className={styles.senderWrapper}>
             <Sender
               value={inputValue}
@@ -128,9 +201,7 @@ const RagPage: React.FC = () => {
             />
           </div>
         </div>
-        <div className={styles.rightPanel}>
-          <MessageList messages={messages} />
-        </div>
+        <div className={styles.rightPanel}>{renderMessages()}</div>
       </div>
     </BasePage>
   );

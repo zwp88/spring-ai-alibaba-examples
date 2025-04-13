@@ -37,10 +37,10 @@ export const pageComponents = {
   [MenuPage.ImageGen]: ImageGenPage,
   [MenuPage.DocSummary]: DocSummaryPage,
   [MenuPage.MultiModal]: MultiModalPage,
-  [MenuPage.FunctionCalling]: FunctionCallingPage,
+  [MenuPage.ToolCalling]: FunctionCallingPage,
   [MenuPage.Rag]: RagPage,
   [MenuPage.Mcp]: McpPage,
-  [MenuPage.MoreExamples]: McpPage, // 暂时使用 McpPage 作为占位
+  // [MenuPage.MoreExamples]: McpPage, // 暂时使用 McpPage 作为占位
 } as const;
 
 // 按钮配置列表
@@ -104,9 +104,9 @@ export const functionMenuItems: FunctionMenuItem[] = [
   //   label: "多模态",
   // },
   {
-    key: "function-calling",
+    key: "tool-calling",
     icon: <ReadOutlined />,
-    label: "Function Calling",
+    label: "Tool Calling",
   },
   {
     key: "rag",
