@@ -42,4 +42,5 @@ public class ClassificationController {
     public String classify(@RequestParam("field") String fieldName, @RequestParam(value = "chatId", required = true) String chatId) {
         return assistant.classify(fieldName, chatId);
     }
+
 }

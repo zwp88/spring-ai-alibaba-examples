@@ -77,4 +77,5 @@ public class ClassificationAssistant {
 				.call()
 				.content();
 	}
+
 }
