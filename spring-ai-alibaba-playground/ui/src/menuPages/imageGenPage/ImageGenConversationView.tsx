@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import { Card, message } from "antd";
@@ -7,8 +7,6 @@ import GeneratedImage from "./components/generatedImage";
 import BasePage from "../components/BasePage";
 import { useConversationContext } from "../../stores/conversation.store";
 import { getImage } from "../../api/image";
-import RequestBubble from "../components/RequestBubble";
-import ResponseBubble from "../components/ResponseBubble";
 import {
   ExtendedChatMessage,
   GeneratedImageType,
@@ -22,7 +20,6 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
   const location = useLocation();
   const [inputContent, setInputContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const {
     activeConversation,
     chooseActiveConversation,
@@ -46,25 +43,6 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
     };
   }, []);
 
-  // 立即滚动到底部
-  const immediateScrollToBottom = useCallback(() => {
-    if (!messagesContainerRef.current) return;
-    const container = messagesContainerRef.current;
-    const lastMessage = container.lastElementChild as HTMLElement;
-
-    if (lastMessage) {
-      const lastMessageTop = lastMessage.offsetTop;
-      const lastMessageHeight = lastMessage.clientHeight;
-      container.scrollTop =
-        lastMessageTop + lastMessageHeight - container.clientHeight;
-    }
-  }, []);
-
-  // 监听消息变化，触发滚动
-  useEffect(() => {
-    immediateScrollToBottom();
-  }, [activeConversation?.messages, immediateScrollToBottom]);
-
   useEffect(() => {
     if (isFirstLoad.current && activeConversation) {
       const queryParams = new URLSearchParams(location.search);
@@ -73,10 +51,6 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
       if (urlPrompt && !processedPrompts.current.has(urlPrompt)) {
         // 标记此prompt已处理，避免重复生成
         processedPrompts.current.add(urlPrompt);
-
-        // 清除URL中的prompt参数，防止刷新页面重复发送
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
 
         // 延迟一点处理以确保组件完全加载
         setTimeout(() => {
@@ -159,8 +133,6 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
     };
     updateActiveConversation(updatedConversation);
 
-    immediateScrollToBottom();
-
     let timeoutId: number | null = null;
 
     try {
@@ -239,21 +211,9 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
           };
 
           // 更新会话，移除占位消息，添加真实图像
-          // 确保保留用户消息，然后加上新的助手消息
           const finalMessages = activeConversation.messages
-            .filter((msg) => !(msg as ExtendedChatMessage).isLoading)
-            .concat([assistantMessage]);
-
-          // 检查最终消息中是否包含了用户消息，如果没有，添加它
-          const hasUserMessage = finalMessages.some(
-            (msg) => msg.role === "user" && msg.content === prompt
-          );
-
-          if (!hasUserMessage) {
-            finalMessages.push(userMessage);
-            // 重新排序消息，确保用户消息在助手消息之前
-            finalMessages.sort((a, b) => a.timestamp - b.timestamp);
-          }
+            .filter((msg) => msg !== placeholderMessage)
+            .concat([userMessage, assistantMessage]);
 
           console.log("更新会话，添加生成的图像");
           updateActiveConversation({
@@ -276,22 +236,12 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
               : msg
           );
 
-          // 检查错误消息列表中是否包含用户消息
-          const hasUserMessage = errorMessages.some(
-            (msg) => msg.role === "user" && msg.content === prompt
-          );
-
-          if (!hasUserMessage) {
-            errorMessages.push(userMessage);
-            // 重新排序消息，确保用户消息在前面
-            errorMessages.sort((a, b) => a.timestamp - b.timestamp);
-          }
-
           updateActiveConversation({
             ...activeConversation,
             messages: errorMessages,
           });
 
+          console.error("响应中没有blob数据");
           message.error("图像生成失败，请重试");
         }
       } catch (error) {
@@ -301,47 +251,31 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
           timeoutId = null;
         }
 
-        console.error("处理图像生成请求错误:", error);
-
         // 替换占位消息为错误消息
         const errorMessages = updatedMessages.map((msg) =>
           msg === placeholderMessage
             ? ({
                 ...msg,
-                content: "图像生成失败，请重试",
+                content: "图像生成错误，请重试",
                 isLoading: false,
                 isError: true,
               } as ExtendedChatMessage)
             : msg
         );
 
-        // 检查错误消息列表中是否包含用户消息
-        const hasUserMessage = errorMessages.some(
-          (msg) => msg.role === "user" && msg.content === prompt
-        );
-
-        if (!hasUserMessage) {
-          errorMessages.push(userMessage);
-          // 重新排序消息，确保用户消息在前面
-          errorMessages.sort((a, b) => a.timestamp - b.timestamp);
-        }
-
         updateActiveConversation({
           ...activeConversation,
           messages: errorMessages,
         });
 
+        console.error("生成图像错误:", error);
         message.error("图像生成失败，请重试");
       }
-    } catch (error) {
-      console.error("处理图像生成请求错误:", error);
-      setIsGenerating(false);
-
+    } finally {
+      // 确保清除任何剩余的超时检测
       if (timeoutId) {
         clearTimeout(timeoutId);
-        timeoutId = null;
       }
-    } finally {
       setIsGenerating(false);
     }
   };
@@ -414,34 +348,143 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
       </div>
 
       {/* 消息和生成的图片展示区域 */}
-      <div ref={messagesContainerRef} className={styles.messagesContainer}>
+      <div style={{ marginTop: "24px" }}>
         {activeConversation?.messages.map((message: any) => (
           <div key={message.timestamp}>
             {/* 用户消息 */}
             {message.role === "user" && (
-              <RequestBubble
-                content={message.content}
-                timestamp={message.timestamp}
-              />
+              <div
+                style={{
+                  marginLeft: "auto",
+                  maxWidth: "80%",
+                  textAlign: "right",
+                  padding: "12px 16px",
+                  background: "#f5f5f5",
+                  borderRadius: "8px",
+                  marginBottom: "16px",
+                }}
+              >
+                {message.content}
+              </div>
             )}
 
             {/* 占位消息或错误消息 */}
             {message.role === "assistant" && !message.images && (
-              <ResponseBubble
-                content={message.content}
-                timestamp={message.timestamp}
-                isError={message.isError}
-              />
+              <div
+                style={{
+                  maxWidth: "80%",
+                  padding: "12px 16px",
+                  background: (message as ExtendedChatMessage).isError
+                    ? "#fff2f0"
+                    : "#f0f9ff",
+                  borderRadius: "8px",
+                  marginBottom: "16px",
+                  color: (message as ExtendedChatMessage).isError
+                    ? "#cf1322"
+                    : "#000000d9",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {(message as ExtendedChatMessage).isLoading && (
+                  <div style={{ marginRight: "8px" }}>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      style={{ animation: "rotate 1s linear infinite" }}
+                    >
+                      <style>
+                        {`
+                            @keyframes rotate {
+                              from { transform: rotate(0deg); }
+                              to { transform: rotate(360deg); }
+                            }
+                          `}
+                      </style>
+                      <path
+                        d="M8 1V4"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M8 12V15"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                      <path
+                        d="M4 4L5.5 5.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.8"
+                      />
+                      <path
+                        d="M10.5 10.5L12 12"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                      <path
+                        d="M1 8H4"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.6"
+                      />
+                      <path
+                        d="M12 8H15"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                      <path
+                        d="M4 12L5.5 10.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                      <path
+                        d="M10.5 5.5L12 4"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeOpacity="0.4"
+                      />
+                    </svg>
+                  </div>
+                )}
+                {message.content}
+              </div>
             )}
 
-            {/* 生成的图像 */}
+            {/* 生成的图片 */}
             {message.role === "assistant" && message.images && (
-              <div className={styles.imageGallery}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                  gap: 24,
+                  marginBottom: "32px",
+                  maxWidth: "1200px",
+                }}
+              >
                 {message.images.map((image) => (
                   <Card
                     key={image.id}
                     bodyStyle={{ padding: 0 }}
-                    className={styles.imageCard}
+                    style={{
+                      width: "100%",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                    }}
                   >
                     <GeneratedImage
                       id={image.id}

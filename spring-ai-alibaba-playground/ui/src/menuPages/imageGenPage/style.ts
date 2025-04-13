@@ -19,30 +19,6 @@ export const useStyles = createStyles(({ token, css }) => ({
   sender: css`
     width: 100%;
   `,
-  messagesContainer: css`
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    scroll-behavior: smooth;
-    margin-top: 24px;
-    height: calc(100vh - 200px);
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: ${token.colorTextTertiary};
-      border-radius: 3px;
-    }
-    &::-webkit-scrollbar-thumb:hover {
-      background: ${token.colorTextSecondary};
-    }
-  `,
   masonryGrid: css`
     display: flex;
     margin-left: -16px;
@@ -52,25 +28,31 @@ export const useStyles = createStyles(({ token, css }) => ({
     padding-left: 16px;
     background-clip: padding-box;
   `,
-  imageGallery: css`
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-  `,
   imageCard: css`
-    width: 100%;
-    box-shadow: ${token.boxShadowSecondary};
+    margin-bottom: 16px;
+    break-inside: avoid;
     border-radius: ${token.borderRadius}px;
     overflow: hidden;
-    background-color: ${token.colorBgElevated};
-    transition: transform 0.3s ease;
+    background: ${token.colorBgContainer};
+    box-shadow: ${token.boxShadowTertiary};
+    transition: all 0.2s ease;
+    position: relative;
+    cursor: pointer;
 
     &:hover {
       transform: translateY(-4px);
+    }
+
+    &:hover .overlay {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
     }
   `,
   overlay: css`

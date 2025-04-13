@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Tooltip, Image, Card, message, theme, Button } from "antd";
+import { Tooltip, Image, Card, message } from "antd";
 import {
   ReloadOutlined,
   DownloadOutlined,
@@ -20,7 +20,6 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
   prompt,
   onReload,
 }) => {
-  const { token } = theme.useToken();
   const [previewVisible, setPreviewVisible] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -70,12 +69,11 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
       }}
       style={{
         position: "relative",
+        // height: "400px",
         width: "100%",
         overflow: "hidden",
         padding: 0,
-        borderRadius: token.borderRadiusLG,
-        maxWidth: "450px",
-        margin: "0 auto",
+        borderRadius: "8px",
       }}
       onMouseEnter={(e) => {
         const overlay = e.currentTarget.querySelector(
@@ -101,25 +99,26 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            height: "240px",
-            backgroundColor: token.colorBgElevated,
-            color: token.colorText,
-            padding: token.padding,
-            border: `1px dashed ${token.colorBorder}`,
-            borderRadius: token.borderRadiusLG,
+            height: "100%",
+            backgroundColor: "#f5f5f5",
+            color: "#999",
           }}
         >
-          <WarningOutlined
+          <WarningOutlined style={{ fontSize: "32px", marginBottom: "8px" }} />
+          <p>图像加载失败</p>
+          <button
+            onClick={() => onReload(prompt)}
             style={{
-              fontSize: "32px",
-              marginBottom: "8px",
-              color: token.colorWarning,
+              background: "#1890ff",
+              color: "white",
+              border: "none",
+              padding: "4px 12px",
+              borderRadius: "4px",
+              cursor: "pointer",
             }}
-          />
-          <p style={{ color: token.colorText }}>图像加载失败</p>
-          <Button type="primary" onClick={() => onReload(prompt)}>
+          >
             重新生成
-          </Button>
+          </button>
         </div>
       ) : (
         <>
@@ -128,18 +127,12 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
             alt={prompt}
             style={{
               width: "100%",
-              height: "240px",
+              height: "100%",
               objectFit: "cover",
             }}
             preview={{
               visible: previewVisible,
               onVisibleChange: setPreviewVisible,
-              mask: (
-                <div style={{ color: token.colorWhite }}>
-                  <EyeOutlined style={{ marginRight: 8 }} />
-                  查看图片
-                </div>
-              ),
             }}
             onError={handleImageError}
           />
@@ -156,30 +149,15 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
               display: "flex",
               flexDirection: "column",
               justifyContent: "flex-end",
-              padding: token.paddingLG,
+              padding: "20px",
               opacity: 0,
               transition: "opacity 0.3s ease",
             }}
           >
-            <p
-              style={{
-                color: token.colorWhite,
-                margin: `0 0 ${token.margin}px 0`,
-                fontSize: token.fontSizeSM,
-                lineHeight: 1.5,
-                display: "-webkit-box",
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {prompt}
-            </p>
             <div
               style={{
                 display: "flex",
-                gap: token.padding,
+                gap: "16px",
                 alignSelf: "flex-start",
               }}
             >
@@ -188,7 +166,7 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
                   onClick={() => setPreviewVisible(true)}
                   style={{
                     fontSize: "20px",
-                    color: token.colorWhite,
+                    color: "white",
                     cursor: "pointer",
                     transition: "transform 0.2s ease",
                   }}
@@ -205,7 +183,7 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
                   onClick={() => onReload(prompt)}
                   style={{
                     fontSize: "20px",
-                    color: token.colorWhite,
+                    color: "white",
                     cursor: "pointer",
                     transition: "transform 0.2s ease",
                   }}
@@ -222,7 +200,7 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
                   onClick={handleDownload}
                   style={{
                     fontSize: "20px",
-                    color: token.colorWhite,
+                    color: "white",
                     cursor: "pointer",
                     transition: "transform 0.2s ease",
                   }}

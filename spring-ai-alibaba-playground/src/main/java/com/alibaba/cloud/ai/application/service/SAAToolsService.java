@@ -70,8 +70,8 @@ public class SAAToolsService {
 
 		this.chatClient = ChatClient.builder(chatModel)
 				.defaultAdvisors(
-						simpleLoggerAdvisor,
-						messageChatMemoryAdvisor
+						simpleLoggerAdvisor
+//						messageChatMemoryAdvisor
 				).build();
 	}
 
@@ -117,15 +117,17 @@ public class SAAToolsService {
 				tcr.setErrorMessage(e.getMessage());
 				tcr.setToolEndTime(LocalDateTime.now());
 				tcr.setToolCostTime((long) (tcr.getToolEndTime().getNano() - tcr.getToolStartTime().getNano()));
-				logger.debug("Error ToolCallResp: {}, msg: {}", tcr, e.getMessage());
+				logger.error("Error ToolCallResp: {}, msg: {}", tcr, e.getMessage());
 				// throw new RuntimeException("Tool execution failed, please check the logs for details.");
 			}
 
 			String llmCallResponse = "";
 			if (Objects.nonNull(toolExecutionResult)) {
-				ToolResponseMessage toolResponseMessage = (ToolResponseMessage) toolExecutionResult.conversationHistory()
-						.get(toolExecutionResult.conversationHistory().size() - 1);
-				llmCallResponse = toolResponseMessage.getResponses().get(0).responseData();
+//				ToolResponseMessage toolResponseMessage = (ToolResponseMessage) toolExecutionResult.conversationHistory()
+//						.get(toolExecutionResult.conversationHistory().size() - 1);
+//				llmCallResponse = toolResponseMessage.getResponses().get(0).responseData();
+				ChatResponse finalResponse = chatClient.prompt().messages(toolExecutionResult.conversationHistory()).call().chatResponse();
+				llmCallResponse = finalResponse.getResult().getOutput().getText();
 			}
 
 			tcr.setStatus(ToolCallResp.ToolState.SUCCESS);
