@@ -1,34 +1,28 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Input, Button, Tabs, message, theme, Form, Spin } from "antd";
-import {
-  ExportOutlined,
-  CopyOutlined,
-  EditOutlined,
-  CodeOutlined,
-  DesktopOutlined,
-  ThunderboltOutlined,
-  ApiOutlined,
-  StarOutlined,
-  CommentOutlined,
-  MessageOutlined,
-} from "@ant-design/icons";
+import { ExportOutlined, CopyOutlined } from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { MenuPage } from "../../stores/functionMenu.store";
-import { useConversationContext } from "../../stores/conversation.store";
-import { MCP_SERVERS, GITHUB_TOOLS, DEFAULT_TOKEN_PLACEHOLDER } from "./const";
-import { getMcpServerData, generateFormFields, name2iconMap } from "./utils";
+import {
+  MOCK_MCP_SERVERS,
+  GITHUB_TOOLS,
+  DEFAULT_TOKEN_PLACEHOLDER,
+  MOCK_SERVER_CONFIG,
+} from "./const";
+import {
+  requestMcpServerList,
+  formatMcpServerListData,
+  generateFormFields,
+  name2iconMap,
+} from "./utils";
 import { McpServerFormatted, McpToolFormatted } from "./types";
 import { useStyles } from "./style";
+import React, { useState, useEffect } from "react";
 
 const { TabPane } = Tabs;
 const { Item: FormItem } = Form;
 
 const McpLandingView = () => {
   const { styles } = useStyles();
-  const { token } = theme.useToken();
-  const [isLoading, setIsLoading] = useState(false);
   const [isFetchingServers, setIsFetchingServers] = useState(false);
   const [isExecutingTool, setIsExecutingTool] = useState(false);
   const [executionResult, setExecutionResult] = useState<any>(null);
@@ -37,10 +31,7 @@ const McpLandingView = () => {
   const [githubToken, setGithubToken] = useState(DEFAULT_TOKEN_PLACEHOLDER);
   const [activeTab, setActiveTab] = useState("stdio");
   const [form] = Form.useForm();
-  const navigate = useNavigate();
-  const { createConversation } = useConversationContext();
 
-  // New state for server data
   const [serverList, setServerList] = useState<McpServerFormatted[]>([]);
   const [currentServer, setCurrentServer] = useState<McpServerFormatted | null>(
     null
@@ -52,35 +43,10 @@ const McpLandingView = () => {
     const loadServers = async () => {
       setIsFetchingServers(true);
       try {
-        const mockServerResponse = {
-          id: "server123",
-          name: "GitHub",
-          desc: "代码仓库管理、文件操作和GitHub API集成",
-          toolList: [
-            {
-              name: "创建或更新文件",
-              params: {
-                repository: "Repository name",
-                path: "File path",
-                content: "File content",
-                message: "Commit message",
-              },
-              desc: "在仓库中创建新文件或更新现有文件",
-            },
-            {
-              name: "搜索仓库",
-              params: {
-                query: "Search query",
-                language: "Programming language",
-                sort: "Sort criteria",
-              },
-              desc: "通过关键字或条件搜索仓库",
-            },
-          ],
-        };
+        // TODO: 目前这是 MOCK 的
+        const serverData = await requestMcpServerList();
+        const parsedData = formatMcpServerListData(serverData);
 
-        // Type assertion to make TypeScript happy with our mock data
-        const parsedData = getMcpServerData(mockServerResponse as any);
         setServerList([parsedData]);
         setCurrentServer(parsedData);
       } catch (error) {
@@ -94,7 +60,6 @@ const McpLandingView = () => {
     loadServers();
   }, []);
 
-  // Update current tool and form fields when selected tool changes
   useEffect(() => {
     if (currentServer && selectedTool) {
       const tool = currentServer.tools.find((t) => t.id === selectedTool);
@@ -107,56 +72,14 @@ const McpLandingView = () => {
     }
   }, [selectedTool, currentServer, form]);
 
-  const configJson = `{
-  "mcpservers": {
-    "": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcprouter"
-      ],
-      "env": {
-        "SERVER_KEY": "za119fm9fbmvk8"
-      }
-    }
-  }
-}`;
-
-  const availableClients = [
-    { name: "VS Code", icon: <CodeOutlined /> },
-    { name: "Cursor", icon: <EditOutlined /> },
-    { name: "Windsurf", icon: <ThunderboltOutlined /> },
-    { name: "Claude", icon: <StarOutlined /> },
-    { name: "Cline", icon: <DesktopOutlined /> },
-    { name: "ChatWise", icon: <CommentOutlined /> },
-    { name: "Cherry Studio", icon: <ApiOutlined /> },
-    { name: "DeepChat", icon: <MessageOutlined /> },
-  ];
-
   const getIconByName = (iconName: string): React.ReactNode => {
     return name2iconMap[iconName] || name2iconMap.Default;
-  };
-
-  const handleCreateConversation = (content: string) => {
-    if (!content.trim() || isLoading) return;
-
-    setIsLoading(true);
-    try {
-      const newConversation = createConversation(MenuPage.Mcp, []);
-      navigate(
-        `/mcp/${newConversation.id}?prompt=${encodeURIComponent(content)}`
-      );
-    } catch (error) {
-      console.error("创建MCP对话错误:", error);
-      setIsLoading(false);
-    }
   };
 
   const handleServerChange = (value: string) => {
     setSelectedServer(value);
     setSelectedTool("");
 
-    // Find the selected server from parsed data
     const server = serverList.find((s) => s.id === value);
     if (server) {
       setCurrentServer(server);
@@ -172,16 +95,16 @@ const McpLandingView = () => {
   };
 
   const handleCopyConfig = () => {
-    navigator.clipboard.writeText(configJson);
+    navigator.clipboard.writeText(MOCK_SERVER_CONFIG);
     message.success("Configuration copied to clipboard");
   };
 
   const serverDescription =
-    MCP_SERVERS.find((server) => server.id === selectedServer)?.description ||
-    "";
+    MOCK_MCP_SERVERS.find((server) => server.id === selectedServer)
+      ?.description || "";
 
   const selectedServerIcon =
-    MCP_SERVERS.find((server) => server.id === selectedServer)?.icon ||
+    MOCK_MCP_SERVERS.find((server) => server.id === selectedServer)?.icon ||
     "CloudOutlined";
 
   const handleFormSubmit = async (values: any) => {
@@ -191,28 +114,14 @@ const McpLandingView = () => {
     setExecutionResult(null);
 
     try {
-      // In a real environment, call the executeToolAction function
-      // const result = await executeToolAction(
-      //   currentServer.id,
-      //   currentTool.name,
-      //   values
-      // );
-
-      // For development, simulate a successful response
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const mockResult = {
-        success: true,
-        data: {
-          message: `Successfully executed ${currentTool.name}`,
-          details: `Used parameters: ${JSON.stringify(values, null, 2)}`,
-        },
-      };
-
-      setExecutionResult(mockResult);
-      message.success(`Successfully executed ${currentTool.name}`);
+      // TODO: 调用
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+      // console.log("Parameters:", values);
+      // setExecutionResult(mockResult);
+      // message.success(`Successfully executed ${currentTool.name}`);
     } catch (error) {
-      console.error("Error executing tool:", error);
-      message.error("Failed to execute tool");
+      console.error("调用失败", error);
+      message.error("调用失败");
       setExecutionResult({
         success: false,
         error: String(error),
@@ -222,8 +131,35 @@ const McpLandingView = () => {
     }
   };
 
-  // Get appropriate tools to display based on current data
   const toolsToDisplay = currentServer?.tools || GITHUB_TOOLS;
+
+  // 添加动态生成客户端列表的代码
+  const clientIconNames = [
+    "CodeOutlined",
+    "EditOutlined",
+    "ThunderboltOutlined",
+    "StarOutlined",
+    "DesktopOutlined",
+    "CommentOutlined",
+    "ApiOutlined",
+    "MessageOutlined",
+  ];
+
+  const clientNames = [
+    "VS Code",
+    "Cursor",
+    "Windsurf",
+    "Claude",
+    "Cline",
+    "ChatWise",
+    "Cherry Studio",
+    "DeepChat",
+  ];
+
+  const availableClients = clientNames.map((name, index) => ({
+    name,
+    icon: getIconByName(clientIconNames[index]),
+  }));
 
   return (
     <div className={styles.pageContainer}>
@@ -231,19 +167,9 @@ const McpLandingView = () => {
         <div className={styles.selectionPanel}>
           <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>MCP Servers</span>
-            {/* <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item key="settings">Settings</Menu.Item>
-                </Menu>
-              }
-              trigger={["click"]}
-            >
-              <Button type="text" icon={<SettingOutlined />} />
-            </Dropdown> */}
           </div>
           <div className={styles.serverList}>
-            {MCP_SERVERS.map((server) => (
+            {MOCK_MCP_SERVERS.map((server) => (
               <div
                 key={server.id}
                 className={`${styles.serverItem} ${
@@ -391,7 +317,7 @@ const McpLandingView = () => {
                       showLineNumbers={true}
                       wrapLines={true}
                     >
-                      {configJson}
+                      {MOCK_SERVER_CONFIG}
                     </SyntaxHighlighter>
                     <Button
                       type="text"
@@ -439,7 +365,7 @@ const McpLandingView = () => {
         </div>
       </div>
 
-      {/* Loading indicator for fetching servers */}
+      {/* 加载中 */}
       {isFetchingServers && (
         <div className={styles.loadingOverlay}>
           <Spin size="large" />

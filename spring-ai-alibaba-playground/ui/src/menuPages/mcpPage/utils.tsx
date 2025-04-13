@@ -12,7 +12,9 @@ import {
 } from "@ant-design/icons";
 import { McpServerFormatted, McpServerResponse } from "./types";
 import React from "react";
+import { MOCK_SERVER_RESPONSE, MOCK_MCP_SERVERS, GITHUB_TOOLS } from "./const";
 
+// 图标组件映射
 export const name2iconMap: Record<string, React.ReactNode> = {
   GithubOutlined: <GithubOutlined />,
   EnvironmentOutlined: <EnvironmentOutlined />,
@@ -24,20 +26,45 @@ export const name2iconMap: Record<string, React.ReactNode> = {
   PictureOutlined: <PictureOutlined />,
   SafetyOutlined: <SafetyOutlined />,
   FireOutlined: <FireOutlined />,
-  // 未知
   Default: <CloudOutlined />,
 };
 
-export const getMcpServerData = (
-  responseData: McpServerResponse
+/**
+ * 获取服务名称对应的图标名称
+ * TODO: 确认服务命名规则
+ */
+export const getIconNameByServerName = (serverName: string): string => {
+  const iconMapping: Record<string, string> = {
+    GitHub: "GithubOutlined",
+    高德地图: "EnvironmentOutlined",
+    Tavily搜索: "SearchOutlined",
+    AWS知识库检索: "CloudOutlined",
+    浮墨笔记: "CloudOutlined",
+  };
+
+  return iconMapping[serverName] || "Default";
+};
+
+/**
+ * TODO: 后续接入真实API
+ */
+export const requestMcpServerList = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  return MOCK_SERVER_RESPONSE;
+};
+
+/**
+ * TODO: 和后端确认数据结构，params中的value当作表单类型
+ */
+export const formatMcpServerListData = (
+  responseData: any
 ): McpServerFormatted => {
   const { id, name, desc, toolList } = responseData;
 
-  // TODO: 前端本地映射icon
-  const icon = name2iconMap[name] || name2iconMap.Default;
+  const iconName = getIconNameByServerName(name);
 
-  const tools = toolList.map((tool) => ({
-    id: tool.name.toLowerCase().replace(/\s+/g, "_"), // Convert name to id format
+  const tools = toolList.map((tool: any) => ({
+    id: tool.name.toLowerCase().replace(/\s+/g, "_"),
     name: tool.name,
     description: tool.desc,
     params: tool.params,
@@ -46,26 +73,39 @@ export const getMcpServerData = (
   return {
     id,
     name,
-    icon,
+    icon: iconName,
     description: desc,
     tools,
   };
 };
 
+/**
+ * 将MCP服务器数据从后端格式转为UI格式
+ * 用于将const.ts中的mock数据转为UI所需格式
+ */
+export const convertMockServersToUiFormat = () => {
+  return MOCK_MCP_SERVERS.map((server) => ({
+    ...server,
+    // 保持返回格式一致性
+    tools: GITHUB_TOOLS,
+  }));
+};
+
+/**
+ * 生成表单字段配置
+ */
 export const generateFormFields = (params: Record<string, string>) => {
   return Object.entries(params).map(([key, value]) => {
-    // Use value to determine field type (could be extended with more field types)
     const fieldType = value.toLowerCase().includes("password")
       ? "password"
       : "text";
 
     return {
       key,
-      label:
-        key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1"),
+      label: key,
       fieldType,
       placeholder: value || `Enter ${key}`,
-      required: true, // Default to required, can be modified as needed
+      required: true,
     };
   });
 };

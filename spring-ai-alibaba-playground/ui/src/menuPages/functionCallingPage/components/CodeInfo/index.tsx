@@ -18,7 +18,7 @@ const { TabPane } = Tabs;
 
 const codeSummaries: { [key: string]: { code: string; language: string } } = {
   frontend: {
-    code: `// McpLandingView.tsx
+    code: `// FunctionCallingLandingView.tsx
 const handleLocalMessage = async (text: string) => {
   // 添加用户消息
   const userMessage: Message = {
@@ -651,7 +651,7 @@ const CodeInfo: React.FC = () => {
 
   return (
     <Card
-      title="Spring AI Alibaba MCP"
+      title="Spring AI Alibaba Tool Calling"
       bordered={false}
       className={styles.codeInfoContainer}
       bodyStyle={{
