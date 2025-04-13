@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import { Card, message } from "antd";
 import { useStyles } from "./style";
-import GeneratedImage from "./components/generatedImage";
+import GeneratedImage from "./components/GeneratedImage";
 import BasePage from "../components/BasePage";
 import { useConversationContext } from "../../stores/conversation.store";
 import { getImage } from "../../api/image";
@@ -350,7 +350,7 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
       {/* 消息和生成的图片展示区域 */}
       <div style={{ marginTop: "24px" }}>
         {activeConversation?.messages.map((message: any) => (
-          <div key={message.timestamp}>
+          <div key={message.timestamp} className={styles.messageItem}>
             {/* 用户消息 */}
             {message.role === "user" && (
               <div

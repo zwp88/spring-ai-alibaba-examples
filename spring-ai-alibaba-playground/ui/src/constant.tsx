@@ -118,11 +118,11 @@ export const functionMenuItems: FunctionMenuItem[] = [
     icon: <PhoneOutlined />,
     label: "MCP",
   },
-  {
-    key: "more-examples",
-    icon: <PhoneOutlined />,
-    label: "更多案例",
-  },
+  // {
+  //   key: "more-examples",
+  //   icon: <PhoneOutlined />,
+  //   label: "更多案例",
+  // },
 ];
 
 const renderTitle = (icon: React.ReactElement, title: string) => (

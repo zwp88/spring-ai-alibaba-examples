@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Tooltip, Image, Card, message } from "antd";
+import { Tooltip, Image, Card, message, theme } from "antd";
 import {
   ReloadOutlined,
   DownloadOutlined,
@@ -20,6 +20,7 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
   prompt,
   onReload,
 }) => {
+  const { token } = theme.useToken();
   const [previewVisible, setPreviewVisible] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -73,7 +74,9 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
         width: "100%",
         overflow: "hidden",
         padding: 0,
-        borderRadius: "8px",
+        borderRadius: token.borderRadiusLG,
+        height: "350px",
+        margin: "0 auto",
       }}
       onMouseEnter={(e) => {
         const overlay = e.currentTarget.querySelector(
@@ -99,9 +102,12 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            height: "100%",
-            backgroundColor: "#f5f5f5",
-            color: "#999",
+            height: "350px",
+            backgroundColor: token.colorBgElevated,
+            color: token.colorText,
+            padding: token.padding,
+            border: `1px dashed ${token.colorBorder}`,
+            borderRadius: token.borderRadiusLG,
           }}
         >
           <WarningOutlined style={{ fontSize: "32px", marginBottom: "8px" }} />
@@ -127,8 +133,9 @@ const GeneratedImage: React.FC<GeneratedImageProps> = ({
             alt={prompt}
             style={{
               width: "100%",
-              height: "100%",
-              objectFit: "cover",
+              height: "350px",
+              objectFit: "contain",
+              backgroundColor: token.colorBgContainer,
             }}
             preview={{
               visible: previewVisible,

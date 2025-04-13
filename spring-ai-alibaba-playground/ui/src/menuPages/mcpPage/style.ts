@@ -170,7 +170,6 @@ export const useStyles = createStyles(({ token, css }) => {
     `,
     connectButton: css`
       width: 100%;
-      background: #f26522;
       border: none;
 
       &:hover {
