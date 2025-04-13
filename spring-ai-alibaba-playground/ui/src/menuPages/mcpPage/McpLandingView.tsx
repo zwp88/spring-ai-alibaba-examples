@@ -1,19 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input, Button, Dropdown, Menu, Tabs, message, theme } from "antd";
+import { Input, Button, Tabs, message, theme, Form, Spin } from "antd";
 import {
-  SettingOutlined,
   ExportOutlined,
-  GithubOutlined,
-  EnvironmentOutlined,
-  SearchOutlined,
-  CloudOutlined,
-  BulbOutlined,
-  QuestionCircleOutlined,
-  RobotOutlined,
-  PictureOutlined,
-  SafetyOutlined,
-  FireOutlined,
   CopyOutlined,
   EditOutlined,
   CodeOutlined,
@@ -26,23 +15,97 @@ import {
 } from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { useStyles } from "./style";
-import { useConversationContext } from "../../stores/conversation.store";
 import { MenuPage } from "../../stores/functionMenu.store";
+import { useConversationContext } from "../../stores/conversation.store";
 import { MCP_SERVERS, GITHUB_TOOLS, DEFAULT_TOKEN_PLACEHOLDER } from "./const";
+import { getMcpServerData, generateFormFields, name2iconMap } from "./utils";
+import { McpServerFormatted, McpToolFormatted } from "./types";
+import { useStyles } from "./style";
 
 const { TabPane } = Tabs;
+const { Item: FormItem } = Form;
 
 const McpLandingView = () => {
   const { styles } = useStyles();
   const { token } = theme.useToken();
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingServers, setIsFetchingServers] = useState(false);
+  const [isExecutingTool, setIsExecutingTool] = useState(false);
+  const [executionResult, setExecutionResult] = useState<any>(null);
   const [selectedServer, setSelectedServer] = useState("github");
   const [selectedTool, setSelectedTool] = useState("");
   const [githubToken, setGithubToken] = useState(DEFAULT_TOKEN_PLACEHOLDER);
   const [activeTab, setActiveTab] = useState("stdio");
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const { createConversation } = useConversationContext();
+
+  // New state for server data
+  const [serverList, setServerList] = useState<McpServerFormatted[]>([]);
+  const [currentServer, setCurrentServer] = useState<McpServerFormatted | null>(
+    null
+  );
+  const [currentTool, setCurrentTool] = useState<McpToolFormatted | null>(null);
+  const [formFields, setFormFields] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadServers = async () => {
+      setIsFetchingServers(true);
+      try {
+        const mockServerResponse = {
+          id: "server123",
+          name: "GitHub",
+          desc: "代码仓库管理、文件操作和GitHub API集成",
+          toolList: [
+            {
+              name: "创建或更新文件",
+              params: {
+                repository: "Repository name",
+                path: "File path",
+                content: "File content",
+                message: "Commit message",
+              },
+              desc: "在仓库中创建新文件或更新现有文件",
+            },
+            {
+              name: "搜索仓库",
+              params: {
+                query: "Search query",
+                language: "Programming language",
+                sort: "Sort criteria",
+              },
+              desc: "通过关键字或条件搜索仓库",
+            },
+          ],
+        };
+
+        // Type assertion to make TypeScript happy with our mock data
+        const parsedData = getMcpServerData(mockServerResponse as any);
+        setServerList([parsedData]);
+        setCurrentServer(parsedData);
+      } catch (error) {
+        console.error("Error loading MCP servers:", error);
+        message.error("Failed to load MCP servers");
+      } finally {
+        setIsFetchingServers(false);
+      }
+    };
+
+    loadServers();
+  }, []);
+
+  // Update current tool and form fields when selected tool changes
+  useEffect(() => {
+    if (currentServer && selectedTool) {
+      const tool = currentServer.tools.find((t) => t.id === selectedTool);
+      if (tool) {
+        setCurrentTool(tool);
+        const fields = generateFormFields(tool.params);
+        setFormFields(fields);
+        form.resetFields();
+      }
+    }
+  }, [selectedTool, currentServer, form]);
 
   const configJson = `{
   "mcpservers": {
@@ -70,21 +133,8 @@ const McpLandingView = () => {
     { name: "DeepChat", icon: <MessageOutlined /> },
   ];
 
-  const iconMap: Record<string, React.ReactNode> = {
-    GithubOutlined: <GithubOutlined />,
-    EnvironmentOutlined: <EnvironmentOutlined />,
-    SearchOutlined: <SearchOutlined />,
-    CloudOutlined: <CloudOutlined />,
-    BulbOutlined: <BulbOutlined />,
-    QuestionCircleOutlined: <QuestionCircleOutlined />,
-    RobotOutlined: <RobotOutlined />,
-    PictureOutlined: <PictureOutlined />,
-    SafetyOutlined: <SafetyOutlined />,
-    FireOutlined: <FireOutlined />,
-  };
-
   const getIconByName = (iconName: string): React.ReactNode => {
-    return iconMap[iconName] || <CloudOutlined />;
+    return name2iconMap[iconName] || name2iconMap.Default;
   };
 
   const handleCreateConversation = (content: string) => {
@@ -105,6 +155,12 @@ const McpLandingView = () => {
   const handleServerChange = (value: string) => {
     setSelectedServer(value);
     setSelectedTool("");
+
+    // Find the selected server from parsed data
+    const server = serverList.find((s) => s.id === value);
+    if (server) {
+      setCurrentServer(server);
+    }
   };
 
   const handleToolChange = (value: string) => {
@@ -127,6 +183,47 @@ const McpLandingView = () => {
   const selectedServerIcon =
     MCP_SERVERS.find((server) => server.id === selectedServer)?.icon ||
     "CloudOutlined";
+
+  const handleFormSubmit = async (values: any) => {
+    if (!currentServer || !currentTool) return;
+
+    setIsExecutingTool(true);
+    setExecutionResult(null);
+
+    try {
+      // In a real environment, call the executeToolAction function
+      // const result = await executeToolAction(
+      //   currentServer.id,
+      //   currentTool.name,
+      //   values
+      // );
+
+      // For development, simulate a successful response
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const mockResult = {
+        success: true,
+        data: {
+          message: `Successfully executed ${currentTool.name}`,
+          details: `Used parameters: ${JSON.stringify(values, null, 2)}`,
+        },
+      };
+
+      setExecutionResult(mockResult);
+      message.success(`Successfully executed ${currentTool.name}`);
+    } catch (error) {
+      console.error("Error executing tool:", error);
+      message.error("Failed to execute tool");
+      setExecutionResult({
+        success: false,
+        error: String(error),
+      });
+    } finally {
+      setIsExecutingTool(false);
+    }
+  };
+
+  // Get appropriate tools to display based on current data
+  const toolsToDisplay = currentServer?.tools || GITHUB_TOOLS;
 
   return (
     <div className={styles.pageContainer}>
@@ -179,7 +276,7 @@ const McpLandingView = () => {
           <div className={styles.toolsSection}>
             <div className={styles.sectionTitle}>Tools</div>
             <div className={styles.toolsList}>
-              {GITHUB_TOOLS.map((tool) => (
+              {toolsToDisplay.map((tool) => (
                 <div
                   key={tool.id}
                   className={`${styles.toolItem} ${
@@ -198,83 +295,157 @@ const McpLandingView = () => {
         {/* 右边栏 */}
         <div className={styles.connectPanel}>
           <div className={styles.panelHeader}>
-            <span className={styles.panelTitle}>连接 MCP 服务器</span>
+            <span className={styles.panelTitle}>
+              {currentTool ? `使用 ${currentTool.name}` : "连接 MCP 服务器"}
+            </span>
           </div>
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            className={styles.connectTabs}
-          >
-            <TabPane tab="Stdio" key="stdio">
-              <div className={styles.configContainer}>
-                <div className={styles.configCode}>
-                  <SyntaxHighlighter
-                    language="json"
-                    style={vscDarkPlus}
-                    customStyle={{
-                      margin: 0,
-                      padding: "16px",
-                      fontSize: "13px",
-                      lineHeight: 1.5,
-                      borderRadius: "8px",
-                      position: "relative",
-                    }}
-                    showLineNumbers={true}
-                    wrapLines={true}
+
+          {currentTool ? (
+            <div className={styles.toolFormContainer}>
+              <div className={styles.toolDescription}>
+                {currentTool.description}
+              </div>
+
+              <Form
+                form={form}
+                layout="vertical"
+                className={styles.toolForm}
+                onFinish={handleFormSubmit}
+              >
+                {formFields.map((field) => (
+                  <FormItem
+                    key={field.key}
+                    label={field.label}
+                    name={field.key}
+                    rules={[
+                      {
+                        required: field.required,
+                        message: `请输入${field.label}`,
+                      },
+                    ]}
                   >
-                    {configJson}
-                  </SyntaxHighlighter>
+                    <Input
+                      type={field.fieldType}
+                      placeholder={field.placeholder}
+                    />
+                  </FormItem>
+                ))}
+
+                <FormItem>
                   <Button
-                    type="text"
-                    icon={<CopyOutlined />}
-                    className={styles.copyButton}
-                    onClick={handleCopyConfig}
+                    type="primary"
+                    htmlType="submit"
+                    className={styles.submitButton}
+                    loading={isExecutingTool}
+                  >
+                    执行
+                  </Button>
+                </FormItem>
+              </Form>
+
+              {executionResult && (
+                <div className={styles.executionResult}>
+                  <div className={styles.resultHeader}>
+                    <span
+                      className={
+                        executionResult.success
+                          ? styles.successHeader
+                          : styles.errorHeader
+                      }
+                    >
+                      {executionResult.success ? "执行成功" : "执行失败"}
+                    </span>
+                  </div>
+                  <div className={styles.resultContent}>
+                    {executionResult.success ? (
+                      <pre>{JSON.stringify(executionResult.data, null, 2)}</pre>
+                    ) : (
+                      <div className={styles.errorMessage}>
+                        {executionResult.error}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              className={styles.connectTabs}
+            >
+              <TabPane tab="Stdio" key="stdio">
+                <div className={styles.configContainer}>
+                  <div className={styles.configCode}>
+                    <SyntaxHighlighter
+                      language="json"
+                      style={vscDarkPlus}
+                      customStyle={{
+                        margin: 0,
+                        padding: "16px",
+                        fontSize: "13px",
+                        lineHeight: 1.5,
+                        borderRadius: "8px",
+                        position: "relative",
+                      }}
+                      showLineNumbers={true}
+                      wrapLines={true}
+                    >
+                      {configJson}
+                    </SyntaxHighlighter>
+                    <Button
+                      type="text"
+                      icon={<CopyOutlined />}
+                      className={styles.copyButton}
+                      onClick={handleCopyConfig}
+                    />
+                  </div>
+                </div>
+                <div className={styles.clientsSection}>
+                  <h3 className={styles.clientsTitle}>Available Clients</h3>
+                  <div className={styles.clientsList}>
+                    {availableClients.map((client, index) => (
+                      <div key={index} className={styles.clientItem}>
+                        <span className={styles.clientIcon}>{client.icon}</span>
+                        <span className={styles.clientName}>{client.name}</span>
+                        <ExportOutlined className={styles.clientArrow} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabPane>
+              <TabPane tab="Streamable HTTP" key="streamable">
+                <div className={styles.tokenInputSection}>
+                  <div className={styles.tokenLabel}>
+                    GITHUB_PERSONAL_ACCESS_TOKEN
+                  </div>
+                  <Input
+                    className={styles.tokenInput}
+                    value={githubToken}
+                    onChange={(e) => setGithubToken(e.target.value)}
+                    placeholder={DEFAULT_TOKEN_PLACEHOLDER}
                   />
+                  <Button
+                    type="primary"
+                    className={styles.connectButton}
+                    onClick={handleConnect}
+                  >
+                    连接
+                  </Button>
                 </div>
-              </div>
-              <div className={styles.clientsSection}>
-                <h3 className={styles.clientsTitle}>Available Clients</h3>
-                <div className={styles.clientsList}>
-                  {availableClients.map((client, index) => (
-                    <div key={index} className={styles.clientItem}>
-                      <span className={styles.clientIcon}>{client.icon}</span>
-                      <span className={styles.clientName}>{client.name}</span>
-                      <ExportOutlined className={styles.clientArrow} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </TabPane>
-            <TabPane tab="Streamable HTTP" key="streamable">
-              {/* TODO: */}
-              <div className={styles.tokenInputSection}>
-                <div className={styles.tokenLabel}>
-                  GITHUB_PERSONAL_ACCESS_TOKEN
-                </div>
-                <Input
-                  className={styles.tokenInput}
-                  value={githubToken}
-                  onChange={(e) => setGithubToken(e.target.value)}
-                  placeholder={DEFAULT_TOKEN_PLACEHOLDER}
-                />
-                <Button
-                  type="primary"
-                  className={styles.connectButton}
-                  onClick={handleConnect}
-                >
-                  连接
-                </Button>
-              </div>
-            </TabPane>
-            <TabPane tab="SSE" key="sse">
-              {/* TODO: SSE tab  */}
-            </TabPane>
-            <TabPane tab="Original" key="original">
-              {/* TODO: Original  */}
-            </TabPane>
-          </Tabs>
+              </TabPane>
+            </Tabs>
+          )}
         </div>
       </div>
+
+      {/* Loading indicator for fetching servers */}
+      {isFetchingServers && (
+        <div className={styles.loadingOverlay}>
+          <Spin size="large" />
+          <div className={styles.loadingText}>Loading MCP Servers...</div>
+        </div>
+      )}
     </div>
   );
 };

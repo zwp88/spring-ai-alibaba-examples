@@ -19,7 +19,6 @@ import {
   FilePdfOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-import "./index.css";
 import {
   uploadFile,
   uploadUrl,
@@ -31,6 +30,7 @@ import ReactMarkdown from "react-markdown";
 import { useConversationContext } from "../../stores/conversation.store";
 import { MenuPage } from "../../stores/functionMenu.store";
 import { useNavigate } from "react-router-dom";
+import { useStyle } from "./style";
 
 const { Text } = Typography;
 
@@ -71,6 +71,7 @@ const TooltipTitle = () => {
 const DocSummaryPage: React.FC = () => {
   const { createConversation, aiCapabilities } = useConversationContext();
   const navigate = useNavigate();
+  const { styles } = useStyle();
 
   // 状态管理
   const [fileHistory, setFileHistory] = useState<StorageData[]>([]);
@@ -187,7 +188,7 @@ const DocSummaryPage: React.FC = () => {
       setIsProcessing(true);
       setResultContent("正在处理链接，请稍候...");
 
-      const result = await uploadUrl(fileLink,currentId);
+      const result = await uploadUrl(fileLink, currentId);
       setIsProcessing(false);
       setIsSuccess(true);
       setResultContent(result);
@@ -209,7 +210,7 @@ const DocSummaryPage: React.FC = () => {
       const params = new URLSearchParams();
       console.log("content: ", content);
 
-      params.append("prompt",content);
+      params.append("prompt", content);
       params.append("conversationId", id);
 
       if (aiCapabilities.onlineSearch) {
@@ -232,8 +233,8 @@ const DocSummaryPage: React.FC = () => {
     setIsProcessing(true);
     try {
       if (!currentId) {
-         const newConversation = createConversation(MenuPage.Chat, []);
-         setCurrentId(newConversation.id);
+        const newConversation = createConversation(MenuPage.Chat, []);
+        setCurrentId(newConversation.id);
       }
       setResultContent("正在重新生成，请稍候...");
       const result = await regenerate(
@@ -250,7 +251,6 @@ const DocSummaryPage: React.FC = () => {
       setResultContent("重新生成失败：" + (error as Error).message);
     } finally {
       setIsProcessing(false);
-
     }
   };
 
@@ -258,7 +258,6 @@ const DocSummaryPage: React.FC = () => {
    * 处理继续操作，创建新对话并保存历史记录
    */
   const handleContinue = () => {
-    
     const storageData: StorageData = {
       content: resultContent,
       id: currentId,
@@ -309,7 +308,7 @@ const DocSummaryPage: React.FC = () => {
 
   return (
     <BasePage title="文档总结">
-      <div className="doc-container">
+      <div className={styles.docContainer}>
         <Text
           style={{ fontSize: 20, margin: "0 auto", textAlign: "center" }}
           type="secondary"
@@ -319,12 +318,12 @@ const DocSummaryPage: React.FC = () => {
 
         {/* 上传区域 */}
         <div
-          className="upload-area"
+          className={styles.uploadArea}
           onClick={chooseFile}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
-          <p className="upload-icon">
+          <p className={styles.uploadIcon}>
             <InboxOutlined />
           </p>
           <Space>
@@ -347,7 +346,7 @@ const DocSummaryPage: React.FC = () => {
               文件链接
             </Button>
           </Space>
-          <p className="upload-hint">
+          <p className={styles.uploadHint}>
             点击上传或者将文件拖拽至此处&nbsp;
             <Tooltip placement="bottom" title={TooltipTitle}>
               <InfoCircleOutlined />
@@ -365,7 +364,7 @@ const DocSummaryPage: React.FC = () => {
                 <List.Item
                   style={{ cursor: "pointer" }}
                   onClick={() => handleFileClick(item)}
-                  className="file-history-item"
+                  className={styles.fileHistoryItem}
                 >
                   <List.Item.Meta
                     avatar={
@@ -445,7 +444,11 @@ const DocSummaryPage: React.FC = () => {
               >
                 重新生成
               </Button>
-              <Button disabled={!isSuccess} type="primary" onClick={handleContinue}>
+              <Button
+                disabled={!isSuccess}
+                type="primary"
+                onClick={handleContinue}
+              >
                 继续
               </Button>
             </Space>

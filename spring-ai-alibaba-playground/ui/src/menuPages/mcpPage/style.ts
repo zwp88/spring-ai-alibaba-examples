@@ -483,5 +483,78 @@ export const useStyles = createStyles(({ token, css }) => {
       color: ${token.colorTextSecondary};
       font-size: 14px;
     `,
+    toolFormContainer: css`
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    `,
+    toolDescription: css`
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      color: ${token.colorTextSecondary};
+    `,
+    toolForm: css`
+      width: 100%;
+    `,
+    submitButton: css`
+      margin-top: 8px;
+    `,
+
+    // Execution result styles
+    executionResult: css`
+      margin-top: 16px;
+      border: 1px solid ${token.colorBorder};
+      border-radius: 8px;
+      overflow: hidden;
+    `,
+    resultHeader: css`
+      padding: 8px 16px;
+      background-color: ${token.colorBgContainer};
+      border-bottom: 1px solid ${token.colorBorder};
+      font-weight: 500;
+    `,
+    successHeader: css`
+      color: ${token.colorSuccess};
+    `,
+    errorHeader: css`
+      color: ${token.colorError};
+    `,
+    resultContent: css`
+      padding: 16px;
+      background-color: ${token.colorBgElevated};
+      max-height: 300px;
+      overflow-y: auto;
+
+      pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    `,
+    errorMessage: css`
+      color: ${token.colorError};
+    `,
+
+    // Loading overlay styles
+    loadingOverlay: css`
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    `,
+    loadingText: css`
+      color: white;
+      margin-top: 16px;
+      font-size: 16px;
+    `,
   };
 });

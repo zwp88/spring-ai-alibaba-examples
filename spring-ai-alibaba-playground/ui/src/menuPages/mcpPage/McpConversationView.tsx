@@ -4,11 +4,11 @@ import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import CodeInfo from "./components/CodeInfo";
 import OutputResult from "./components/OutputResult";
-import { useStyles } from "./style";
 import { useConversationContext } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
 import { McpMessage, Message } from "./types";
 import { getMcp } from "../../api/mcp";
+import { useStyles } from "./style";
 
 // 将存储的消息转换为UI显示的消息
 const mapStoredMessagesToUIMessages = (messages: McpMessage[]): Message[] => {
