@@ -27,6 +27,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -104,6 +105,7 @@ public class SAAMcpService {
 					toolCalls.get(0).name(),
 					toolCalls.get(0).arguments()
 			);
+			tcr.setToolParameters(toolCalls.get(0).arguments());
 			logger.debug("Start ToolCallResp: {}", tcr);
 			ToolExecutionResult toolExecutionResult = null;
 
@@ -128,7 +130,19 @@ public class SAAMcpService {
 //						.get(toolExecutionResult.conversationHistory().size() - 1);
 //				llmCallResponse = toolResponseMessage.getResponses().get(0).responseData();
 				ChatResponse finalResponse = chatClient.prompt().messages(toolExecutionResult.conversationHistory()).call().chatResponse();
-				llmCallResponse = finalResponse.getResult().getOutput().getText();
+                if (finalResponse != null) {
+                    llmCallResponse = finalResponse.getResult().getOutput().getText();
+                }
+
+                StringBuilder sb = new StringBuilder();
+				toolExecutionResult.conversationHistory().stream().filter(message -> message instanceof ToolResponseMessage)
+						.forEach(message -> {
+							ToolResponseMessage toolResponseMessage = (ToolResponseMessage) message;
+							toolResponseMessage.getResponses().forEach(tooResponse -> {
+								sb.append(tooResponse.responseData());
+							});
+						});
+				tcr.setToolResponse(sb.toString());
 			}
 
 			tcr.setStatus(ToolCallResp.ToolState.SUCCESS);
