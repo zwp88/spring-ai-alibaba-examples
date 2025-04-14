@@ -17,7 +17,9 @@
 package com.alibaba.cloud.ai.example.dcg.controller;
 
 import com.alibaba.cloud.ai.example.dcg.service.ClassificationAssistant;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 /**
  * 字段分类分级接口
@@ -41,6 +43,11 @@ public class ClassificationController {
     @GetMapping
     public String classify(@RequestParam("field") String fieldName, @RequestParam(value = "chatId", required = true) String chatId) {
         return assistant.classify(fieldName, chatId);
+    }
+
+    @RequestMapping(path="/chat/field", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> chat(@RequestParam("field") String fieldName, @RequestParam(value = "chatId", required = true) String chatId) {
+        return assistant.streamClassify(fieldName, chatId);
     }
 
 }
