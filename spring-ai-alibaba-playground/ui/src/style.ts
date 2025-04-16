@@ -15,8 +15,8 @@ export const useStyle = createStyles(({ token, css }) => {
       z-index: 10;
     `,
     layout: css`
-      width: 100%;
-      min-width: 1000px;
+      /* width: 100%; */
+      /* min-width: 1000px; */
       height: calc(100vh - 56px);
       border-radius: ${token.borderRadius}px;
       display: flex;
@@ -32,7 +32,7 @@ export const useStyle = createStyles(({ token, css }) => {
     menu: css`
       background: ${token.colorBgLayout}80;
       width: 280px;
-      min-width: 280px;
+      min-width: 0px;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -41,13 +41,23 @@ export const useStyle = createStyles(({ token, css }) => {
       transform-origin: left center;
       overflow-y: auto;
       overflow-x: hidden;
+      transition: all 0.3s cubic-bezier(0.34, 0.69, 0.1, 1);
+      will-change: transform;
     `,
     menuCollapsed: css`
       width: 0;
       min-width: 0;
       padding: 0;
-      opacity: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
       transform: translateX(-100%);
+      will-change: transform, opacity;
+
+      .functionMenu,
+      .chooseModel,
+      .conversationsContainer {
+        display: none;
+      }
     `,
     chooseModel: css`
       flex-direction: column;

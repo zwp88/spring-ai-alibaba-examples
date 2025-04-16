@@ -49,8 +49,6 @@ const Independent: React.FC = () => {
   // 根据当前主题设置body背景色
   useEffect(() => {
     document.body.style.backgroundColor = isDark ? "#141414" : "#ffffff";
-
-    // 如果是暗色主题，添加class
     if (isDark) {
       document.body.classList.add("dark-theme");
     } else {

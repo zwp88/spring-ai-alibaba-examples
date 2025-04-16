@@ -320,38 +320,38 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   };
 
   // 创建附件上传区域
-  const senderHeader = (
-    <Sender.Header
-      title="附件"
-      open={isFileUploadEnabled}
-      onOpenChange={setIsFileUploadEnabled}
-      styles={{
-        header: {
-          background: token.colorBgElevated,
-        },
-        content: {
-          padding: 0,
-        },
-      }}
-    >
-      <Attachments
-        accept=".jpg, .jpeg, .png, .webp"
-        maxCount={1}
-        beforeUpload={() => false}
-        items={attachedFiles}
-        onChange={handleFileChange}
-        placeholder={(type) =>
-          type === "drop"
-            ? { title: "拖放文件到这里" }
-            : {
-                icon: <CloudUploadOutlined />,
-                title: "上传文件",
-                description: "点击或拖拽文件到此区域上传",
-              }
-        }
-      />
-    </Sender.Header>
-  );
+  // const senderHeader = (
+  //   <Sender.Header
+  //     title="附件"
+  //     open={isFileUploadEnabled}
+  //     onOpenChange={setIsFileUploadEnabled}
+  //     styles={{
+  //       header: {
+  //         background: token.colorBgElevated,
+  //       },
+  //       content: {
+  //         padding: 0,
+  //       },
+  //     }}
+  //   >
+  //     <Attachments
+  //       accept=".jpg, .jpeg, .png, .webp"
+  //       maxCount={1}
+  //       beforeUpload={() => false}
+  //       items={attachedFiles}
+  //       onChange={handleFileChange}
+  //       placeholder={(type) =>
+  //         type === "drop"
+  //           ? { title: "拖放文件到这里" }
+  //           : {
+  //               icon: <CloudUploadOutlined />,
+  //               title: "上传文件",
+  //               description: "点击或拖拽文件到此区域上传",
+  //             }
+  //       }
+  //     />
+  //   </Sender.Header>
+  // );
 
   return (
     <BasePage title="对话" conversationId={conversationId}>
@@ -416,7 +416,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
           </div>
           <Sender
             value={inputContent}
-            header={senderHeader}
+            // header={senderHeader}
             onSubmit={handleSendMessage}
             // allowSpeech
             onChange={setInputContent}
