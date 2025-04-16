@@ -9,8 +9,7 @@ export const useStyle = createStyles(({ token }) => ({
     marginBottom: token.margin,
     backgroundColor: token.colorBgElevated,
     borderRadius: token.borderRadius,
-    width: "80%",
-    maxWidth: "80%",
+    width: "calc(100% - 32px)",
     alignSelf: "flex-start",
     marginRight: "auto",
     transition: "all 0.2s ease-out",
@@ -25,16 +24,19 @@ export const useStyle = createStyles(({ token }) => ({
   messageText: {
     whiteSpace: "pre-wrap",
     wordBreak: "break-word",
-    transition: "all 0.2s ease-out",
+    transition: "all 1s ease-out",
     willChange: "contents, height",
     transform: "translateZ(0)",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
 
     pre: {
       background: token.colorBgContainer,
       borderRadius: token.borderRadius,
       padding: token.padding,
       margin: `${token.marginXS}px 0`,
-      maxHeight: "300px",
       overflow: "auto",
 
       "&::-webkit-scrollbar": {
@@ -75,6 +77,9 @@ export const useStyle = createStyles(({ token }) => ({
     margin: `${token.marginXS}px 0`,
     color: token.colorTextSecondary,
     fontStyle: "italic",
+    transition: "all 1s ease-out",
+    willChange: "contents, height",
+    transform: "translateZ(0)",
   },
   codeBlock: {
     "&::-webkit-scrollbar": {

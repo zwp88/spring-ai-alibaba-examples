@@ -116,9 +116,9 @@ const RagPage = () => {
       //   setMessages([...updatedMessages, assistantMessage]);
       // });
 
-      if (!response.ok) {
-        throw new Error("RAG查询失败");
-      }
+      // if (!response.ok) {
+      //   throw new Error("RAG查询失败");
+      // }
 
       // 最终消息
       const finalMessages = [

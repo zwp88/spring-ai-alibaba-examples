@@ -50,6 +50,8 @@ export const getMarkdownRenderConfig = (styles: Record<string, string>) => {
 const processedContentCache = new Map<string, string>();
 export const getSseTagProcessor = () => {
   let isProcessing = false;
+  let incompleteThinkContent = "";
+
   const sseTagProcessor = (content: string, timestamp: string) => {
     try {
       isProcessing = true;
@@ -59,6 +61,16 @@ export const getSseTagProcessor = () => {
       }
 
       let result = content;
+
+      // 检查是否存在未闭合的think标签
+      const openTagCount = (result.match(/<think>/g) || []).length;
+      const closeTagCount = (result.match(/<\/think>/g) || []).length;
+
+      // 如果标签未配对完成，先保存当前内容并返回原始内容
+      if (openTagCount !== closeTagCount) {
+        return content;
+      }
+
       const thinkRegex = /<think>([\s\S]*?)<\/think>/g;
       const matches = result.matchAll(thinkRegex);
 
@@ -78,11 +90,11 @@ export const getSseTagProcessor = () => {
 
       // 如果有 think 内容，将它们合并并添加引用符号
       if (thinkContents.length > 0) {
-        const combinedThinkContent = thinkContents.join("");
-        processedResult = `> ${combinedThinkContent}\n${processedResult}`;
+        const combinedThinkContent = thinkContents.join("\n\n");
+        processedResult = `> ${combinedThinkContent}\n\n${processedResult}`;
       }
-      processedContentCache.set(timestamp, processedResult);
 
+      processedContentCache.set(timestamp, processedResult);
       return processedResult;
     } catch (err) {
       console.error("Failed to process content:", err);

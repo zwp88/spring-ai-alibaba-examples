@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Button, Space, theme } from "antd";
-import { CopyOutlined } from "@ant-design/icons";
 import { useStyle } from "./style";
 import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { getMarkdownRenderConfig, getSseTagProcessor } from "./utils";
+import MessageFooter from "./components/CopyButton";
 
 interface ResponseBubbleProps {
   content: string;
@@ -14,16 +13,12 @@ interface ResponseBubbleProps {
   footer?: () => React.ReactNode;
 }
 
-// 缓存防止重复
-const processedContentCache = new Map<string, string>();
-
 const ResponseBubble: React.FC<ResponseBubbleProps> = ({
   content,
   timestamp,
   isError = false,
   footer = null,
 }) => {
-  const { token } = theme.useToken();
   const { styles } = useStyle();
   const [processedContent, setProcessedContent] = useState(content);
   const isProcessingRef = useRef(false);
@@ -43,28 +38,10 @@ const ResponseBubble: React.FC<ResponseBubbleProps> = ({
     };
 
     processContent();
-
-    return () => {
-      processedContentCache.delete(messageId);
-    };
   }, [content, timestamp]);
 
-  const createMessageFooter = (value: string) => (
-    <Space size={token.paddingXXS}>
-      <Button
-        color="default"
-        variant="text"
-        size="small"
-        onClick={() => {
-          navigator.clipboard.writeText(value);
-        }}
-        icon={<CopyOutlined />}
-      />
-    </Space>
-  );
-
   return (
-    <div className={styles.botMessage}>
+    <div className={styles.botMessage} key={"responseBubble" + messageId}>
       <div className={styles.messageSender}>AI</div>
       <div className={styles.messageText}>
         <ReactMarkdown
@@ -78,7 +55,7 @@ const ResponseBubble: React.FC<ResponseBubbleProps> = ({
       <div className={styles.messageTime}>
         {new Date(timestamp).toLocaleString()}
       </div>
-      {!isError && (footer ? footer() : createMessageFooter(content))}
+      {!isError && (footer?.() ?? <MessageFooter value={content} />)}
     </div>
   );
 };

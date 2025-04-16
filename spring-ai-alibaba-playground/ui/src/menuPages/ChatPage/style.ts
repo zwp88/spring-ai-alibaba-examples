@@ -85,7 +85,7 @@ export const useStyle = createStyles(({ token, css }) => {
     senderContainerCollapsed: css`
       position: fixed;
       bottom: 32px;
-      width: 100%;
+      width: calc(100% - 32px);
       padding: 0 16px;
     `,
     landingContainer: css`

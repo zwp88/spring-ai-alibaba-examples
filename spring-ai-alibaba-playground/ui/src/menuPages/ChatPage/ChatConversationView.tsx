@@ -5,8 +5,8 @@ import { useStyle } from "./style";
 import { useConversationContext } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
 import { getChat } from "../../api/chat";
-import { Badge, Button, theme } from "antd";
-import { CloudUploadOutlined, PaperClipOutlined } from "@ant-design/icons";
+import { Button, theme } from "antd";
+import { CloudUploadOutlined } from "@ant-design/icons";
 import { Attachments } from "@ant-design/x";
 import { actionButtonConfig, MAX_IMAGE_SIZE } from "../../const";
 import {
@@ -25,7 +25,7 @@ import {
 } from "./types";
 import ResponseBubble from "../components/ResponseBubble";
 import RequestBubble from "../components/RequestBubble";
-import { useCallback } from "react";
+import { useThrottle } from "../../hooks";
 
 const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   conversationId,
@@ -123,50 +123,52 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     }
   }, [location.search, activeConversation, updateCapability, isLoading]);
 
-  const updateConversationMessages = (
-    messageContent: string,
-    role: "assistant" | "assistant",
-    isError: boolean = false,
-    userTimestamp: number,
-    userMessage: ChatMessage
-  ) => {
-    const timestamp = Date.now();
-    const responseMessage: ChatMessage = {
-      role: role,
-      content: messageContent,
-      timestamp: timestamp,
-      isError: isError,
-    };
-    const responseMessageUI: Message = mapStoredMessagesToUIMessages([
-      responseMessage,
-    ])[0];
-    setMessages((prev) => [...prev, responseMessageUI]);
+  const updateConversationMessages = useThrottle(
+    (
+      messageContent: string,
+      role: "assistant" | "assistant",
+      isError: boolean = false,
+      userTimestamp: number,
+      userMessage: ChatMessage
+    ) => {
+      const timestamp = Date.now();
+      const responseMessage: ChatMessage = {
+        role: role,
+        content: messageContent,
+        timestamp: timestamp,
+        isError: isError,
+      };
+      const responseMessageUI: Message = mapStoredMessagesToUIMessages([
+        responseMessage,
+      ])[0];
+      setMessages((prev) => [...prev, responseMessageUI]);
 
-    // 确保用户消息存在
-    const existingUserMessage = activeConversation?.messages.find(
-      (msg) => msg.timestamp === userTimestamp && msg.role === "user"
-    );
-    // 如果用户消息不存在，先添加
-    const baseMessages = existingUserMessage
-      ? activeConversation?.messages
-      : [...(activeConversation?.messages || []), userMessage];
+      // 确保用户消息存在
+      const existingUserMessage = activeConversation?.messages.find(
+        (msg) => msg.timestamp === userTimestamp && msg.role === "user"
+      );
+      // 如果用户消息不存在，先添加
+      const baseMessages = existingUserMessage
+        ? activeConversation?.messages
+        : [...(activeConversation?.messages || []), userMessage];
 
-    // 更新会话，移除占位消息，添加新消息
-    const finalMessages = baseMessages
-      ?.filter((msg) => !(msg as ChatMessage).isLoading)
-      .concat([responseMessage]);
+      // TODO: 目前还没有添加占位消息。。。。
+      // 更新会话，移除占位消息，添加新消息
+      const finalMessages = baseMessages
+        ?.filter((msg) => !(msg as ChatMessage).isLoading)
+        .concat([responseMessage]);
 
-    // if (isError) {
-    //   console.log("更新错误后的消息列表:", finalMessages);
-    // }
-    if (!activeConversation?.id) {
-      throw new Error("会话ID为空!");
-    }
-    updateActiveConversation({
-      ...activeConversation,
-      messages: finalMessages as unknown as ChatMessage[],
-    });
-  };
+      if (!activeConversation?.id) {
+        throw new Error("会话ID为空!");
+      }
+
+      updateActiveConversation({
+        ...activeConversation,
+        messages: finalMessages as unknown as ChatMessage[],
+      });
+    },
+    500
+  );
 
   // 发送消息到API并更新会话
   const handleSendMessage = async (text: string) => {
@@ -174,9 +176,9 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
 
     setIsLoading(true);
     setInputContent(""); // 清空输入框
-
     // 记录当前时间戳，确保消息顺序
     const userTimestamp = Date.now();
+    console.log("text", text, userTimestamp);
 
     // 创建用户消息
     const userMessage: ChatMessage = {
@@ -218,18 +220,16 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
             const chunk = decoder.decode(value);
             responseText += chunk;
 
-            // 降低更新频率，防止抖动
+            // 频率太快会导致闪动
             const isLastChunk = value.length === 0;
-            if (isLastChunk || responseText.length % 3 === 0) {
-              requestAnimationFrame(() => {
-                updateConversationMessages(
-                  responseText,
-                  "assistant",
-                  false,
-                  userTimestamp,
-                  userMessage
-                );
-              });
+            if (isLastChunk || responseText.length % 6 === 0) {
+              updateConversationMessages(
+                responseText,
+                "assistant",
+                false,
+                userTimestamp,
+                userMessage
+              );
             }
           },
           params
@@ -352,32 +352,6 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       />
     </Sender.Header>
   );
-
-  // 创建附件按钮
-  const attachmentsNode = (
-    <Badge dot={attachedFiles.length > 0 && !isFileUploadEnabled}>
-      <Button
-        type="text"
-        icon={<PaperClipOutlined />}
-        onClick={() => setIsFileUploadEnabled(!isFileUploadEnabled)}
-      />
-    </Badge>
-  );
-
-  // 创建消息底部控件
-  // const createMessageFooter = (value: string) => (
-  //   <Space size={token.paddingXXS}>
-  //     <Button
-  //       color="default"
-  //       variant="text"
-  //       size="small"
-  //       onClick={() => {
-  //         navigator.clipboard.writeText(value);
-  //       }}
-  //       icon={<CopyOutlined />}
-  //     />
-  //   </Space>
-  // );
 
   return (
     <BasePage title="对话" conversationId={conversationId}>
