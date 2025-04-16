@@ -1,6 +1,6 @@
 import { message } from "antd";
 import type { GetProp, UploadProps } from "antd";
-import { ChatMessage, Message } from "./menuPages/ChatPage/types";
+import { ChatMessage, Message } from "./menuPages/chatPage/types";
 import { AiCapabilities } from "./stores/conversation.store";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
@@ -97,4 +97,16 @@ export const createTagMerger = (startTag: string, endTag: string) => {
     tagMerger,
     getResult,
   };
+};
+
+export const scrollToBottom = (container: HTMLElement | null) => {
+  if (!container) return;
+  const lastMessage = container.lastElementChild as HTMLElement;
+
+  if (lastMessage) {
+    const lastMessageTop = lastMessage.offsetTop;
+    const lastMessageHeight = lastMessage.clientHeight;
+    container.scrollTop =
+      lastMessageTop + lastMessageHeight - container.clientHeight;
+  }
 };

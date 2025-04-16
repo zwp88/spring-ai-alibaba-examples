@@ -8,11 +8,12 @@ import { getChat } from "../../api/chat";
 import { Badge, Button, theme } from "antd";
 import { CloudUploadOutlined, PaperClipOutlined } from "@ant-design/icons";
 import { Attachments } from "@ant-design/x";
-import { actionButtonConfig, MAX_IMAGE_SIZE } from "../../constant";
+import { actionButtonConfig, MAX_IMAGE_SIZE } from "../../const";
 import {
   decoder,
   litFileSize,
   mapStoredMessagesToUIMessages,
+  scrollToBottom,
 } from "../../utils";
 import { useFunctionMenuStore } from "../../stores/functionMenu.store";
 import { useModelConfigContext } from "../../stores/modelConfig.store";
@@ -59,24 +60,9 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     chooseActiveConversation(conversationId);
   }, [conversationId, chooseActiveConversation]);
 
-  // 立即滚动到底部
-  const immediateScrollToBottom = useCallback(() => {
-    if (!messagesContainerRef.current) return;
-    const container = messagesContainerRef.current;
-    const lastMessage = container.lastElementChild as HTMLElement;
-
-    if (lastMessage) {
-      const lastMessageTop = lastMessage.offsetTop;
-      const lastMessageHeight = lastMessage.clientHeight;
-      container.scrollTop =
-        lastMessageTop + lastMessageHeight - container.clientHeight;
-    }
-  }, []);
-
-  // 监听消息变化，触发滚动
   useEffect(() => {
-    immediateScrollToBottom();
-  }, [messages, immediateScrollToBottom]);
+    scrollToBottom(messagesContainerRef.current);
+  }, [messages]);
 
   // 从存储的会话中加载消息
   useEffect(() => {
@@ -213,7 +199,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       messages: updatedWithUserMessage,
     });
 
-    immediateScrollToBottom();
+    scrollToBottom(messagesContainerRef.current);
 
     try {
       const params = {
@@ -234,7 +220,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
 
             // 降低更新频率，防止抖动
             const isLastChunk = value.length === 0;
-            if (isLastChunk || responseText.length % 6 === 0) {
+            if (isLastChunk || responseText.length % 2 === 0) {
               updateConversationMessages(
                 responseText,
                 "assistant",

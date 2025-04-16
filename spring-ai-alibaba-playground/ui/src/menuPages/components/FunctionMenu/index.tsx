@@ -14,7 +14,7 @@ import {
   Conversation,
   useConversationContext,
 } from "../../../stores/conversation.store";
-import { functionMenuItems } from "../../../constant";
+import { functionMenuItems } from "../../../const";
 import { useFunctionMenuStore } from "../../../stores/functionMenu.store";
 import { useNavigate } from "react-router-dom";
 

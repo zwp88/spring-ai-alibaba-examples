@@ -1,4 +1,4 @@
-import { BASE_URL } from "../constant";
+import { BASE_URL } from "../const";
 
 // 上传文档创建知识库
 export const createKnowledgeBase = async (

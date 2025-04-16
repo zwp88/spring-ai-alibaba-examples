@@ -23,7 +23,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { pageComponents } from "./constant";
+import { pageComponents } from "./const";
 import FunctionMenu from "./menuPages/components/FunctionMenu";
 import { useTheme } from "./hooks/useTheme";
 import { ThemeProvider } from "antd-style";
