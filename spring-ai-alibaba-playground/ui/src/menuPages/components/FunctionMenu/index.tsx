@@ -139,11 +139,7 @@ const FunctionMenu = (props: MenuProps) => {
           onClick={toggleMenuCollapsed}
         />
       )}
-      <div
-        className={`${styles.menu} ${
-          menuCollapsed ? styles.menuCollapsed : ""
-        }`}
-      >
+      <div className={`${menuCollapsed ? styles.menuCollapsed : styles.menu}`}>
         {/* 🌟 顶部信息 */}
         <div className={styles.userProfile}>
           <Space align="center">

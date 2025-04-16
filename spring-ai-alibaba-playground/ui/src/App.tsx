@@ -112,7 +112,6 @@ const Independent: React.FC = () => {
         </Tooltip>
       </Space>
       <div className={styles.layout}>
-        {/* 左侧菜单不应用过渡效果 */}
         <FunctionMenu />
         {/* 菜单页面容器 */}
         <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>

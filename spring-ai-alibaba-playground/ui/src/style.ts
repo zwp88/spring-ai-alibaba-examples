@@ -23,7 +23,7 @@ export const useStyle = createStyles(({ token, css }) => {
       background: ${token.colorBgContainer};
       font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
       overflow-x: hidden;
-      position: relative;
+      /* position: relative; */
 
       .ant-prompts {
         color: ${token.colorText};
@@ -31,18 +31,16 @@ export const useStyle = createStyles(({ token, css }) => {
     `,
     menu: css`
       background: ${token.colorBgLayout}80;
-      width: 280px;
+      max-width: 280px;
       min-width: 0px;
       height: 100%;
       display: flex;
       flex-direction: column;
       padding: 0 16px;
       box-sizing: border-box;
-      transform-origin: left center;
       overflow-y: auto;
       overflow-x: hidden;
-      transition: all 0.3s cubic-bezier(0.34, 0.69, 0.1, 1);
-      will-change: transform;
+      transition: width 0.8s ease-in-out;
     `,
     menuCollapsed: css`
       width: 0;
@@ -50,9 +48,9 @@ export const useStyle = createStyles(({ token, css }) => {
       padding: 0;
       overflow: hidden;
       text-overflow: ellipsis;
-      transform: translateX(-100%);
-      will-change: transform, opacity;
+      display: none;
 
+      transform: translateX(-999px);
       .functionMenu,
       .chooseModel,
       .conversationsContainer {
