@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Button, Space, theme } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 import { useStyle } from "./style";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { getMarkdownRenderConfig, getSseTagProcessor } from "./utils";
@@ -70,7 +70,7 @@ const ResponseBubble: React.FC<ResponseBubbleProps> = ({
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw]}
-          components={markdownRenderConfig}
+          components={markdownRenderConfig as Components}
         >
           {processedContent}
         </ReactMarkdown>

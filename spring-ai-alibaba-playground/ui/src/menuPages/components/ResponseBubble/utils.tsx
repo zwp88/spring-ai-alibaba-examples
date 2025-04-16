@@ -1,9 +1,12 @@
 import React from "react";
 import { Components } from "react-markdown";
+import PureText from "./components/PureText";
 
-export const getMarkdownRenderConfig = (
-  styles: Record<string, string>
-): Components => {
+export const getMarkdownRenderConfig = (styles: Record<string, string>) => {
+  const TextWithoutMargin = ({ children }) => {
+    <div className={styles.textWithoutMargin}>{children}</div>;
+  };
+
   return {
     blockquote: ({ children }) => (
       <blockquote className={styles.thinkBlock}>{children}</blockquote>
@@ -12,6 +15,34 @@ export const getMarkdownRenderConfig = (
       <code className={styles.codeInline}>{children}</code>
     ),
     pre: ({ children }) => <pre className={styles.codeBlock}>{children}</pre>,
+    p: PureText,
+    h3: ({ children }) => (
+      <PureText style={{ fontSize: "18px", fontWeight: 800 }}>
+        {children}
+      </PureText>
+    ),
+    h4: ({ children }) => (
+      <PureText style={{ fontSize: "16px", fontWeight: 800 }}>
+        {children}
+      </PureText>
+    ),
+    h5: ({ children }) => (
+      <PureText style={{ fontSize: "14px", fontWeight: 800 }}>
+        {children}
+      </PureText>
+    ),
+    h6: ({ children }) => (
+      <PureText style={{ fontSize: "12px", fontWeight: 800 }}>
+        {children}
+      </PureText>
+    ),
+    ul: ({ children }) => (
+      <PureText style={{ paddingLeft: "24px", margin: 0 }}>{children}</PureText>
+    ),
+    ol: ({ children }) => (
+      <PureText style={{ paddingLeft: "24px", margin: 0 }}>{children}</PureText>
+    ),
+    li: ({ children }) => <PureText style={{ margin: 0 }}>{children}</PureText>,
   };
 };
 

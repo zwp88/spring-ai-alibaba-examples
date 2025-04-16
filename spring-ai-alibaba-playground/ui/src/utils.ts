@@ -101,12 +101,14 @@ export const createTagMerger = (startTag: string, endTag: string) => {
 
 export const scrollToBottom = (container: HTMLElement | null) => {
   if (!container) return;
-  const lastMessage = container.lastElementChild as HTMLElement;
+  requestAnimationFrame(() => {
+    const lastMessage = container.lastElementChild as HTMLElement;
 
-  if (lastMessage) {
-    const lastMessageTop = lastMessage.offsetTop;
-    const lastMessageHeight = lastMessage.clientHeight;
-    container.scrollTop =
-      lastMessageTop + lastMessageHeight - container.clientHeight;
-  }
+    if (lastMessage) {
+      const lastMessageTop = lastMessage.offsetTop;
+      const lastMessageHeight = lastMessage.clientHeight;
+      container.scrollTop =
+        lastMessageTop + lastMessageHeight - container.clientHeight;
+    }
+  });
 };

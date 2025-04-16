@@ -220,14 +220,16 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
 
             // 降低更新频率，防止抖动
             const isLastChunk = value.length === 0;
-            if (isLastChunk || responseText.length % 2 === 0) {
-              updateConversationMessages(
-                responseText,
-                "assistant",
-                false,
-                userTimestamp,
-                userMessage
-              );
+            if (isLastChunk || responseText.length % 3 === 0) {
+              requestAnimationFrame(() => {
+                updateConversationMessages(
+                  responseText,
+                  "assistant",
+                  false,
+                  userTimestamp,
+                  userMessage
+                );
+              });
             }
           },
           params
@@ -442,9 +444,9 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
             value={inputContent}
             header={senderHeader}
             onSubmit={handleSendMessage}
-            allowSpeech
+            // allowSpeech
             onChange={setInputContent}
-            prefix={attachmentsNode}
+            // prefix={attachmentsNode}
             loading={isLoading}
             className={styles.sender}
             placeholder={"您可以问我任何问题..."}

@@ -2,16 +2,20 @@ import { createStyles } from "antd-style";
 
 export const useStyle = createStyles(({ token }) => ({
   botMessage: {
+    fontFamily: token.fontFamilyCode,
     display: "flex",
     flexDirection: "column",
     padding: token.padding,
     marginBottom: token.margin,
     backgroundColor: token.colorBgElevated,
+    // backgroundColor: "red",
     borderRadius: token.borderRadius,
+    width: "80%",
     maxWidth: "80%",
     alignSelf: "flex-start",
     marginRight: "auto",
-    willChange: "transform, opacity",
+    transition: "all 0.2s ease-out",
+    willChange: "transform, height",
     transform: "translateZ(0)",
     backfaceVisibility: "hidden",
   },
@@ -22,6 +26,9 @@ export const useStyle = createStyles(({ token }) => ({
   messageText: {
     whiteSpace: "pre-wrap",
     wordBreak: "break-word",
+    transition: "all 0.2s ease-out",
+    willChange: "contents, height",
+    transform: "translateZ(0)",
 
     pre: {
       background: token.colorBgContainer,
@@ -87,4 +94,9 @@ export const useStyle = createStyles(({ token }) => ({
     },
   },
   codeInline: {},
+  textWithoutMargin: {
+    margin: 0,
+    fontSize: "16px",
+    lineHeight: 1.8,
+  },
 }));
