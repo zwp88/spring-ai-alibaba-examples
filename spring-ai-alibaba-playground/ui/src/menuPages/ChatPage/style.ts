@@ -106,7 +106,7 @@ export const useStyle = createStyles(({ token, css }) => {
       position: fixed;
       bottom: 80px;
       left: 294px;
-      width: calc(100% - 330px);
+      width: calc(100% - 315px);
     `,
     landingSenderCollapsed: css`
       position: fixed;

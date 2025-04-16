@@ -8,7 +8,6 @@ export const useStyle = createStyles(({ token }) => ({
     padding: token.padding,
     marginBottom: token.margin,
     backgroundColor: token.colorBgElevated,
-    // backgroundColor: "red",
     borderRadius: token.borderRadius,
     width: "80%",
     maxWidth: "80%",
