@@ -45,6 +45,12 @@ public class ClassificationController {
         return assistant.classify(fieldName, chatId);
     }
 
+    /**
+     * 查询字段的分类分级信息（流式返回）
+     * @param fieldName
+     * @param chatId
+     * @return
+     */
     @RequestMapping(path="/chat/field", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chat(@RequestParam("field") String fieldName, @RequestParam(value = "chatId", required = true) String chatId) {
         return assistant.streamClassify(fieldName, chatId);
