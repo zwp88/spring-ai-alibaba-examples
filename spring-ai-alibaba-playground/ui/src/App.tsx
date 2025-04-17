@@ -95,7 +95,7 @@ const Independent: React.FC = () => {
           </a>
         </Tooltip>
       </Space>
-      <Space className={styles.bottomLinkWrapper}>
+      {/* <Space className={styles.bottomLinkWrapper}>
         <Tooltip title={"Question Feedback"}>
           <a
             href="https://github.com/springaialibaba/spring-ai-alibaba-examples/issues"
@@ -110,7 +110,7 @@ const Independent: React.FC = () => {
             <Button icon={<DingdingOutlined />} />
           </a>
         </Tooltip>
-      </Space>
+      </Space> */}
       <div className={styles.layout}>
         <FunctionMenu />
         {/* 菜单页面容器 */}
@@ -140,14 +140,11 @@ const Independent: React.FC = () => {
               </React.Fragment>
             ))}
           </Routes>
-        </div>
 
-        <Layout.Footer
-          className={styles.footer}
-          style={{ color: token.colorText }}
-        >
-          Copyright 2024-2026 By spring-ai-alibaba-community
-        </Layout.Footer>
+          <Layout.Footer className={styles.footer}>
+            © 2024-2025 Spring AI Alibaba Community
+          </Layout.Footer>
+        </div>
       </div>
     </>
   );

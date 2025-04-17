@@ -173,5 +173,11 @@ export const useStyle = createStyles(({ token, css }) => {
         transform: scale(1.05);
       }
     `,
+    bottomLinkWrapper: css`
+      position: absolute;
+      left: 20px;
+      bottom: 8px;
+      z-index: 10;
+    `,
   };
 });

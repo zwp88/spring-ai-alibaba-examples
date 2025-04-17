@@ -204,7 +204,6 @@ export const PlaceholderNode = ({ className, onPromptsItemClick }) => {
           description: {
             fontSize: 16,
             width: "1000px",
-            marginBottom: 16,
           },
         }}
         description="一个基于 Spring AI Alibaba 框架构建的 AI 助手，通过 RAG 技术嵌入了 Spring AI Alibaba 领域知识。"

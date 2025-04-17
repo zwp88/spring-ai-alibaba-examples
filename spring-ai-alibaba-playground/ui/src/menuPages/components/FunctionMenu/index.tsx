@@ -5,8 +5,18 @@ import {
   MenuUnfoldOutlined,
   CheckOutlined,
   CloseOutlined,
+  FormOutlined,
+  DingdingOutlined,
 } from "@ant-design/icons";
-import { Button, message, Select, Space, Typography, Input } from "antd";
+import {
+  Button,
+  message,
+  Select,
+  Space,
+  Typography,
+  Input,
+  Tooltip,
+} from "antd";
 import React, { useEffect, useState, useRef } from "react";
 import { useStyle } from "./style";
 import { useModelConfigContext } from "../../../stores/modelConfig.store";
@@ -278,6 +288,23 @@ const FunctionMenu = () => {
             ))}
           </div>
         </div>
+
+        <Space className={styles.bottomLinkWrapper}>
+          <Tooltip title={"Question Feedback"}>
+            <a
+              href="https://github.com/springaialibaba/spring-ai-alibaba-examples/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button icon={<FormOutlined />} />
+            </a>
+          </Tooltip>
+          <Tooltip title={"Contact Us"}>
+            <a target="_blank" rel="noopener noreferrer">
+              <Button icon={<DingdingOutlined />} />
+            </a>
+          </Tooltip>
+        </Space>
       </div>
     </>
   );

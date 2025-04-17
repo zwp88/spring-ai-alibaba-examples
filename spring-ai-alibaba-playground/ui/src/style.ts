@@ -15,31 +15,28 @@ export const useStyle = createStyles(({ token, css }) => {
       z-index: 10;
     `,
     layout: css`
-      /* width: 100%; */
-      /* min-width: 1000px; */
-      height: calc(100vh - 56px);
+      /* height: calc(100vh - 56px); */
+      height: 100vh;
       border-radius: ${token.borderRadius}px;
       display: flex;
       background: ${token.colorBgContainer};
       font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
       overflow-x: hidden;
-      /* position: relative; */
 
       .ant-prompts {
         color: ${token.colorText};
       }
     `,
     footer: css`
-      position: fixed;
+      position: absolute;
       left: 0;
       bottom: 0;
       width: 100%;
       text-align: center;
-      padding: 16px 50px;
-      color: rgba(0, 0, 0, 0.45);
+      color: ${token.colorText};
       background-color: rgba(0, 0, 0, 0.02);
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-      /* background-color: ${token.colorBgElevated}; */
+      font-family: ${token.fontFamily};
+      background: transparent;
     `,
     logo: css`
       display: flex;
