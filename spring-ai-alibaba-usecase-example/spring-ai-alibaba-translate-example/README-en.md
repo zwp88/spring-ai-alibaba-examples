@@ -1,6 +1,6 @@
 # Spring AI Alibaba Translate Example
 
-English | [中文](./README.md)
+English | [中文](README.md)
 
 This project demonstrates the integration of Spring Boot with AI capabilities using Spring AI and Spring AI Alibaba libraries to perform text translation, leveraging various model providers such as Ollama and DashScope.
 
@@ -138,4 +138,4 @@ curl "http://localhost:8080/api/dashscope/translate/simple?text=你好，世界�
 
 ## License
 
-This project is licensed under the Apache License 2.0. See the [LICENSE](../LICENSE) file for details. 
+This project is licensed under the Apache License 2.0. See the [LICENSE](../../LICENSE) file for details. 
