@@ -16,7 +16,7 @@ export const useStyles = createStyles(({ token, css }) => {
     `,
     rightPanel: css`
       width: 67%;
-      height: 100%;
+      /* height: 100%; */
       padding-left: 8px;
     `,
     card: css`
