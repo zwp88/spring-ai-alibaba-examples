@@ -1,6 +1,6 @@
 # Spring AI Alibaba Translate Example
 
-[English](./README-en.md) | 中文
+[English](README-en.md) | 中文
 
 本项目演示了如何使用 Spring AI 和 Spring AI Alibaba 库集成多种大模型提供翻译服务，支持 Ollama 和 DashScope 等多种模型提供商。
 
@@ -138,4 +138,4 @@ curl "http://localhost:8080/api/dashscope/translate/simple?text=你好，世界�
 
 ## 许可证
 
-本项目基于 Apache License 2.0 许可证。详情请参阅 [LICENSE](../LICENSE) 文件。
+本项目基于 Apache License 2.0 许可证。详情请参阅 [LICENSE](../../LICENSE) 文件。
