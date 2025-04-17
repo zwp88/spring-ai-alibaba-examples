@@ -1,6 +1,11 @@
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
-import { actualThemeAtom, setupThemeListener, themeModeAtom, ThemeMode } from '../stores/theme.store';
+import { useAtom } from "jotai";
+import { useEffect } from "react";
+import {
+  actualThemeAtom,
+  setupThemeListener,
+  themeModeAtom,
+  ThemeMode,
+} from "../stores/theme.store";
 
 export const useTheme = () => {
   const [themeMode, setThemeMode] = useAtom(themeModeAtom);
@@ -8,16 +13,16 @@ export const useTheme = () => {
 
   // 在组件挂载时设置监听器
   useEffect(() => {
-    if (themeMode === 'system') {
+    if (themeMode === "system") {
       return setupThemeListener(() => {
-        setThemeMode('system');
+        setThemeMode("system");
       });
     }
   }, [themeMode, setThemeMode]);
 
   // 切换主题的函数
   const toggleTheme = () => {
-    setThemeMode(prev => prev === 'dark' ? 'light' : 'dark');
+    setThemeMode((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
   // 设置特定主题的函数
@@ -26,9 +31,9 @@ export const useTheme = () => {
   };
 
   return {
-    themeMode,     
-    actualTheme,   
-    toggleTheme,   
-    setTheme,      
+    themeMode,
+    actualTheme,
+    toggleTheme,
+    setTheme,
   };
-}; 
+};
