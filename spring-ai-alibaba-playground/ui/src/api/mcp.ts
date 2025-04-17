@@ -1,4 +1,4 @@
-import { BASE_URL } from "../constant";
+import { BASE_URL } from "../const";
 
 interface McpResponse {
   data: string;
@@ -12,7 +12,7 @@ export const getMcp = async (
 ): Promise<McpResponse> => {
   try {
     const res = await fetch(
-      BASE_URL + "/api/v1/mcp?prompt=" + encodeURIComponent(prompt),
+      BASE_URL + "/mcp?prompt=" + encodeURIComponent(prompt),
       {
         method: "GET",
         headers: {
