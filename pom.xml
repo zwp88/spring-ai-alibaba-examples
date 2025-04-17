@@ -76,7 +76,7 @@
 		<module>spring-ai-alibaba-text-classification-example</module>
 		<module>spring-ai-alibaba-chat-memory-example</module>
 		<module>spring-ai-alibaba-translate-example</module>
-	</modules>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>
