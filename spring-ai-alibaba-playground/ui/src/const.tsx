@@ -25,7 +25,7 @@ import { FunctionMenuItem } from "./types";
 import { Bubble, Prompts, Welcome } from "@ant-design/x";
 import { Space, GetProp, Tag, message, Typography, Image, Button } from "antd";
 import ReactMarkdown from "react-markdown";
-import ChatPage from "./menuPages/ChatPage";
+import ChatPage from "./menuPages/chatPage";
 import { MenuPage } from "./stores/functionMenu.store";
 
 export const BASE_URL = "/api/v1";
