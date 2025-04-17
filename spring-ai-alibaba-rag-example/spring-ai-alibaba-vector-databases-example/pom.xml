@@ -14,7 +14,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>vector-simple-example</module>
-        <module>vector-elasticsearch-example</module>
         <module>vector-redis-example</module>
     </modules>
 
