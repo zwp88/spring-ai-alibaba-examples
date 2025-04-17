@@ -27,6 +27,7 @@
 		<module>spring-ai-alibaba-text-classification-example</module>
 		<module>spring-ai-alibaba-text-summarizer-example</module>
 		<module>spring-ai-alibaba-translate-example</module>
+		<module>spring-ai-alibaba-classification-grading-example</module>
 	</modules>
 
 </project>
