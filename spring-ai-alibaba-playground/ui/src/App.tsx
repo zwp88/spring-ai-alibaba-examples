@@ -140,7 +140,6 @@ const Independent: React.FC = () => {
               </React.Fragment>
             ))}
           </Routes>
-
           <Layout.Footer className={styles.footer}>
             © 2024-2025 Spring AI Alibaba Community
           </Layout.Footer>

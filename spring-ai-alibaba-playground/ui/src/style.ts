@@ -32,11 +32,14 @@ export const useStyle = createStyles(({ token, css }) => {
       left: 0;
       bottom: 0;
       width: 100%;
+      height: 20px;
+      line-height: 18px;
+      padding: 20px 0;
       text-align: center;
       color: ${token.colorText};
       background-color: rgba(0, 0, 0, 0.02);
       font-family: ${token.fontFamily};
-      background: transparent;
+      background: ${token.colorBgContainer};
     `,
     logo: css`
       display: flex;
