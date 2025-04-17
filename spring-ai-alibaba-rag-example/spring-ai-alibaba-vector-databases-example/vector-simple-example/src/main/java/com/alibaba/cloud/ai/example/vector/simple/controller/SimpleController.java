@@ -23,8 +23,8 @@ public class SimpleController {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleController.class);
     private final SimpleVectorStore simpleVectorStore;
-    private final String SAVE_PATH = System.getProperty("user.dir") + "/spring-ai-alibaba-vector-databases-example/simple-example/src/main/resources/save.json";
-    public SimpleController(EmbeddingModel embeddingModel) {
+    private final String SAVE_PATH = System.getProperty("user.dir") + "/spring-ai-alibaba-rag-example" +"/spring-ai-alibaba-vector-databases-example/vector-simple-example/src/main/resources/save.json";
+    public SimpleController(EmbeddingModel embeddingModel) {// /Users/guotao/IdeaProjects/spring-ai-alibaba-examples/spring-ai-alibaba-rag-example/spring-ai-alibaba-vector-databases-example/vector-simple-example/src/main/resources/save.json
         this.simpleVectorStore = SimpleVectorStore
                 .builder(embeddingModel).build();
     }
