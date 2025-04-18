@@ -11,8 +11,7 @@ export const getRag = async (
 ): Promise<Response> => {
   const { chatId } = params || {};
 
-  const url = new URL(BASE_URL + "/api/v1/rag");
-  url.searchParams.append("prompt", prompt);
+  const url = BASE_URL + "/rag?prompt=" + encodeURIComponent(prompt);
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",

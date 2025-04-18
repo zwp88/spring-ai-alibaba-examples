@@ -55,6 +55,7 @@ export const useStyles = createStyles(({ token, css }) => ({
   `,
   masonryColumn: css`
     padding-left: 16px;
+    margin-bottom: 64px;
     background-clip: padding-box;
   `,
   imageGallery: css`

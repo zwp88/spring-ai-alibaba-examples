@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { throttle } from "./utils";
 
 export const useDebounce = <T extends (...args: any[]) => any>(
   fn: T,
@@ -26,9 +25,4 @@ export const useDebounce = <T extends (...args: any[]) => any>(
   }, []);
 
   return debouncedFn as T;
-};
-
-export const useThrottle = (func: (...args: any[]) => void, time: number) => {
-  const throttledFunc = throttle(func, time);
-  return throttledFunc;
 };

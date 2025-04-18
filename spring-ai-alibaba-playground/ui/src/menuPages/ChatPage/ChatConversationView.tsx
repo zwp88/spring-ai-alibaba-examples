@@ -25,7 +25,7 @@ import {
 } from "./types";
 import ResponseBubble from "../components/ResponseBubble";
 import RequestBubble from "../components/RequestBubble";
-import { useThrottle } from "../../hooks";
+import { useThrottle } from "../../hooks/useThrottle";
 
 const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   conversationId,
@@ -36,8 +36,8 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   const [inputContent, setInputContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isFileUploadEnabled, setIsFileUploadEnabled] = useState(false);
-  const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
+  // const [isFileUploadEnabled, setIsFileUploadEnabled] = useState(false);
+  // const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { currentModel } = useModelConfigContext();
@@ -298,26 +298,26 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   };
 
   // 处理文件上传变化
-  const handleFileChange = (info: any) => {
-    if (
-      info.fileList?.length > 0 &&
-      litFileSize(info.fileList?.[0]?.originFileObj as any, MAX_IMAGE_SIZE)
-    ) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const base64String = e.target?.result;
-        // 暂存图片 base64
-        window.tempImageBase64 = base64String as string;
-      };
-      reader.readAsDataURL(info.fileList?.[0]?.originFileObj as File);
+  // const handleFileChange = (info: any) => {
+  //   if (
+  //     info.fileList?.length > 0 &&
+  //     litFileSize(info.fileList?.[0]?.originFileObj as any, MAX_IMAGE_SIZE)
+  //   ) {
+  //     const reader = new FileReader();
+  //     reader.onload = function (e) {
+  //       const base64String = e.target?.result;
+  //       // 暂存图片 base64
+  //       window.tempImageBase64 = base64String as string;
+  //     };
+  //     reader.readAsDataURL(info.fileList?.[0]?.originFileObj as File);
 
-      setAttachedFiles(info.fileList);
-    }
+  //     setAttachedFiles(info.fileList);
+  //   }
 
-    if (info.fileList?.length === 0) {
-      setAttachedFiles(info.fileList);
-    }
-  };
+  //   if (info.fileList?.length === 0) {
+  //     setAttachedFiles(info.fileList);
+  //   }
+  // };
 
   // 创建附件上传区域
   // const senderHeader = (

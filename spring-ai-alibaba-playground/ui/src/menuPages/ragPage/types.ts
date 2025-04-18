@@ -8,4 +8,12 @@ export interface RagMessage {
   isError?: boolean;
 }
 
+export interface RagUiMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
+  isLoading?: boolean;
+  isError?: boolean;
+}
+
 export type { KnowledgeBase };

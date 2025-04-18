@@ -4,7 +4,6 @@ import { Sender } from "@ant-design/x";
 import { Card, message } from "antd";
 import { useStyles } from "./style";
 import GeneratedImage from "./components/GeneratedImage";
-import BasePage from "../components/BasePage";
 import { useConversationContext } from "../../stores/conversation.store";
 import { getImage } from "../../api/image";
 import RequestBubble from "../components/RequestBubble";
@@ -46,20 +45,6 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
       objectUrlsRef.current = [];
     };
   }, []);
-
-  // 立即滚动到底部
-  // const immediateScrollToBottom = useCallback(() => {
-  //   if (!messagesContainerRef.current) return;
-  //   const container = messagesContainerRef.current;
-  //   const lastMessage = container.lastElementChild as HTMLElement;
-
-  //   if (lastMessage) {
-  //     const lastMessageTop = lastMessage.offsetTop;
-  //     const lastMessageHeight = lastMessage.clientHeight;
-  //     container.scrollTop =
-  //       lastMessageTop + lastMessageHeight - container.clientHeight;
-  //   }
-  // }, []);
 
   // 监听消息变化，触发滚动
   useEffect(() => {

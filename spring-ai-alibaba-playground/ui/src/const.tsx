@@ -67,64 +67,6 @@ export const actionButtonConfig = [
   },
 ];
 
-export const functionMenuItems: FunctionMenuItem[] = [
-  {
-    key: "chat",
-    icon: <PlusOutlined />,
-    label: "对话",
-    render: (props: any) => {
-      const { item, styles, handleNewChat } = props;
-      return (
-        <Button
-          key={item?.key}
-          onClick={handleNewChat}
-          type="primary"
-          className={styles.newChatBtn}
-          icon={<PlusOutlined />}
-          block
-        >
-          新对话
-        </Button>
-      );
-    },
-  },
-  {
-    key: "image-gen",
-    icon: <PictureOutlined />,
-    label: "图像生成",
-  },
-  {
-    key: "doc-summary",
-    icon: <ReadOutlined />,
-    label: "文档总结",
-  },
-  // {
-  //   key: "multi-modal",
-  //   icon: <PictureOutlined />,
-  //   label: "多模态",
-  // },
-  {
-    key: "tool-calling",
-    icon: <ToolOutlined />,
-    label: "Tool Calling",
-  },
-  {
-    key: "rag",
-    icon: <DatabaseOutlined />,
-    label: "RAG",
-  },
-  {
-    key: "mcp",
-    icon: <ApiOutlined />,
-    label: "MCP",
-  },
-  // {
-  //   key: "more-examples",
-  //   icon: <PhoneOutlined />,
-  //   label: "更多案例",
-  // },
-];
-
 const renderTitle = (icon: React.ReactElement, title: string) => (
   <Space align="start">
     {icon}
@@ -137,43 +79,46 @@ export const placeholderPromptsItems: GetProp<typeof Prompts, "items"> = [
     key: "1",
     label: renderTitle(
       <ReadOutlined style={{ color: "#1890FF" }} />,
-      "User Guide"
+      "用户指南"
     ),
     description: "",
     children: [
       {
         key: "2-1",
         icon: <HeartOutlined />,
-        description: `Build a chatbot using Spring Ai Alibaba?`,
+        description: `如何使用 Spring AI Alibaba 构建聊天机器人？`,
       },
       {
         key: "2-2",
         icon: <SmileOutlined />,
-        description: `How to use RAG in Spring Ai Alibaba?`,
+        description: `如何在 Spring AI Alibaba 中使用 RAG？`,
       },
       {
         key: "2-3",
         icon: <CommentOutlined />,
-        description: `What are best practices for using Spring Ai Alibaba?`,
+        description: `使用 Spring AI Alibaba 的最佳实践有哪些？`,
       },
     ],
   },
   {
     key: "2",
-    label: renderTitle(<FireOutlined style={{ color: "#FF4D4F" }} />, "Q&A"),
+    label: renderTitle(
+      <FireOutlined style={{ color: "#FF4D4F" }} />,
+      "常见问题"
+    ),
     description: "",
     children: [
       {
         key: "1-1",
-        description: `Does Spring AI Alibaba support workflow and multi-agent?`,
+        description: `Spring AI Alibaba 是否支持工作流和多智能体？`,
       },
       {
         key: "1-2",
-        description: `The relation between Spring AI and Spring AI Alibaba?`,
+        description: `Spring AI 和 Spring AI Alibaba 之间的关系是什么？`,
       },
       {
         key: "1-3",
-        description: `Where can I contribute?`,
+        description: `我可以在哪里参与贡献？`,
       },
     ],
   },
@@ -185,7 +130,7 @@ export const defaultConversationsItems = [
     key: defaultKey,
     label: (
       <span>
-        Conversation 1
+        对话 1
         <Tag style={{ marginLeft: 8 }} color="green">
           {DEFAULT_MODEL}
         </Tag>
@@ -254,11 +199,17 @@ export const PlaceholderNode = ({ className, onPromptsItemClick }) => {
       <Welcome
         variant="borderless"
         icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-        title="Hello, I'm Spring Ai Alibaba"
-        description="An AI assistant built with Spring AI Alibaba framework, with embedded Spring AI Alibaba domain knowledge using RAG. Supports text and image user input, audio generation, and image generation."
+        title="你好，我是 Spring AI Alibaba"
+        styles={{
+          description: {
+            fontSize: 16,
+            width: "1000px",
+          },
+        }}
+        description="一个基于 Spring AI Alibaba 框架构建的 AI 助手，通过 RAG 技术嵌入了 Spring AI Alibaba 领域知识。"
       />
       <Prompts
-        title="What do you want?"
+        // title="你想了解什么？"
         items={placeholderPromptsItems}
         styles={{
           list: {

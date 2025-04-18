@@ -5,16 +5,26 @@ import {
   MenuUnfoldOutlined,
   CheckOutlined,
   CloseOutlined,
+  FormOutlined,
+  DingdingOutlined,
 } from "@ant-design/icons";
-import { Button, message, Select, Space, Typography, Input } from "antd";
+import {
+  Button,
+  message,
+  Select,
+  Space,
+  Typography,
+  Input,
+  Tooltip,
+} from "antd";
 import React, { useEffect, useState, useRef } from "react";
-import { useStyle } from "../../../style";
+import { useStyle } from "./style";
 import { useModelConfigContext } from "../../../stores/modelConfig.store";
 import {
   Conversation,
   useConversationContext,
 } from "../../../stores/conversation.store";
-import { functionMenuItems } from "../../../const";
+import { functionMenuItems } from "./const";
 import { useFunctionMenuStore } from "../../../stores/functionMenu.store";
 import { useNavigate } from "react-router-dom";
 
@@ -23,9 +33,7 @@ export interface ConversationItem {
   label: React.ReactNode;
 }
 
-export interface MenuProps {}
-
-const FunctionMenu = (props: MenuProps) => {
+const FunctionMenu = () => {
   const { styles } = useStyle();
   const { menuCollapsed, toggleMenuCollapsed } = useFunctionMenuStore();
   const {
@@ -88,7 +96,7 @@ const FunctionMenu = (props: MenuProps) => {
     navigate("/chat");
   };
 
-  // 开始编辑会话标题
+  // 编辑会话标题
   const startEditingTitle = (
     conversation: Conversation,
     e: React.MouseEvent
@@ -96,7 +104,7 @@ const FunctionMenu = (props: MenuProps) => {
     e.stopPropagation();
     setEditingConversationId(conversation.id);
     setEditingTitle(conversation.title);
-    // 等待DOM更新后聚焦输入框
+    // 等待 DOM 更新后聚焦输入框
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus();
@@ -280,6 +288,23 @@ const FunctionMenu = (props: MenuProps) => {
             ))}
           </div>
         </div>
+
+        <Space className={styles.bottomLinkWrapper}>
+          <Tooltip title={"Question Feedback"}>
+            <a
+              href="https://github.com/springaialibaba/spring-ai-alibaba-examples/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button icon={<FormOutlined />} />
+            </a>
+          </Tooltip>
+          <Tooltip title={"Contact Us"}>
+            <a target="_blank" rel="noopener noreferrer">
+              <Button icon={<DingdingOutlined />} />
+            </a>
+          </Tooltip>
+        </Space>
       </div>
     </>
   );

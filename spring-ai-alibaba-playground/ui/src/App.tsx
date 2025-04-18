@@ -95,7 +95,7 @@ const Independent: React.FC = () => {
           </a>
         </Tooltip>
       </Space>
-      <Space className={styles.bottomLinkWrapper}>
+      {/* <Space className={styles.bottomLinkWrapper}>
         <Tooltip title={"Question Feedback"}>
           <a
             href="https://github.com/springaialibaba/spring-ai-alibaba-examples/issues"
@@ -110,11 +110,11 @@ const Independent: React.FC = () => {
             <Button icon={<DingdingOutlined />} />
           </a>
         </Tooltip>
-      </Space>
+      </Space> */}
       <div className={styles.layout}>
         <FunctionMenu />
         {/* 菜单页面容器 */}
-        <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+        <div className={styles.menuPagesWrapper}>
           <Routes>
             <Route path="/" element={<Navigate to="/chat" replace />} />
             {Object.entries(pageComponents).map(([key, Component]) => (
@@ -123,18 +123,7 @@ const Independent: React.FC = () => {
                 <Route
                   path={`/${key}`}
                   element={
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        transition: "none",
-                        backgroundColor: token.colorBgContainer,
-                        overflowY: "auto",
-                      }}
-                    >
+                    <div className={styles.pageWrapper}>
                       <Component />
                     </div>
                   }
@@ -143,18 +132,7 @@ const Independent: React.FC = () => {
                 <Route
                   path={`/${key}/:conversationId`}
                   element={
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        transition: "none",
-                        backgroundColor: token.colorBgContainer,
-                        overflowY: "auto",
-                      }}
-                    >
+                    <div className={styles.pageWrapper}>
                       <Component />
                     </div>
                   }
@@ -162,15 +140,10 @@ const Independent: React.FC = () => {
               </React.Fragment>
             ))}
           </Routes>
+          <Layout.Footer className={styles.footer}>
+            © 2024-2025 Spring AI Alibaba Community
+          </Layout.Footer>
         </div>
-
-        {/* 页脚始终显示 */}
-        <Layout.Footer
-          className={styles.footer}
-          style={{ color: token.colorText }}
-        >
-          Copyright 2024-2026 By spring-ai-alibaba-community
-        </Layout.Footer>
       </div>
     </>
   );
