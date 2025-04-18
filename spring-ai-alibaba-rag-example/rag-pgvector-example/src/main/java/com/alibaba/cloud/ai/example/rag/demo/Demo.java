@@ -87,19 +87,19 @@ public class Demo {
      */
     @GetMapping("/rag/importText")
     public ResponseEntity<String> insertText(@RequestParam("text") String text) {
-        //1、parameter verification
+        // 1.parameter verification
         if (!StringUtils.hasText(text)){
             return ResponseEntity.badRequest().body("Please enter text");
         }
-        //2、parse document
+        // 2.parse document
         List<Document> documents = List.of(new Document(text));
 
-        //3、Splitting Text
+        // 3.Splitting Text
         List<Document> splitDocuments = new TokenTextSplitter().apply(documents);
 
-        //4、create embedding and store to vector store
+        // 4.create embedding and store to vector store
         vectorStore.add(splitDocuments);
-        //5、return success prompt
+        // 5.return success prompt
         String msg = String.format("successfully inserted %d text fragments into vector store", splitDocuments.size());
         return ResponseEntity.ok(msg);
     }
@@ -124,7 +124,7 @@ public class Demo {
         // 4. create embedding and store to vector store
         vectorStore.add(splitDocs);
 
-        //5、return success prompt
+        // 5.return success prompt
         String msg = String.format("successfully inserted %d text fragments into vector store", splitDocs.size());
         return ResponseEntity.ok(msg);
     }
