@@ -1,12 +1,11 @@
 import {
   LinkOutlined,
   GithubOutlined,
-  FormOutlined,
-  DingdingOutlined,
   BulbOutlined,
   BulbFilled,
   WechatWorkOutlined,
   SnippetsOutlined,
+  FormOutlined,
   DingtalkOutlined,
 } from "@ant-design/icons";
 import {
@@ -113,7 +112,7 @@ const Independent: React.FC = () => {
             <Button icon={<GithubOutlined />} />
           </a>
         </Tooltip>
-        <Tooltip title={"Spring AI Alibaba WebSite"}>
+        <Tooltip title={"官方文档"}>
           <a
             href="https://java2ai.com"
             target="_blank"
@@ -139,11 +138,7 @@ const Independent: React.FC = () => {
           </a>
         </Tooltip>
       </Space> */}
-      <Space>
-        <Tooltip title={"Contact Us By WeChat"}>
-          <Button icon={<WechatWorkOutlined />} onClick={showWeChatModal} />
-        </Tooltip>
-      </Space>
+
       <div className={styles.layout}>
         <FunctionMenu />
         {/* 菜单页面容器 */}
