@@ -105,17 +105,23 @@ public final class McpServerUtils {
 
 		mcpServerConfig.getMcpServers().forEach((key, parameters) -> {
 
-			System.out.println("==================fdsfdsfad ==================");
+			List<McpServer.Tools> toolsList = new ArrayList<>();
 			for (FunctionCallback toolCallback : toolCallbackProvider.getToolCallbacks()) {
-				System.out.println(toolCallback.getName());
-				System.out.println(toolCallback.getDescription());
+
+				McpServer.Tools tool = new McpServer.Tools();
+				tool.setDesc(toolCallback.getDescription());
+				tool.setName(toolCallback.getName());
+				tool.setParams(toolCallback.getInputTypeSchema());
+
+				toolsList.add(tool);
 			}
 
 			McpServerContainer.addServer(McpServer.builder()
 					.id(getId())
 					.name(key)
+					.env(parameters.env())
 					.desc(mcpServerDescMap.get(key))
-					.toolList(new ArrayList<>())
+					.toolList(toolsList)
 					.build()
 			);
 		});

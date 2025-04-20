@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.autoconfigure.mcp.client.StdioTransportAutoConfiguration;
 import org.springframework.ai.autoconfigure.mcp.client.properties.McpStdioClientProperties;
-import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.io.ByteArrayResource;
@@ -56,7 +55,6 @@ public class McpStdioTransportConfigurationBeanPostProcessor implements BeanPost
 
 	public McpStdioTransportConfigurationBeanPostProcessor(
 			ObjectMapper objectMapper,
-			ToolCallbackProvider toolCallbackProvider,
 			McpStdioClientProperties mcpStdioClientProperties
 	) {
 		this.objectMapper = objectMapper;
