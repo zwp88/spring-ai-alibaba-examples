@@ -16,13 +16,12 @@
  */
 package com.alibaba.cloud.ai.application.config;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 import com.alibaba.cloud.ai.application.entity.mcp.McpServerConfig;
 import com.alibaba.cloud.ai.application.exception.SAAAppException;
-import com.alibaba.cloud.ai.application.utils.McpServerUtils;
+import com.alibaba.cloud.ai.application.mcp.McpServerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -30,12 +29,13 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.autoconfigure.mcp.client.StdioTransportAutoConfiguration;
 import org.springframework.ai.autoconfigure.mcp.client.properties.McpStdioClientProperties;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+
+import static com.alibaba.cloud.ai.application.mcp.McpServerUtils.getMcpLibsAbsPath;
 
 /**
  * @author brianxiadong
@@ -56,9 +56,9 @@ public class McpStdioTransportConfigurationBeanPostProcessor implements BeanPost
 
 	public McpStdioTransportConfigurationBeanPostProcessor(
 			ObjectMapper objectMapper,
+			ToolCallbackProvider toolCallbackProvider,
 			McpStdioClientProperties mcpStdioClientProperties
 	) {
-
 		this.objectMapper = objectMapper;
 		this.mcpStdioClientProperties = mcpStdioClientProperties;
 	}
@@ -105,30 +105,6 @@ public class McpStdioTransportConfigurationBeanPostProcessor implements BeanPost
 		}
 
 		return bean;
-	}
-
-	private String getMcpLibsAbsPath(String jarName) {
-
-		File file = new File(jarName);
-		if (new File(jarName).isAbsolute()) {
-			return file.getAbsolutePath();
-		}
-
-		try {
-			Resource resource = new ClassPathResource(jarName);
-			File fileResource = resource.getFile();
-
-			if (fileResource.exists()) {
-				return fileResource.getAbsolutePath();
-			}
-			else {
-				logger.error("File not found: {}", fileResource.getAbsolutePath());
-				return null;
-			}
-		}
-		catch (IOException e) {
-			throw new SAAAppException(e.getMessage());
-		}
 	}
 
 }

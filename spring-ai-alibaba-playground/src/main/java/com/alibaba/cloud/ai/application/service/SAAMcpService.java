@@ -16,15 +16,17 @@
  */
 package com.alibaba.cloud.ai.application.service;
 
-import com.alibaba.cloud.ai.application.entity.result.Result;
-import com.alibaba.cloud.ai.application.entity.tools.ToolCallResp;
-import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
+import com.alibaba.cloud.ai.application.entity.tools.ToolCallResp;
+import com.alibaba.cloud.ai.application.mcp.McpServerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
@@ -38,13 +40,6 @@ import org.springframework.ai.model.tool.ToolExecutionResult;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 /**
  * @author brianxiadong
@@ -62,31 +57,33 @@ public class SAAMcpService {
 			ToolCallbackProvider tools,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
 			ToolCallingManager toolCallingManager,
-			MessageChatMemoryAdvisor messageChatMemoryAdvisor,
 			@Qualifier("openAiChatModel") ChatModel chatModel
-	) {
+	) throws IOException {
 
 		// Initialize chat client with non-blocking configuration
 		this.chatClient = ChatClient.builder(chatModel)
 				.defaultAdvisors(
-//						messageChatMemoryAdvisor,
 						simpleLoggerAdvisor
 				).defaultTools(tools)
 				.build();
 		this.tools = tools;
 		this.toolCallingManager = toolCallingManager;
+
+		McpServerUtils.initMcpServerContainer(tools);
 	}
 
 	public ToolCallResp chat(String prompt) {
+
+		System.out.println("===========================fdsasfdsfsafaasf ===================");
+		// System.out.println(tools.getToolCallbacks()[0].getName());
 
 		// manual run tools flag
 		ChatOptions chatOptions = ToolCallingChatOptions.builder()
 				.toolCallbacks(tools.getToolCallbacks())
 				.internalToolExecutionEnabled(false)
 				.build();
-		Prompt userPrompt = new Prompt(prompt, chatOptions);
 
-		ChatResponse response = chatClient.prompt(userPrompt)
+		ChatResponse response = chatClient.prompt(new Prompt(prompt, chatOptions))
 				.call().chatResponse();
 
 		logger.debug("ChatResponse: {}", response);

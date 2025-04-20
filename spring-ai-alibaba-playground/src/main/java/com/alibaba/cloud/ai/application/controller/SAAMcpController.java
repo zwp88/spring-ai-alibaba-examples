@@ -16,17 +16,19 @@
  */
 package com.alibaba.cloud.ai.application.controller;
 
+import java.util.List;
+
 import com.alibaba.cloud.ai.application.annotation.UserIp;
+import com.alibaba.cloud.ai.application.entity.mcp.McpServer;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.entity.tools.ToolCallResp;
+import com.alibaba.cloud.ai.application.mcp.McpServerContainer;
 import com.alibaba.cloud.ai.application.service.SAAMcpService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,6 +56,14 @@ public class SAAMcpController {
     ) {
 
         return Result.success(mcpService.chat(prompt));
+    }
+
+    @UserIp
+    @GetMapping("/mcp-list")
+    @Operation(summary = "MCP List")
+    public Result<List<McpServer>> mcpList() {
+
+        return Result.success(McpServerContainer.getAllServers());
     }
 
 }

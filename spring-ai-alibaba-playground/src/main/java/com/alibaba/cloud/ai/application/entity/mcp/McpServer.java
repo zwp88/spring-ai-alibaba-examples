@@ -96,4 +96,40 @@ public class McpServer {
 
 		return sb.toString();
 	}
+
+	public static McpServerBuilder builder() {
+		return new McpServerBuilder();
+	}
+
+	public static class McpServerBuilder {
+
+		private McpServer mcpServer = new McpServer();
+
+		public McpServerBuilder() {}
+
+		public McpServerBuilder id(String id) {
+			this.mcpServer.id = id;
+			return this;
+		}
+
+		public McpServerBuilder name(String name) {
+			this.mcpServer.name = name;
+			return this;
+		}
+
+		public McpServerBuilder desc(String desc) {
+			this.mcpServer.desc = desc;
+			return this;
+		}
+
+		public McpServerBuilder toolList(List<Tools> toolList) {
+			this.mcpServer.toolList = toolList;
+			return this;
+		}
+
+		public McpServer build() {
+			return this.mcpServer;
+		}
+	}
+
 }
