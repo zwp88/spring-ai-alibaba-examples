@@ -64,6 +64,9 @@ export const useStyle = createStyles(({ token, css }) => {
         transition: height 0.3s ease, max-height 0.3s ease;
         min-height: 56px;
       }
+      .ant-sender-content {
+        background: ${token.colorBgElevated};
+      }
     `,
     actionButtons: css`
       display: flex;

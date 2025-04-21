@@ -102,11 +102,7 @@ const FunctionMenu = () => {
   };
 
   const handleNewChat = () => {
-    const newConversation = createConversation(MenuPage.Chat, []);
-    if (newConversation) {
-      chooseActiveConversation(newConversation.id);
-      navigate(`/chat/${newConversation.id}`);
-    }
+    navigate("/chat");
   };
 
   // 编辑会话标题
