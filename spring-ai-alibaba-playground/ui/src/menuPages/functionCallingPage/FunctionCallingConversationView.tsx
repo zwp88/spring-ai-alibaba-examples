@@ -15,6 +15,7 @@ import ResponseBubble from "../components/ResponseBubble";
 import RequestBubble from "../components/RequestBubble";
 import { Message } from "../chatPage/types";
 import { useStyles } from "./style";
+import { getToolCalling } from "../../api/toolCalling";
 
 interface FunctionCallingConversationViewProps {
   conversationId: string;
@@ -114,22 +115,6 @@ const FunctionCallingConversationView = ({
     }
   }, [location.search, activeConversation]);
 
-  const updateConversationMessages = (
-    messageContent: string,
-    role: "assistant",
-    isError: boolean = false,
-    userTimestamp: number,
-    userMessage: FunctionCallingUiMessage
-  ) => {
-    appendAssistantMessage(
-      messageContent,
-      role,
-      isError,
-      userTimestamp,
-      userMessage
-    );
-  };
-
   const handleSendMessage = async (text: string) => {
     const createMessage = (
       text: string,
@@ -145,24 +130,26 @@ const FunctionCallingConversationView = ({
       userTimestamp: number,
       userMessage: FunctionCallingUiMessage
     ) => {
-      const response = await getMcp(text, conversationId);
-      if (response.code !== 10000 || !response.data) {
-        throw new Error(response.message || "获取数据失败");
-      }
-      // TODO: 目前接口还没定下来，这里的类型问题暂时忽略
-      // @ts-ignore
-      const isToolCall = response.data.toolName;
-      if (isToolCall) {
-        // TODO: 加入一个工具调用节点, 而且还需要是阻塞下方消息正文渲染的
+      const result = await getToolCalling(text, conversationId);
+
+      // 如果是工具调用，可以先显示工具调用的中间状态
+      if (result.toolName) {
+        appendAssistantMessage(
+          `正在调用工具: ${result.toolName}\n参数: ${result.toolParameters}`,
+          "assistant",
+          false,
+          userTimestamp,
+          userMessage
+        );
       }
 
-      // @ts-ignore
-      const responseText = response.data.toolResult as string;
-
-      updateConversationMessages(
+      // 显示最终结果
+      const responseText =
+        result.toolResult || result.toolResponse || "工具调用失败";
+      appendAssistantMessage(
         responseText,
         "assistant",
-        false,
+        result.status !== "SUCCESS",
         userTimestamp,
         userMessage
       );
