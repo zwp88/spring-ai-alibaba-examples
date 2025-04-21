@@ -1,63 +1,119 @@
 import { BASE_URL } from "../const";
 
-interface McpResponse {
-  data: string;
+// Define the structure for a single MCP Server based on backend response
+export interface McpServer {
+  id: string;
+  name: string;
+  description: string;
+  // Add other relevant fields if available from the API
+}
+
+// Define the structure for the response of the list endpoint
+interface McpListResponse {
+  data: McpServer[];
   code: number;
   message?: string;
 }
 
-export const getMcp = async (
-  prompt: string,
-  chatId: string
-): Promise<McpResponse> => {
+// Define the structure for the response of the run endpoint
+interface McpRunResponse {
+  data: any; // The data can be complex, handle appropriately
+  code: number;
+  message?: string;
+}
+
+// Function to fetch the list of MCP servers
+export const getMcpList = async (): Promise<McpListResponse> => {
   try {
-    const res = await fetch(
-      BASE_URL + "/mcp?prompt=" + encodeURIComponent(prompt),
-      {
-        method: "GET",
-        headers: {
-          chatId: chatId || "",
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const res = await fetch(`${BASE_URL}/mcp-list`, {
+      method: "GET",
+    });
 
     if (!res.ok) {
       throw new Error(`API request failed with status ${res.status}`);
     }
 
+    const data = await res.json();
+    return data as McpListResponse;
+  } catch (error) {
+    console.error("MCP List API call error:", error);
+    // Return a standard error format or rethrow
+    return {
+      code: -1, // Use a specific code for client-side errors
+      data: [],
+      message: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+};
+
+// Renamed and updated function to run a specific MCP server
+export const runMcp = async (
+  id: string, // Server ID
+  prompt: string,
+  envs?: string
+): Promise<McpRunResponse> => {
+  try {
+    // Corrected endpoint to match the backend controller
+    const res = await fetch(`${BASE_URL}/mcp-run`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        id: id,
+        prompt: prompt,
+        ...(envs ? { envs } : {}),
+      }),
+    });
+
+    if (!res.ok) {
+      // Attempt to read error message from response body
+      let errorBody = "Unknown error";
+      try {
+        const errorData = await res.json();
+        errorBody = errorData.message || JSON.stringify(errorData);
+      } catch (e) {
+        errorBody = await res.text();
+      }
+      throw new Error(
+        `API request failed with status ${res.status}: ${errorBody}`
+      );
+    }
+
     const text = await res.text();
-    let data;
+    let parsedData;
 
     try {
-      data = JSON.parse(text);
+      parsedData = JSON.parse(text);
     } catch (e) {
+      // If response is plain text
       return {
-        code: 0,
+        code: 0, // Assuming success if response is plain text
         data: text,
       };
     }
 
-    // 如果是JSON格式，检查是否有标准结构
-    if (data && typeof data === "object") {
-      if (data.code !== undefined) {
-        return data as McpResponse;
-      } else {
-        // 如果是其他JSON格式，包装为标准格式返回
-        return {
-          code: 0,
-          data: JSON.stringify(data),
-        };
-      }
+    // Check if the parsed data has the expected structure (data, code, message)
+    if (
+      parsedData &&
+      typeof parsedData === "object" &&
+      parsedData.code !== undefined
+    ) {
+      return parsedData as McpRunResponse;
+    } else {
+      // If it's some other JSON structure, wrap it in the data field
+      return {
+        code: 0, // Assuming success
+        data: parsedData,
+      };
     }
-
-    // 默认返回
-    return {
-      code: 0,
-      data: text,
-    };
   } catch (error) {
-    console.error("MCP API 调用错误:", error);
-    throw error;
+    console.error("MCP Run API call error:", error);
+    // Return a standard error format
+    return {
+      code: -1, // Use a specific code for client-side errors
+      data: null,
+      message: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 };

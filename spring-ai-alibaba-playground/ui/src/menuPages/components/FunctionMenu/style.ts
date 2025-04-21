@@ -90,6 +90,7 @@ export const useStyle = createStyles(({ token, css }) => {
       height: 100%;
       overflow: auto;
       padding-right: 2px;
+      margin-bottom: 48px;
     `,
     conversationItem: css`
       display: flex;

@@ -17,6 +17,7 @@ import {
 import { McpServerFormatted, McpToolFormatted } from "./types";
 import { useStyles } from "./style";
 import React, { useState, useEffect } from "react";
+import { getMcpList } from "../../api/mcp";
 
 const { TabPane } = Tabs;
 const { Item: FormItem } = Form;
@@ -44,11 +45,11 @@ const McpLandingView = () => {
       setIsFetchingServers(true);
       try {
         // TODO: 目前这是 MOCK 的
-        const serverData = await requestMcpServerList();
-        const parsedData = formatMcpServerListData(serverData);
-
-        setServerList([parsedData]);
-        setCurrentServer(parsedData);
+        const serverData = await getMcpList();
+        console.log("serverData", serverData);
+        // const parsedData = formatMcpServerListData(serverData);
+        // setServerList([parsedData]);
+        // setCurrentServer(parsedData);
       } catch (error) {
         console.error("Error loading MCP servers:", error);
         message.error("Failed to load MCP servers");
@@ -365,7 +366,7 @@ const McpLandingView = () => {
         </div>
       </div>
 
-      {/* TODO: 统一加一个过渡的动画，现在的页面切换看着有点生硬 */}
+      {/* 加载中 */}
       {isFetchingServers && (
         <div className={styles.loadingOverlay}>
           <Spin size="large" />

@@ -44,7 +44,7 @@ const CodeInfo = () => {
           </div>
         </div>
 
-        <div className={styles.documentationContainer}>
+        {/* <div className={styles.documentationContainer}>
           <h4>使用示例</h4>
           <p>你可以尝试询问以下类型的问题：</p>
           <ul>
@@ -52,7 +52,7 @@ const CodeInfo = () => {
             <li>RAG 的工作原理是什么？</li>
             <li>RAG 有哪些应用场景？</li>
           </ul>
-        </div>
+        </div> */}
       </div>
     </div>
   );

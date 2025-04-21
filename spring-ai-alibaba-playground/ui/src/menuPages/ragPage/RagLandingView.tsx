@@ -38,7 +38,7 @@ const RagLandingView = () => {
             value={inputContent}
             onChange={setInputContent}
             onSubmit={handleCreateConversation}
-            placeholder="请输入您想查询的内容，例如：什么是RAG？..."
+            placeholder="可以询问关于Spring AI Alibaba相关的问题..."
             className={styles.sender}
             loading={isLoading}
           />
