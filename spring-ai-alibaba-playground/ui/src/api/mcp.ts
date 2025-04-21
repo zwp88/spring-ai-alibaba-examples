@@ -1,28 +1,23 @@
 import { BASE_URL } from "../const";
 
-// Define the structure for a single MCP Server based on backend response
 export interface McpServer {
   id: string;
   name: string;
   description: string;
-  // Add other relevant fields if available from the API
 }
 
-// Define the structure for the response of the list endpoint
 interface McpListResponse {
   data: McpServer[];
   code: number;
   message?: string;
 }
 
-// Define the structure for the response of the run endpoint
 interface McpRunResponse {
-  data: any; // The data can be complex, handle appropriately
+  data: any;
   code: number;
   message?: string;
 }
 
-// Function to fetch the list of MCP servers
 export const getMcpList = async (): Promise<McpListResponse> => {
   try {
     const res = await fetch(`${BASE_URL}/mcp-list`, {
@@ -46,14 +41,12 @@ export const getMcpList = async (): Promise<McpListResponse> => {
   }
 };
 
-// Renamed and updated function to run a specific MCP server
 export const runMcp = async (
   id: string, // Server ID
   prompt: string,
   envs?: string
 ): Promise<McpRunResponse> => {
   try {
-    // Corrected endpoint to match the backend controller
     const res = await fetch(`${BASE_URL}/mcp-run`, {
       method: "POST",
       headers: {
@@ -86,14 +79,12 @@ export const runMcp = async (
     try {
       parsedData = JSON.parse(text);
     } catch (e) {
-      // If response is plain text
       return {
-        code: 0, // Assuming success if response is plain text
+        code: 0,
         data: text,
       };
     }
 
-    // Check if the parsed data has the expected structure (data, code, message)
     if (
       parsedData &&
       typeof parsedData === "object" &&
@@ -101,9 +92,8 @@ export const runMcp = async (
     ) {
       return parsedData as McpRunResponse;
     } else {
-      // If it's some other JSON structure, wrap it in the data field
       return {
-        code: 0, // Assuming success
+        code: 0,
         data: parsedData,
       };
     }
