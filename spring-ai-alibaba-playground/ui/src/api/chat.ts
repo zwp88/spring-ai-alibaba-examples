@@ -1,4 +1,4 @@
-import { BASE_URL } from "../constant";
+import { BASE_URL } from "../const";
 
 interface ChatParams {
   model?: string;
@@ -17,29 +17,32 @@ export const getChat = async (
   let res: Response;
   if (onlineSearch) {
     console.log("onlineSearch", onlineSearch);
-    res = await fetch(BASE_URL + "/search?query=" + prompt, {
-      method: "GET",
+    res = await fetch(BASE_URL + "/search", {
+      method: "POST",
       headers: {
-        model: model || "",
-        chatId: chatId || "",
+        "Content-Type": "application/json",
       },
+      body: prompt,
     });
     console.log("联网搜索响应状态:", res.status, res.statusText);
   } else if (deepThink) {
-    res = await fetch(BASE_URL + "/deep-thinking/chat?prompt=" + prompt, {
-      method: "GET",
+    res = await fetch(BASE_URL + "/deep-thinking/chat", {
+      method: "POST",
       headers: {
-        // model: model || "",
+        "Content-Type": "application/json",
         chatId: chatId || "",
       },
+      body: prompt,
     });
   } else {
-    res = await fetch(BASE_URL + "/chat?prompt=" + prompt, {
-      method: "GET",
+    res = await fetch(BASE_URL + "/chat", {
+      method: "POST",
       headers: {
+        "Content-Type": "application/json",
         model: model || "",
         chatId: chatId || "",
       },
+      body: prompt,
     });
   }
 
@@ -48,10 +51,9 @@ export const getChat = async (
     throw new Error("Failed to get response reader");
   }
 
-  console.log("reader", reader);
   await reader.read().then(function process({ done, value }) {
     if (done) return;
-    callback?.(value); // TODO: 支持打字机效果
+    callback?.(value);
     return reader.read().then(process);
   });
 

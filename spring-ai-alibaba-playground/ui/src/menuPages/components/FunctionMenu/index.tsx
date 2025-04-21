@@ -5,16 +5,28 @@ import {
   MenuUnfoldOutlined,
   CheckOutlined,
   CloseOutlined,
+  FormOutlined,
+  DingdingOutlined,
+  WechatWorkOutlined,
 } from "@ant-design/icons";
-import { Button, message, Select, Space, Typography, Input } from "antd";
+import {
+  Button,
+  message,
+  Select,
+  Space,
+  Typography,
+  Input,
+  Tooltip,
+  Modal,
+} from "antd";
 import React, { useEffect, useState, useRef } from "react";
-import { useStyle } from "../../../style";
+import { useStyle } from "./style";
 import { useModelConfigContext } from "../../../stores/modelConfig.store";
 import {
   Conversation,
   useConversationContext,
 } from "../../../stores/conversation.store";
-import { functionMenuItems } from "../../../constant";
+import { functionMenuItems } from "./const";
 import { useFunctionMenuStore } from "../../../stores/functionMenu.store";
 import { useNavigate } from "react-router-dom";
 
@@ -23,9 +35,7 @@ export interface ConversationItem {
   label: React.ReactNode;
 }
 
-export interface MenuProps {}
-
-const FunctionMenu = (props: MenuProps) => {
+const FunctionMenu = () => {
   const { styles } = useStyle();
   const { menuCollapsed, toggleMenuCollapsed } = useFunctionMenuStore();
   const {
@@ -46,6 +56,8 @@ const FunctionMenu = (props: MenuProps) => {
   >(null);
   const [editingTitle, setEditingTitle] = useState("");
   const inputRef = useRef<any>(null);
+  const [isDingTalkModalOpen, setIsDingTalkModalOpen] = useState(false);
+  const [isWeChatModalOpen, setIsWeChatModalOpen] = useState(false);
 
   useEffect(() => {
     initModelOptionList();
@@ -88,7 +100,7 @@ const FunctionMenu = (props: MenuProps) => {
     navigate("/chat");
   };
 
-  // 开始编辑会话标题
+  // 编辑会话标题
   const startEditingTitle = (
     conversation: Conversation,
     e: React.MouseEvent
@@ -96,7 +108,7 @@ const FunctionMenu = (props: MenuProps) => {
     e.stopPropagation();
     setEditingConversationId(conversation.id);
     setEditingTitle(conversation.title);
-    // 等待DOM更新后聚焦输入框
+    // 等待 DOM 更新后聚焦输入框
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus();
@@ -139,11 +151,7 @@ const FunctionMenu = (props: MenuProps) => {
           onClick={toggleMenuCollapsed}
         />
       )}
-      <div
-        className={`${styles.menu} ${
-          menuCollapsed ? styles.menuCollapsed : ""
-        }`}
-      >
+      <div className={`${menuCollapsed ? styles.menuCollapsed : styles.menu}`}>
         {/* 🌟 顶部信息 */}
         <div className={styles.userProfile}>
           <Space align="center">
@@ -190,7 +198,9 @@ const FunctionMenu = (props: MenuProps) => {
 
         {/* 🌟 模型选择 */}
         <div className={styles.chooseModel}>
-          <Typography.Text>模型选择</Typography.Text>
+          <Typography.Text className={styles.menuTitle}>
+            模型选择
+          </Typography.Text>
           <Select
             onChange={(value) => chooseModel(value)}
             options={modelOptionList}
@@ -199,7 +209,9 @@ const FunctionMenu = (props: MenuProps) => {
           />
         </div>
         <div className={styles.conversationsContainer}>
-          <Typography.Text>对话历史</Typography.Text>
+          <Typography.Text className={styles.menuTitle}>
+            对话历史
+          </Typography.Text>
           <div className={styles.conversationsScrollContainer}>
             {conversations.map((conversation) => (
               <div
@@ -284,6 +296,64 @@ const FunctionMenu = (props: MenuProps) => {
             ))}
           </div>
         </div>
+
+        <Space className={styles.bottomLinkWrapper}>
+          <Tooltip title={"问题反馈"}>
+            <a
+              href="https://github.com/springaialibaba/spring-ai-alibaba-examples/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button icon={<FormOutlined />} />
+            </a>
+          </Tooltip>
+          <Tooltip title={"钉钉群"}>
+            <Button
+              icon={<DingdingOutlined />}
+              onClick={() => setIsDingTalkModalOpen(true)}
+            />
+          </Tooltip>
+
+          <Tooltip title={"微信群"}>
+            <Button
+              icon={<WechatWorkOutlined />}
+              onClick={() => setIsWeChatModalOpen(true)}
+            />
+          </Tooltip>
+        </Space>
+
+        <Modal
+          title="钉钉群"
+          open={isDingTalkModalOpen}
+          onCancel={() => setIsDingTalkModalOpen(false)}
+          centered
+        >
+          <img
+            src="/dingtalk.png"
+            alt="钉钉群"
+            style={{
+              width: "100%",
+              margin: "0 auto",
+            }}
+          />
+        </Modal>
+
+        <Modal
+          title="微信群"
+          open={isWeChatModalOpen}
+          onCancel={() => setIsWeChatModalOpen(false)}
+          centered
+        >
+          <img
+            src="/wechat.png"
+            alt="微信群"
+            style={{
+              width: "100%",
+              textAlign: "center",
+              margin: "0 auto",
+            }}
+          />
+        </Modal>
       </div>
     </>
   );

@@ -15,62 +15,31 @@ export const useStyle = createStyles(({ token, css }) => {
       z-index: 10;
     `,
     layout: css`
-      width: 100%;
-      min-width: 1000px;
-      height: calc(100vh - 56px);
+      /* height: calc(100vh - 56px); */
+      height: 100vh;
       border-radius: ${token.borderRadius}px;
       display: flex;
       background: ${token.colorBgContainer};
       font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
       overflow-x: hidden;
-      position: relative;
 
       .ant-prompts {
         color: ${token.colorText};
       }
     `,
-    menu: css`
-      background: ${token.colorBgLayout}80;
-      width: 280px;
-      min-width: 280px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      padding: 0 16px;
-      box-sizing: border-box;
-      transform-origin: left center;
-      overflow-y: auto;
-      overflow-x: hidden;
-    `,
-    menuCollapsed: css`
-      width: 0;
-      min-width: 0;
-      padding: 0;
-      opacity: 0;
-      transform: translateX(-100%);
-    `,
-    chooseModel: css`
-      flex-direction: column;
-      color: rgba(0, 0, 0, 0.88);
-      margin: 8px 0 8px;
-    `,
-    // conversations: css`
-    //   flex: 1;
-    //   padding: 8px;
-    //   cursor: pointer;
-    //   z-index: ;
-    // `,
     footer: css`
-      position: fixed;
+      position: absolute;
       left: 0;
       bottom: 0;
       width: 100%;
+      height: 20px;
+      line-height: 18px;
+      padding: 20px 0;
       text-align: center;
-      padding: 16px 50px;
-      color: rgba(0, 0, 0, 0.45);
+      color: ${token.colorText};
       background-color: rgba(0, 0, 0, 0.02);
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-      /* background-color: ${token.colorBgElevated}; */
+      font-family: ${token.fontFamily};
+      background: ${token.colorBgContainer};
     `,
     logo: css`
       display: flex;
@@ -100,77 +69,10 @@ export const useStyle = createStyles(({ token, css }) => {
       width: calc(100% - 24px);
       margin: 0 12px 24px 12px;
     `,
-    userProfile: css`
-      display: flex;
-      height: 30px;
-      width: 100%;
-      justify-content: flex-end;
-      gap: 12px;
-      align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid ${token.colorBorderSecondary};
-      margin-bottom: 16px;
-      img {
-        height: 121px;
-      }
-    `,
     newChatBtn: css`
       margin-bottom: 16px;
       height: 40px;
       font-size: 15px;
-    `,
-    functionMenu: css`
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      gap: 8px;
-      margin-bottom: 16px;
-      padding: 4px 0;
-      border-bottom: 1px solid ${token.colorBorderSecondary};
-    `,
-    functionMenuItem: css`
-      padding: 10px 16px;
-      cursor: pointer;
-      border-radius: ${token.borderRadius}px;
-
-      &:hover {
-        background-color: ${token.colorBgTextHover};
-      }
-
-      .anticon {
-        font-size: 18px;
-        margin-right: 8px;
-      }
-
-      span {
-        font-size: 15px;
-      }
-    `,
-    conversationsContainer: css`
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    `,
-    collapsedMenuBtn: css`
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      z-index: 1000;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: ${token.boxShadowSecondary};
-      cursor: pointer;
-      opacity: 1;
-      transform: scale(1);
-
-      &:hover {
-        transform: scale(1.05);
-      }
     `,
     pageContainer: css`
       flex: 1;
@@ -204,77 +106,20 @@ export const useStyle = createStyles(({ token, css }) => {
         opacity: 1;
       }
     `,
-    conversationItem: css`
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      margin: 4px 0;
-      cursor: pointer;
-      border-radius: ${token.borderRadius}px;
-      transition: background-color 0.2s ease;
-
-      &:hover {
-        background-color: ${token.colorBgTextHover};
-      }
-
-      &.active {
-        background-color: rgba(22, 119, 255, 0.1);
-      }
-    `,
-    conversationTitle: css`
+    menuPagesWrapper: css`
+      flex: 1;
+      position: relative;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex: 1;
     `,
-    actionButtonsContainer: css`
-      display: flex;
-      gap: 4px;
-      visibility: hidden;
-
-      .active & {
-        visibility: visible;
-      }
-
-      .conversationItem:hover & {
-        visibility: visible;
-      }
-    `,
-    conversationsScrollContainer: css`
-      height: 100%;
-      overflow: auto;
-      padding-right: 2px;
-    `,
-    editButton: css`
-      &.ant-btn {
-        padding: 0 4px;
-        min-width: 24px;
-        height: 24px;
-      }
-    `,
-    deleteButton: css`
-      &.ant-btn {
-        padding: 0 4px;
-        min-width: 24px;
-        height: 24px;
-      }
-    `,
-    titleEditContainer: css`
-      display: flex;
-      align-items: center;
+    pageWrapper: css`
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      gap: 4px;
-    `,
-    titleInput: css`
-      flex: 1;
-      font-size: 14px;
-    `,
-
-    titleEditButton: css`
-      padding: 0 4px;
-      font-size: 12px;
-      height: 22px;
-      min-width: 22px;
+      height: 100%;
+      transition: none;
+      background-color: ${token.colorBgContainer};
+      overflow-y: auto;
     `,
   };
 });
