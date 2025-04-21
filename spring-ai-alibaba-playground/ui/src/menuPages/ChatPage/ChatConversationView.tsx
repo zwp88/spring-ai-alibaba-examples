@@ -138,7 +138,24 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       const responseMessageUI: Message = mapStoredMessagesToUIMessages([
         responseMessage,
       ])[0];
-      setMessages((prev) => [...prev, responseMessageUI]);
+
+      // 更新UI消息，采用替换而不是追加的策略
+      setMessages((prev) => {
+        let lastNonUserIndex = -1;
+        for (let i = prev.length - 1; i >= 0; i--) {
+          if (prev[i].sender !== "user") {
+            lastNonUserIndex = i;
+            break;
+          }
+        }
+        if (lastNonUserIndex === -1) {
+          return [...prev, responseMessageUI];
+        }
+        // 替换最后一个非用户消息
+        const newMessages = [...prev];
+        newMessages[lastNonUserIndex] = responseMessageUI;
+        return newMessages;
+      });
 
       // 确保用户消息存在
       const existingUserMessage = activeConversation?.messages.find(
@@ -164,7 +181,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
         messages: finalMessages as unknown as ChatMessage[],
       });
     },
-    500
+    100
   );
 
   // 发送消息到API并更新会话
@@ -208,34 +225,46 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
         onlineSearch: aiCapabilities.onlineSearch,
       };
       let response;
-      let responseText = "";
+      let thinkContentText = "";
+      let contentText = "";
 
       try {
         response = await getChat(
           text,
           (value) => {
             const chunk = decoder.decode(value);
-            responseText += chunk;
-
-            // 频率太快会导致闪动
-            const isLastChunk = value.length === 0;
-            if (isLastChunk || responseText.length % 6 === 0) {
-              updateConversationMessages(
-                responseText,
-                "assistant",
-                false,
-                userTimestamp,
-                userMessage
-              );
+            const [thinkContent, content] = classifyChunk(chunk);
+            if (thinkContent) {
+              // 如果是think内容，我们需要累加到已有的think内容中
+              thinkContentText = thinkContentText
+                ? `${thinkContentText}\n${thinkContent}`
+                : thinkContent;
             }
+            if (content) {
+              contentText += content; // 正常内容继续累加
+            }
+            const totalText = thinkContentText
+              ? `> ${thinkContentText} <hr/> ${contentText}`
+              : contentText;
+
+            updateConversationMessages(
+              totalText,
+              "assistant",
+              false,
+              userTimestamp,
+              userMessage
+            );
           },
           params
         );
 
-        if (response.ok && responseText) {
+        if (response.ok && contentText) {
           // 最终更新一次，确保完整内容被保存
+          const finalText = thinkContentText
+            ? `> ${thinkContentText} <hr/> ${contentText}`
+            : contentText;
           updateConversationMessages(
-            responseText,
+            finalText,
             "assistant",
             false,
             userTimestamp,
@@ -245,7 +274,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
           throw new Error("请求失败");
         }
       } catch (error) {
-        console.error("处理聊天请求错误:", error, "响应文本:", responseText);
+        console.error("处理聊天请求错误:", error, "响应文本:", contentText);
 
         updateConversationMessages(
           "抱歉，处理您的请求时出现错误。",
@@ -349,6 +378,15 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   //     />
   //   </Sender.Header>
   // );
+
+  const classifyChunk = (chunk: string) => {
+    console.log("chunk?????", chunk);
+    if (chunk.includes("<think>")) {
+      return [chunk, ""];
+    } else {
+      return ["", chunk];
+    }
+  };
 
   return (
     <BasePage title="对话" conversationId={conversationId}>
