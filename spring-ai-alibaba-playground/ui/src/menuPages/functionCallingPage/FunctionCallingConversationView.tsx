@@ -132,12 +132,14 @@ const FunctionCallingConversationView = ({
     ) => {
       const result = await getToolCalling(text, conversationId);
 
+      let toolText = "";
       // 如果是工具调用，可以先显示工具调用的中间状态
       if (result.toolName) {
+        toolText = `调用工具: ${result.toolName}\n${result.toolParameters}`;
         appendAssistantMessage(
-          `正在调用工具: ${result.toolName}\n参数: ${result.toolParameters}`,
+          toolText,
           "assistant",
-          false,
+          result.status !== "SUCCESS",
           userTimestamp,
           userMessage
         );
@@ -146,8 +148,13 @@ const FunctionCallingConversationView = ({
       // 显示最终结果
       const responseText =
         result.toolResult || result.toolResponse || "工具调用失败";
+
+      const totalText = toolText
+        ? `<tool>${toolText}</tool>\n${responseText}`
+        : responseText;
+
       appendAssistantMessage(
-        responseText,
+        totalText,
         "assistant",
         result.status !== "SUCCESS",
         userTimestamp,
@@ -188,7 +195,7 @@ const FunctionCallingConversationView = ({
             className={`${styles.card} ${styles.resultPanel}`}
             // ref={msgContainerRef}
           >
-            <h2 className={styles.panelTitle}>天气查询功能演示</h2>
+            <h2 className={styles.panelTitle}>地图查询功能演示</h2>
             <div className={styles.messagesContainer} ref={msgContainerRef}>
               {messages.length === 0 && !conversationId ? (
                 <ResponseBubble

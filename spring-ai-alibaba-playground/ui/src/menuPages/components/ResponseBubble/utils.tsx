@@ -15,16 +15,16 @@ export const getMarkdownRenderConfig = (styles: Record<string, string>) => {
     ),
     pre: ({ children }) => <pre className={styles.codeBlock}>{children}</pre>,
     p: PureText,
-    h3: ({ children }) => (
-      <PureText style={{ fontSize: "18px", fontWeight: 800 }}>
-        {children}
-      </PureText>
-    ),
-    h4: ({ children }) => (
-      <PureText style={{ fontSize: "16px", fontWeight: 800 }}>
-        {children}
-      </PureText>
-    ),
+    // h3: ({ children }) => (
+    //   <PureText style={{ fontSize: "18px", fontWeight: 800 }}>
+    //     {children}
+    //   </PureText>
+    // ),
+    // h4: ({ children }) => (
+    //   <PureText style={{ fontSize: "16px", fontWeight: 800 }}>
+    //     {children}
+    //   </PureText>
+    // ),
     h5: ({ children }) => (
       <PureText style={{ fontSize: "14px", fontWeight: 800 }}>
         {children}
@@ -44,6 +44,9 @@ export const getMarkdownRenderConfig = (styles: Record<string, string>) => {
     li: ({ children }) => <PureText style={{ margin: 0 }}>{children}</PureText>,
     think: ({ children }) => {
       return children;
+    },
+    tool: ({ children }) => {
+      return <div className={styles.toolTag}>{children}</div>;
     },
   };
 };

@@ -48,7 +48,7 @@ const FunctionCallingLandingView = () => {
       </div>
 
       <div className={styles.rightPanel}>
-        <OutputResult messages={[]} title="天气查询功能演示" />
+        <OutputResult messages={[]} title="地图查询功能演示" />
       </div>
     </div>
   );
