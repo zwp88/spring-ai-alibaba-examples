@@ -113,7 +113,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
             handleSendMessage(urlPrompt);
           }
           clearTimeout(timeId);
-        }, 100);
+        }, 30);
       }
 
       isFirstLoad.current = false;
@@ -227,24 +227,28 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
       let response;
       let thinkContentText = "";
       let contentText = "";
+      let chunkBuffer: string[] = [];
 
       try {
         response = await getChat(
           text,
           (value) => {
             const chunk = decoder.decode(value);
+            // 添加到缓冲区
+            chunkBuffer.push(chunk);
+
+            // 如果凑够3个chunk或者是最后一个chunk（空value），就处理
+            // if (chunkBuffer.length >= 3 || value.length === 0) {
+            // const combinedChunk = chunkBuffer.join("");
             const [thinkContent, content] = classifyChunk(chunk);
             if (thinkContent) {
-              // 如果是think内容，我们需要累加到已有的think内容中
-              thinkContentText = thinkContentText
-                ? `${thinkContentText}\n${thinkContent}`
-                : thinkContent;
+              thinkContentText += thinkContent;
             }
             if (content) {
-              contentText += content; // 正常内容继续累加
+              contentText += content;
             }
             const totalText = thinkContentText
-              ? `> ${thinkContentText} <hr/> ${contentText}`
+              ? `<think>${thinkContentText}</think> ${contentText}`
               : contentText;
 
             updateConversationMessages(
@@ -254,14 +258,30 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
               userTimestamp,
               userMessage
             );
+
+            // 清空缓冲区
+            chunkBuffer = [];
+            // }
           },
           params
         );
 
         if (response.ok && contentText) {
+          // 处理缓冲区中剩余的内容
+          if (chunkBuffer.length > 0) {
+            const remainingChunk = chunkBuffer.join("");
+            const [thinkContent, content] = classifyChunk(remainingChunk);
+            if (thinkContent) {
+              thinkContentText += thinkContent;
+            }
+            if (content) {
+              contentText += content;
+            }
+          }
+
           // 最终更新一次，确保完整内容被保存
           const finalText = thinkContentText
-            ? `> ${thinkContentText} <hr/> ${contentText}`
+            ? `<think>${thinkContentText}</think> ${contentText}`
             : contentText;
           updateConversationMessages(
             finalText,
@@ -380,9 +400,9 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   // );
 
   const classifyChunk = (chunk: string) => {
-    console.log("chunk?????", chunk);
+    console.log("chunk", chunk);
     if (chunk.includes("<think>")) {
-      return [chunk, ""];
+      return [chunk.replace("<think>", "").replace("</think>", ""), ""];
     } else {
       return ["", chunk];
     }
