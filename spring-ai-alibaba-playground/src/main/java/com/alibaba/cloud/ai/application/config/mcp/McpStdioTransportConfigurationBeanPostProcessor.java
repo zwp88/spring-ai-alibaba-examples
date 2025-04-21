@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.cloud.ai.application.config;
+
+package com.alibaba.cloud.ai.application.config.mcp;
 
 import java.io.IOException;
 import java.util.Map;

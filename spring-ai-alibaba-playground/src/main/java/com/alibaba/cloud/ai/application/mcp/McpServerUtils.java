@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.alibaba.cloud.ai.application.config.mcp.SyncMcpToolCallbackWrapper;
 import com.alibaba.cloud.ai.application.entity.mcp.McpServer;
 import com.alibaba.cloud.ai.application.entity.mcp.McpServerConfig;
 import com.alibaba.cloud.ai.application.exception.SAAAppException;
@@ -17,6 +18,7 @@ import com.alibaba.cloud.ai.application.utils.ModelsUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
+import org.springframework.ai.mcp.SyncMcpToolCallback;
 import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.core.io.ClassPathResource;
@@ -108,12 +110,20 @@ public final class McpServerUtils {
 			List<McpServer.Tools> toolsList = new ArrayList<>();
 			for (FunctionCallback toolCallback : toolCallbackProvider.getToolCallbacks()) {
 
-				McpServer.Tools tool = new McpServer.Tools();
-				tool.setDesc(toolCallback.getDescription());
-				tool.setName(toolCallback.getName());
-				tool.setParams(toolCallback.getInputTypeSchema());
+				// todo: 拿不到 mcp client, 先用包装器拿吧
+				SyncMcpToolCallback mcpToolCallback = (SyncMcpToolCallback) toolCallback;
+				SyncMcpToolCallbackWrapper syncMcpToolCallbackWrapper = new SyncMcpToolCallbackWrapper(mcpToolCallback);
+				String currentMcpServerName = syncMcpToolCallbackWrapper.getMcpClient().getServerInfo().name();
 
-				toolsList.add(tool);
+				// 按照 mcp server name 聚合 mcp server tools
+				if (Objects.equals(key, currentMcpServerName)) {
+					McpServer.Tools tool = new McpServer.Tools();
+					tool.setDesc(toolCallback.getDescription());
+					tool.setName(toolCallback.getName());
+					tool.setParams(toolCallback.getInputTypeSchema());
+
+					toolsList.add(tool);
+				}
 			}
 
 			McpServerContainer.addServer(McpServer.builder()
