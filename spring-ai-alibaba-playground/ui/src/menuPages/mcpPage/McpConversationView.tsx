@@ -248,6 +248,45 @@ const McpConversationView = ({ conversationId }: McpConversationViewProps) => {
     }
   };
 
+  const updateConversationMessages = (
+    messageContent: string,
+    role: "assistant",
+    isError: boolean = false,
+    userTimestamp: number,
+    userMessage: McpMessage
+  ) => {
+    if (!activeConversation) return;
+
+    const assistantTimestamp = Date.now();
+    const assistantMessage: McpMessage = {
+      role: role,
+      content: messageContent,
+      timestamp: assistantTimestamp,
+      isError: isError,
+    };
+
+    const existingUserMessage = activeConversation.messages.find(
+      (msg) => msg.timestamp === userTimestamp && msg.role === "user"
+    );
+
+    const baseMessages = existingUserMessage
+      ? activeConversation.messages
+      : [...activeConversation.messages, userMessage];
+
+    const finalMessages = baseMessages
+      .filter((msg) => !(msg as McpMessage).isLoading)
+      .concat([assistantMessage]);
+
+    if (isError) {
+      console.log("更新错误后的消息列表:", finalMessages);
+    }
+
+    updateActiveConversation({
+      ...activeConversation,
+      messages: finalMessages as McpMessage[],
+    });
+  };
+
   return (
     <BasePage title="MCP" conversationId={conversationId}>
       <div className={styles.container}>

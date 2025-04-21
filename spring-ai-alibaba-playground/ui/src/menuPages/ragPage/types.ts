@@ -1,19 +1,8 @@
+import { BaseMessage, Message } from "../../types/message";
 import { KnowledgeBase } from "../../stores/knowledgeBase.store";
 
-export interface RagMessage {
-  id: string;
-  sender: "user" | "assistant";
-  text: string;
-  timestamp: number;
-  isError?: boolean;
-}
+export { Message };
 
-export interface RagUiMessage {
-  role: "user" | "assistant";
-  content: string;
-  timestamp: number;
-  isLoading?: boolean;
-  isError?: boolean;
-}
+export interface RagUiMessage extends BaseMessage {}
 
 export type { KnowledgeBase };

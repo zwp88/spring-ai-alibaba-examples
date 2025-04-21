@@ -22,6 +22,8 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   timestamp: number;
+  isError?: boolean;
+  isLoading?: boolean;
   images?: GeneratedImage[];
 }
 
@@ -43,6 +45,17 @@ export interface Conversation {
   messages: ChatMessage[];
   createdAt: number;
   capabilities?: AiCapabilities;
+}
+
+/**
+ * 基础消息接口，定义所有消息类型必须包含的字段
+ */
+export interface BaseMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
+  isError?: boolean;
+  isLoading?: boolean;
 }
 
 // 存储键名
@@ -276,10 +289,10 @@ export const useConversationContext = () => {
   };
 
   /**
-   * 更新全部对话会话列表
-   * @param conversations - 新的对话会话列表
+   * 替换所有会话
+   * @param newConversations - 新的会话列表
    */
-  const updateConversations = (conversations: Conversation[]) => {
+  const replaceAllConversations = (conversations: Conversation[]) => {
     setConversations([...conversations]);
   };
 
@@ -320,37 +333,6 @@ export const useConversationContext = () => {
       setActiveConversation(conversation);
     }
   };
-
-  // /**
-  //  * 向当前活跃的对话添加新消息
-  //  * @param message - 要添加的消息对象
-  //  */
-  // const addMessage = (message: ChatMessage) => {
-  //   if (!activeConversation) {
-  //     console.error("No active conversation to add message to");
-  //     return;
-  //   }
-  //   // 创建更新后的对话对象
-  //   const updatedConversation = {
-  //     ...activeConversation,
-  //     messages: [...activeConversation.messages, message],
-  //   };
-  //   // 更新 conversations 数组
-  //   const updatedConversations = conversations.map((conv) =>
-  //     conv.id === activeConversation.id ? updatedConversation : conv
-  //   );
-
-  //   // 更新状态
-  //   setConversations(updatedConversations);
-  //   setActiveConversation(updatedConversation);
-
-  //   // 直接更新到 localStorage 确保保存
-  //   try {
-  //     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedConversations));
-  //   } catch (error) {
-  //     console.error("addMessage: Failed to save to localStorage:", error);
-  //   }
-  // };
 
   /**
    * 更新对话的标题
@@ -395,6 +377,109 @@ export const useConversationContext = () => {
     setActiveConversation(null);
   };
 
+  /**
+   * 向会话中添加助手回复消息
+   * @param messageContent - 消息内容
+   * @param role - 消息角色
+   * @param isError - 是否为错误消息
+   * @param userTimestamp - 用户消息的时间戳
+   * @param userMessage - 用户消息对象
+   */
+  const appendAssistantMessage = <T extends BaseMessage>(
+    messageContent: string,
+    role: "assistant",
+    isError: boolean = false,
+    userTimestamp: number,
+    userMessage: T
+  ) => {
+    if (!activeConversation) return;
+
+    const assistantTimestamp = Date.now();
+    const assistantMessage = {
+      role,
+      content: messageContent,
+      timestamp: assistantTimestamp,
+      isError,
+    } as T;
+
+    const existingUserMessage = activeConversation.messages.find(
+      (msg) => msg.timestamp === userTimestamp && msg.role === "user"
+    );
+
+    const baseMessages = existingUserMessage
+      ? activeConversation.messages
+      : [...activeConversation.messages, userMessage];
+
+    const finalMessages = baseMessages
+      .filter((msg) => !(msg as BaseMessage).isLoading)
+      .concat([assistantMessage]);
+
+    if (isError) {
+      console.log("更新错误后的消息列表:", finalMessages);
+    }
+
+    updateActiveConversation({
+      ...activeConversation,
+      messages: finalMessages as T[],
+    });
+  };
+
+  /**
+   * 处理消息发送的完整流程
+   * @param text - 消息文本
+   * @param sendRequest - 发送请求的函数
+   * @param createMessage - 创建消息对象的函数
+   * @param setLoading - 设置加载状态的函数
+   * @param setInputContent - 设置输入内容的函数
+   */
+  const processSendMessage = async <T extends BaseMessage>({
+    text,
+    sendRequest,
+    createMessage,
+    setLoading,
+    setInputContent,
+  }: {
+    text: string;
+    sendRequest: (text: string, timestamp: number, message: T) => Promise<void>;
+    createMessage: (text: string, timestamp: number) => T;
+    setLoading: (loading: boolean) => void;
+    setInputContent: (content: string) => void;
+  }) => {
+    if (!text.trim() || !activeConversation) return;
+
+    setLoading(true);
+    setInputContent(""); // 清空输入框
+
+    const userTimestamp = Date.now();
+    const userMessage = createMessage(text, userTimestamp);
+
+    // 立即保存用户消息到localStorage(即使后续API调用失败)
+    const updatedWithUserMessage = [
+      ...activeConversation.messages,
+      userMessage,
+    ] as T[];
+
+    updateActiveConversation({
+      ...activeConversation,
+      messages: updatedWithUserMessage,
+    });
+
+    try {
+      await sendRequest(text, userTimestamp, userMessage);
+    } catch (error) {
+      console.error("处理请求错误:", error);
+      appendAssistantMessage(
+        "抱歉，处理您的请求时出现错误。",
+        "assistant",
+        true,
+        userTimestamp,
+        userMessage
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     conversations,
     activeConversation,
@@ -403,11 +488,13 @@ export const useConversationContext = () => {
     toggleCapability,
     createConversation,
     deleteConversation,
-    updateConversations,
+    replaceAllConversations,
     updateActiveConversation,
     updateConversationWithoutLocalStorage,
     chooseActiveConversation,
     clearActiveConversation,
     updateConversationTitle,
+    appendAssistantMessage,
+    processSendMessage,
   };
 };
