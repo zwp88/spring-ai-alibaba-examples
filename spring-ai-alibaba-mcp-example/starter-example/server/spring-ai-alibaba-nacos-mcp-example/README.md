@@ -15,9 +15,9 @@ MCP Server 注册到 Nacos 中，并通过注解式工具（Tool）提供服务�
 
         <!-- MCP Server (WebMVC) -->
 <dependency>
-<groupId>org.springframework.ai</groupId>
-<artifactId>spring-ai-mcp-server-webmvc-spring-boot-starter</artifactId>
-<version>1.0.0-M6</version>
+<groupId>com.alibaba.cloud.ai</groupId>
+<artifactId>spring-ai-alibaba-starter</artifactId>
+<version>${spring-ai-alibaba.version}</version>
 </dependency>
 ```
 
