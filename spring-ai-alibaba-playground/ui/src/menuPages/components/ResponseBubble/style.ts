@@ -103,4 +103,21 @@ export const useStyle = createStyles(({ token }) => ({
     fontSize: "16px",
     lineHeight: 1.8,
   },
+  toolTag: {
+    backgroundColor: token.colorBgContainer,
+    borderRadius: "4px",
+    borderLeft: "4px solid #1677ff",
+    padding: "12px 16px",
+    fontSize: token.fontSizeSM,
+    color: token.colorText,
+    lineHeight: 1.6,
+    position: "relative",
+    margin: "8px 0",
+    display: "block",
+    "&::before": {
+      content: '"⚙️"',
+      marginRight: "8px",
+      fontSize: "14px",
+    },
+  },
 }));

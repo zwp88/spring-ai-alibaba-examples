@@ -1,5 +1,4 @@
 import React from "react";
-import { Components } from "react-markdown";
 import PureText from "./components/PureText";
 
 export const getMarkdownRenderConfig = (styles: Record<string, string>) => {
@@ -16,16 +15,16 @@ export const getMarkdownRenderConfig = (styles: Record<string, string>) => {
     ),
     pre: ({ children }) => <pre className={styles.codeBlock}>{children}</pre>,
     p: PureText,
-    h3: ({ children }) => (
-      <PureText style={{ fontSize: "18px", fontWeight: 800 }}>
-        {children}
-      </PureText>
-    ),
-    h4: ({ children }) => (
-      <PureText style={{ fontSize: "16px", fontWeight: 800 }}>
-        {children}
-      </PureText>
-    ),
+    // h3: ({ children }) => (
+    //   <PureText style={{ fontSize: "18px", fontWeight: 800 }}>
+    //     {children}
+    //   </PureText>
+    // ),
+    // h4: ({ children }) => (
+    //   <PureText style={{ fontSize: "16px", fontWeight: 800 }}>
+    //     {children}
+    //   </PureText>
+    // ),
     h5: ({ children }) => (
       <PureText style={{ fontSize: "14px", fontWeight: 800 }}>
         {children}
@@ -43,14 +42,21 @@ export const getMarkdownRenderConfig = (styles: Record<string, string>) => {
       <PureText style={{ paddingLeft: "24px", margin: 0 }}>{children}</PureText>
     ),
     li: ({ children }) => <PureText style={{ margin: 0 }}>{children}</PureText>,
+    think: ({ children }) => {
+      return children;
+    },
+    tool: ({ children }) => {
+      return <div className={styles.toolTag}>{children}</div>;
+    },
   };
 };
 
+const THINK_TAG_REGEX = /<think>([\s\S]*?)<\/think>/g;
 // 缓存防止重复
 const processedContentCache = new Map<string, string>();
+// 直接由上游处理，暂时不需要这个方法了
 export const getSseTagProcessor = () => {
   let isProcessing = false;
-  let incompleteThinkContent = "";
 
   const sseTagProcessor = (content: string, timestamp: string) => {
     try {
@@ -62,17 +68,16 @@ export const getSseTagProcessor = () => {
 
       let result = content;
 
-      // 检查是否存在未闭合的think标签
-      const openTagCount = (result.match(/<think>/g) || []).length;
-      const closeTagCount = (result.match(/<\/think>/g) || []).length;
+      // 使用split来计数，性能更好
+      const openTagCount = result.split("<think>").length - 1;
+      const closeTagCount = result.split("</think>").length - 1;
 
       // 如果标签未配对完成，先保存当前内容并返回原始内容
       if (openTagCount !== closeTagCount) {
         return content;
       }
 
-      const thinkRegex = /<think>([\s\S]*?)<\/think>/g;
-      const matches = result.matchAll(thinkRegex);
+      const matches = result.matchAll(THINK_TAG_REGEX);
 
       const thinkContents: string[] = [];
       let lastIndex = 0;
@@ -88,7 +93,6 @@ export const getSseTagProcessor = () => {
       // 添加剩余内容
       processedResult += result.slice(lastIndex);
 
-      // 如果有 think 内容，将它们合并并添加引用符号
       if (thinkContents.length > 0) {
         const combinedThinkContent = thinkContents.join("\n\n");
         processedResult = `> ${combinedThinkContent}\n\n${processedResult}`;

@@ -27,28 +27,16 @@ export const MOCK_SERVER_RESPONSE = {
 
 export const MOCK_MCP_SERVERS = [
   {
-    id: "github",
+    id: "github-mcp-server",
     name: "GitHub",
     icon: "GithubOutlined",
     description: "代码仓库管理、文件操作和GitHub API集成",
   },
   {
-    id: "amap-maps",
-    name: "高德地图",
-    icon: "EnvironmentOutlined",
-    description: "地图和位置服务集成",
-  },
-  {
-    id: "tavily-mcp",
-    name: "Tavily搜索",
-    icon: "SearchOutlined",
-    description: "搜索和信息检索服务",
-  },
-  {
-    id: "aws-kb-retrieval-server",
-    name: "AWS知识库检索",
+    id: "weather-server",
+    name: "Weather Service",
     icon: "CloudOutlined",
-    description: "AWS知识库检索服务",
+    description: "Weather forecast and air quality information",
   },
 ];
 

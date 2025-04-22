@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useStyle } from "./style";
 import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import { getMarkdownRenderConfig, getSseTagProcessor } from "./utils";
+import { getMarkdownRenderConfig } from "./utils";
 import MessageFooter from "./components/CopyButton";
 
 interface ResponseBubbleProps {
@@ -20,25 +20,12 @@ const ResponseBubble: React.FC<ResponseBubbleProps> = ({
   footer = null,
 }) => {
   const { styles } = useStyle();
-  const [processedContent, setProcessedContent] = useState(content);
-  const isProcessingRef = useRef(false);
   const messageId = `${timestamp}`;
 
   const markdownRenderConfig = useMemo(
     () => getMarkdownRenderConfig(styles),
     [styles]
   );
-  const sseTagProcessor = useMemo(() => getSseTagProcessor(), []);
-
-  useEffect(() => {
-    const processContent = () => {
-      if (isProcessingRef.current) return;
-      const processedContent = sseTagProcessor(content, messageId);
-      setProcessedContent(processedContent);
-    };
-
-    processContent();
-  }, [content, timestamp]);
 
   return (
     <div className={styles.botMessage} key={"responseBubble" + messageId}>
@@ -49,7 +36,7 @@ const ResponseBubble: React.FC<ResponseBubbleProps> = ({
           rehypePlugins={[rehypeRaw]}
           components={markdownRenderConfig as Components}
         >
-          {processedContent}
+          {content}
         </ReactMarkdown>
       </div>
       <div className={styles.messageTime}>

@@ -5,18 +5,24 @@ import CodeInfo from "./components/CodeInfo";
 import {
   ChatMessage,
   useConversationContext,
+  BaseMessage,
 } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
 import { getRag } from "../../api/rag";
 import { mapStoredMessagesToUIMessages, scrollToBottom } from "../../utils";
 import ResponseBubble from "../components/ResponseBubble";
 import RequestBubble from "../components/RequestBubble";
-import { RagUiMessage } from "./types";
 import { Message } from "../chatPage/types";
 import { useStyles } from "./style";
 
 interface RagConversationViewProps {
   conversationId: string;
+}
+
+interface RagUiMessage extends BaseMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
 }
 
 const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
@@ -29,7 +35,8 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
   const {
     activeConversation,
     chooseActiveConversation,
-    updateActiveConversation,
+    processSendMessage,
+    appendAssistantMessage,
   } = useConversationContext();
 
   const isFirstLoad = useRef(true);
@@ -46,7 +53,7 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
         activeConversation.messages.length > 0
       ) {
         const filteredMessages = activeConversation.messages.filter(
-          (msg) => !(msg as RagUiMessage).isLoading
+          (msg) => !(msg as ChatMessage).isLoading
         );
 
         if (filteredMessages.length > 0) {
@@ -102,83 +109,27 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
     userTimestamp: number,
     userMessage: RagUiMessage
   ) => {
-    if (!activeConversation) return;
-
-    const assistantTimestamp = Date.now();
-    const assistantMessage: RagUiMessage = {
-      role: role,
-      content: messageContent,
-      timestamp: assistantTimestamp,
-      isError: isError,
-    };
-    const assistantUiMessage = mapStoredMessagesToUIMessages([
-      assistantMessage,
-    ])[0];
-
-    setMessages((prev) => {
-      // 找到最后一个非用户消息
-      let lastNonUserIndex = -1;
-      for (let i = prev.length - 1; i >= 0; i--) {
-        if (prev[i].sender !== "user") {
-          lastNonUserIndex = i;
-          break;
-        }
-      }
-      if (lastNonUserIndex === -1) {
-        return [...prev, assistantUiMessage];
-      }
-      // 替换最后一个非用户消息
-      const newMessages = [...prev];
-      newMessages[lastNonUserIndex] = assistantUiMessage;
-      return newMessages;
-    });
-
-    const existingUserMessage = activeConversation.messages.find(
-      (msg) => msg.timestamp === userTimestamp && msg.role === "user"
+    appendAssistantMessage(
+      messageContent,
+      role,
+      isError,
+      userTimestamp,
+      userMessage
     );
-
-    const baseMessages = existingUserMessage
-      ? activeConversation.messages
-      : [...activeConversation.messages, userMessage];
-
-    const finalMessages = baseMessages
-      .filter((msg) => !(msg as RagUiMessage).isLoading)
-      .concat([assistantMessage]);
-
-    if (isError) {
-      console.log("更新错误后的消息列表:", finalMessages);
-    }
-
-    updateActiveConversation({
-      ...activeConversation,
-      messages: finalMessages as RagUiMessage[],
-    });
   };
 
   const handleSendMessage = async (text: string) => {
-    if (!text.trim() || isLoading || !activeConversation) return;
-    setIsLoading(true);
-    setInputContent("");
-    const userTimestamp = Date.now();
-    const userMessage: RagUiMessage = {
+    const createMessage = (text: string, timestamp: number): RagUiMessage => ({
       role: "user",
       content: text,
-      timestamp: userTimestamp,
-    };
-
-    const userUiMessage = mapStoredMessagesToUIMessages([userMessage])[0];
-    setMessages((prev) => [...prev, userUiMessage]);
-
-    const updatedWithUserMessage = [
-      ...activeConversation.messages,
-      userMessage,
-    ] as RagUiMessage[];
-    updateActiveConversation({
-      ...activeConversation,
-      messages: updatedWithUserMessage,
+      timestamp,
     });
 
-    try {
+    const sendRequest = async (
+      text: string,
+      userTimestamp: number,
+      userMessage: RagUiMessage
+    ) => {
       let accumulatedText = "";
       const response = await getRag(
         text,
@@ -199,18 +150,15 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
       if (!response.ok) {
         throw new Error("RAG查询失败");
       }
-    } catch (error) {
-      console.error("处理RAG请求错误:", error);
-      updateConversationMessages(
-        "抱歉，处理您的请求时出现错误。",
-        "assistant",
-        true,
-        userTimestamp,
-        userMessage
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    await processSendMessage({
+      text,
+      sendRequest,
+      createMessage,
+      setLoading: setIsLoading,
+      setInputContent,
+    });
   };
 
   return (

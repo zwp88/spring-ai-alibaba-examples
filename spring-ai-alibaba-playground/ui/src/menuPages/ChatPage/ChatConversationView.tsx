@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import { useStyle } from "./style";
-import { useConversationContext } from "../../stores/conversation.store";
+import {
+  useConversationContext,
+  BaseMessage,
+} from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
 import { getChat } from "../../api/chat";
 import { Button, theme } from "antd";
@@ -14,15 +17,16 @@ import {
 } from "../../utils";
 import { useFunctionMenuStore } from "../../stores/functionMenu.store";
 import { useModelConfigContext } from "../../stores/modelConfig.store";
-import {
-  AiCapabilities,
-  ChatConversationViewProps,
-  ChatMessage,
-  Message,
-} from "./types";
+import { AiCapabilities, ChatConversationViewProps, Message } from "./types";
 import ResponseBubble from "../components/ResponseBubble";
 import RequestBubble from "../components/RequestBubble";
 import { useThrottle } from "../../hooks/useThrottle";
+
+interface ChatUiMessage extends BaseMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
+}
 
 const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   conversationId,
@@ -43,10 +47,11 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   const {
     activeConversation,
     chooseActiveConversation,
-    updateActiveConversation,
     aiCapabilities,
     toggleCapability,
     updateCapability,
+    appendAssistantMessage,
+    processSendMessage,
   } = useConversationContext();
 
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数
@@ -74,7 +79,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
 
         if (filteredMessages.length > 0) {
           const uiMessages = mapStoredMessagesToUIMessages(
-            filteredMessages as ChatMessage[]
+            filteredMessages as ChatUiMessage[]
           );
           setMessages(uiMessages);
         } else {
@@ -113,7 +118,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
             handleSendMessage(urlPrompt);
           }
           clearTimeout(timeId);
-        }, 100);
+        }, 30);
       }
 
       isFirstLoad.current = false;
@@ -123,175 +128,118 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   const updateConversationMessages = useThrottle(
     (
       messageContent: string,
-      role: "assistant" | "assistant",
+      role: "assistant",
       isError: boolean = false,
       userTimestamp: number,
-      userMessage: ChatMessage
+      userMessage: ChatUiMessage
     ) => {
-      const timestamp = Date.now();
-      const responseMessage: ChatMessage = {
-        role: role,
-        content: messageContent,
-        timestamp: timestamp,
-        isError: isError,
-      };
-      const responseMessageUI: Message = mapStoredMessagesToUIMessages([
-        responseMessage,
-      ])[0];
-      setMessages((prev) => [...prev, responseMessageUI]);
-
-      // 确保用户消息存在
-      const existingUserMessage = activeConversation?.messages.find(
-        (msg) => msg.timestamp === userTimestamp && msg.role === "user"
+      appendAssistantMessage(
+        messageContent,
+        role,
+        isError,
+        userTimestamp,
+        userMessage
       );
-      // 如果用户消息不存在，先添加
-      const baseMessages = existingUserMessage
-        ? activeConversation?.messages
-        : [...(activeConversation?.messages || []), userMessage];
-
-      // TODO: 目前还没有添加占位消息。。。。
-      // 更新会话，移除占位消息，添加新消息
-      const finalMessages = baseMessages
-        ?.filter((msg) => !(msg as ChatMessage).isLoading)
-        .concat([responseMessage]);
-
-      if (!activeConversation?.id) {
-        throw new Error("会话ID为空!");
-      }
-
-      updateActiveConversation({
-        ...activeConversation,
-        messages: finalMessages as unknown as ChatMessage[],
-      });
     },
-    500
+    100
   );
 
   // 发送消息到API并更新会话
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isLoading || !activeConversation) return;
 
-    setIsLoading(true);
-    setInputContent(""); // 清空输入框
-    // 记录当前时间戳，确保消息顺序
-    const userTimestamp = Date.now();
-    console.log("text", text, userTimestamp);
-
-    // 创建用户消息
-    const userMessage: ChatMessage = {
+    const createMessage = (text: string, timestamp: number): ChatUiMessage => ({
       role: "user",
       content: text,
-      timestamp: userTimestamp,
-    };
+      timestamp,
+    });
+
+    const userTimestamp = Date.now();
+    const userMessage = createMessage(text, userTimestamp);
     const userMessageUI: Message = mapStoredMessagesToUIMessages([
       userMessage,
     ])[0];
     setMessages((prev) => [...prev, userMessageUI]);
 
-    const updatedWithUserMessage = [
-      ...activeConversation.messages,
-      userMessage,
-    ] as ChatMessage[];
-    // 立即保存用户消息到localStorage(即使后续API调用失败)
-    updateActiveConversation({
-      ...activeConversation,
-      messages: updatedWithUserMessage,
-    });
-
-    scrollToBottom(messagesContainerRef.current);
-
-    try {
+    const sendRequest = async (
+      text: string,
+      userTimestamp: number,
+      userMessage: ChatUiMessage
+    ) => {
       const params = {
         chatId: activeConversation?.id,
         model: currentModel?.value,
         deepThink: aiCapabilities.deepThink,
         onlineSearch: aiCapabilities.onlineSearch,
       };
-      let response;
-      let responseText = "";
+      let thinkContentText = "";
+      let contentText = "";
+      let chunkBuffer: string[] = [];
 
-      try {
-        response = await getChat(
-          text,
-          (value) => {
-            const chunk = decoder.decode(value);
-            responseText += chunk;
+      const response = await getChat(
+        text,
+        (value) => {
+          const chunk = decoder.decode(value);
+          chunkBuffer.push(chunk);
 
-            // 频率太快会导致闪动
-            const isLastChunk = value.length === 0;
-            if (isLastChunk || responseText.length % 6 === 0) {
-              updateConversationMessages(
-                responseText,
-                "assistant",
-                false,
-                userTimestamp,
-                userMessage
-              );
-            }
-          },
-          params
-        );
+          const [thinkContent, content] = classifyChunk(chunk);
+          if (thinkContent) {
+            thinkContentText += thinkContent;
+          }
+          if (content) {
+            contentText += content;
+          }
+          const totalText = thinkContentText
+            ? `<think>${thinkContentText}</think> ${contentText}`
+            : contentText;
 
-        if (response.ok && responseText) {
-          // 最终更新一次，确保完整内容被保存
           updateConversationMessages(
-            responseText,
+            totalText,
             "assistant",
             false,
             userTimestamp,
             userMessage
           );
-        } else {
-          throw new Error("请求失败");
-        }
-      } catch (error) {
-        console.error("处理聊天请求错误:", error, "响应文本:", responseText);
 
-        updateConversationMessages(
-          "抱歉，处理您的请求时出现错误。",
-          "assistant",
-          true,
-          userTimestamp,
-          userMessage
-        );
-      }
-    } catch (error) {
-      console.error("处理聊天请求错误:", error);
-
-      const errorTimestamp = Date.now();
-      const errorMessage: ChatMessage = {
-        role: "assistant",
-        content: "抱歉，处理您的请求时出现错误。",
-        timestamp: errorTimestamp,
-        isError: true,
-      };
-      const errorMessageUI: Message = mapStoredMessagesToUIMessages([
-        errorMessage,
-      ])[0];
-      setMessages((prev) => [...prev, errorMessageUI]);
-
-      const existingUserMessage = activeConversation.messages.find(
-        (msg) => msg.timestamp === userTimestamp && msg.role === "user"
+          chunkBuffer = [];
+        },
+        params
       );
 
-      // 如果用户消息不存在，先添加
-      const baseMessages = existingUserMessage
-        ? activeConversation.messages
-        : [...activeConversation.messages, userMessage];
+      if (!response.ok || !contentText) {
+        throw new Error("请求失败");
+      }
 
-      // 更新会话，移除占位消息，添加错误消息
-      const finalMessages = baseMessages
-        .filter((msg) => !(msg as ChatMessage).isLoading) // 移除所有加载中的消息
-        .concat([errorMessage]);
+      if (chunkBuffer.length > 0) {
+        const remainingChunk = chunkBuffer.join("");
+        const [thinkContent, content] = classifyChunk(remainingChunk);
+        if (thinkContent) {
+          thinkContentText += thinkContent;
+        }
+        if (content) {
+          contentText += content;
+        }
+      }
 
-      if (!activeConversation?.id) return;
-      updateActiveConversation({
-        ...activeConversation,
-        messages: finalMessages,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+      const finalText = thinkContentText
+        ? `<think>${thinkContentText}</think> ${contentText}`
+        : contentText;
+      updateConversationMessages(
+        finalText,
+        "assistant",
+        false,
+        userTimestamp,
+        userMessage
+      );
+    };
+
+    await processSendMessage({
+      text,
+      sendRequest,
+      createMessage,
+      setLoading: setIsLoading,
+      setInputContent,
+    });
   };
 
   // 处理文件上传变化
@@ -349,6 +297,15 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   //     />
   //   </Sender.Header>
   // );
+
+  const classifyChunk = (chunk: string) => {
+    console.log("chunk", chunk);
+    if (chunk.includes("<think>")) {
+      return [chunk.replace("<think>", "").replace("</think>", ""), ""];
+    } else {
+      return ["", chunk];
+    }
+  };
 
   return (
     <BasePage title="对话" conversationId={conversationId}>

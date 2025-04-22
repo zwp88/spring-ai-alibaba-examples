@@ -10,9 +10,14 @@ import {
   SafetyOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { McpServerFormatted, McpServerResponse } from "./types";
+import {
+  McpServer,
+  McpServerFormatted,
+  McpTool,
+  McpToolFormatted,
+  FormField,
+} from "./types";
 import React from "react";
-import { MOCK_SERVER_RESPONSE, MOCK_MCP_SERVERS, GITHUB_TOOLS } from "./const";
 
 // 图标组件映射
 export const name2iconMap: Record<string, React.ReactNode> = {
@@ -31,11 +36,12 @@ export const name2iconMap: Record<string, React.ReactNode> = {
 
 /**
  * 获取服务名称对应的图标名称
- * TODO: 确认服务命名规则
  */
 export const getIconNameByServerName = (serverName: string): string => {
   const iconMapping: Record<string, string> = {
     GitHub: "GithubOutlined",
+    "github-mcp-server": "GithubOutlined",
+    "my-weather-server": "CloudOutlined",
     高德地图: "EnvironmentOutlined",
     Tavily搜索: "SearchOutlined",
     AWS知识库检索: "CloudOutlined",
@@ -46,66 +52,92 @@ export const getIconNameByServerName = (serverName: string): string => {
 };
 
 /**
- * TODO: 后续接入真实API
- */
-export const requestMcpServerList = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return MOCK_SERVER_RESPONSE;
-};
-
-/**
- * TODO: 和后端确认数据结构，params中的value当作表单类型
+ * 格式化MCP服务列表数据
  */
 export const formatMcpServerListData = (
-  responseData: any
-): McpServerFormatted => {
-  const { id, name, desc, toolList } = responseData;
+  servers: McpServer[]
+): McpServerFormatted[] => {
+  return servers.map((server) => {
+    const iconName = getIconNameByServerName(server.name);
 
-  const iconName = getIconNameByServerName(name);
+    const tools = server.toolList.map((tool: McpTool) => {
+      // Parse JSON schema string to object
+      let parsedParams: Record<string, any> = {};
+      let schema: any = null;
 
-  const tools = toolList.map((tool: any) => ({
-    id: tool.name.toLowerCase().replace(/\s+/g, "_"),
-    name: tool.name,
-    description: tool.desc,
-    params: tool.params,
-  }));
+      try {
+        schema = JSON.parse(tool.params);
+        // For form generation, we extract properties from the JSON schema
+        if (schema && schema.properties) {
+          parsedParams = Object.entries(schema.properties).reduce(
+            (acc, [key, propDef]: [string, any]) => {
+              acc[key] = propDef.description || key;
+              return acc;
+            },
+            {} as Record<string, string>
+          );
+        }
+      } catch (error) {
+        console.error(`Error parsing params for tool ${tool.name}:`, error);
+      }
 
-  return {
-    id,
-    name,
-    icon: iconName,
-    description: desc,
-    tools,
-  };
+      return {
+        id: tool.name,
+        name: tool.name,
+        description: tool.desc,
+        params: parsedParams,
+        schema: schema,
+      };
+    });
+
+    return {
+      id: server.id,
+      name: server.name,
+      icon: iconName,
+      description: server.desc || "",
+      tools,
+    };
+  });
 };
 
 /**
- * 将MCP服务器数据从后端格式转为UI格式
- * 用于将const.ts中的mock数据转为UI所需格式
+ * 生成表单字段配置，从JSON schema创建表单字段
  */
-export const convertMockServersToUiFormat = () => {
-  return MOCK_MCP_SERVERS.map((server) => ({
-    ...server,
-    // 保持返回格式一致性
-    tools: GITHUB_TOOLS,
-  }));
-};
+export const generateFormFields = (schema: any): FormField[] => {
+  // Handle the case where schema might be null or undefined
+  if (!schema || typeof schema !== "object") {
+    return [];
+  }
 
-/**
- * 生成表单字段配置
- */
-export const generateFormFields = (params: Record<string, string>) => {
-  return Object.entries(params).map(([key, value]) => {
-    const fieldType = value.toLowerCase().includes("password")
-      ? "password"
-      : "text";
+  const properties = schema.properties || {};
+
+  // Get the required fields array or default to empty array
+  const requiredFields = Array.isArray(schema.required) ? schema.required : [];
+
+  return Object.entries(properties).map(([key, propDef]: [string, any]) => {
+    const isRequired = requiredFields.includes(key);
+    const description = propDef.description || "";
+
+    let fieldType = "text";
+    if (propDef.type === "boolean") {
+      fieldType = "checkbox";
+    } else if (propDef.type === "number" || propDef.type === "integer") {
+      fieldType = "number";
+    } else if (
+      propDef.format === "password" ||
+      key.toLowerCase().includes("token") ||
+      key.toLowerCase().includes("password")
+    ) {
+      fieldType = "password";
+    }
 
     return {
       key,
       label: key,
       fieldType,
-      placeholder: value || `Enter ${key}`,
-      required: true,
+      placeholder: description || `Enter ${key}`,
+      required: isRequired,
+      description,
     };
   });
 };

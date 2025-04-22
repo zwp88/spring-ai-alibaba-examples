@@ -186,6 +186,36 @@ export const useStyles = createStyles(({ token, css }) => {
       height: 100%;
       padding-left: 16px;
     `,
+    rightPanelTabs: css`
+      height: calc(100% - 50px);
+      .ant-tabs-content {
+        height: 100%;
+      }
+      .ant-tabs-tabpane {
+        padding: 16px;
+        height: 100%;
+        overflow-y: auto;
+      }
+      .ant-tabs-nav {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        &::before {
+          display: none;
+        }
+      }
+      .ant-tabs-nav-list {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .ant-tabs-tab {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+      }
+    `,
     card: css`
       background: ${token.colorBgContainer};
       border-radius: ${token.borderRadiusLG}px;
@@ -418,7 +448,6 @@ export const useStyles = createStyles(({ token, css }) => {
     `,
     configContainer: css`
       padding: 16px;
-      margin-bottom: 16px;
     `,
     configCode: css`
       position: relative;
@@ -555,6 +584,42 @@ export const useStyles = createStyles(({ token, css }) => {
       color: white;
       margin-top: 16px;
       font-size: 16px;
+    `,
+    introContainer: css`
+      padding: 0 16px;
+      h2 {
+        color: ${token.colorTextHeading};
+        margin-bottom: 16px;
+      }
+      h3 {
+        color: ${token.colorTextHeading};
+        margin: 16px 0 8px;
+      }
+      p,
+      li {
+        color: ${token.colorText};
+        line-height: 1.6;
+      }
+      ul,
+      ol {
+        padding-left: 20px;
+      }
+    `,
+    resultContainer: css`
+      display: flex;
+      flex-direction: column;
+      height: calc(100% - 24px);
+      gap: 16px;
+    `,
+    // responseBubbleContainer: css`
+    //   flex: 1;
+    //   overflow-y: auto;
+    //   padding: 0 0 16px;
+    //   border-bottom: 1px solid ${token.colorBorderSecondary};
+    // `,
+    jsonResultContainer: css`
+      height: 100%;
+      /* flex: 1; */
     `,
   };
 });

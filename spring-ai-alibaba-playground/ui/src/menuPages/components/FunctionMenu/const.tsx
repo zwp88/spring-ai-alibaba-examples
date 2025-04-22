@@ -56,11 +56,11 @@ export const functionMenuItems: FunctionMenuItem[] = [
     icon: <DatabaseOutlined />,
     label: "RAG",
   },
-  // {
-  //   key: "mcp",
-  //   icon: <ApiOutlined />,
-  //   label: "MCP",
-  // },
+  {
+    key: "mcp",
+    icon: <ApiOutlined />,
+    label: "MCP",
+  },
   // {
   //   key: "more-examples",
   //   icon: <PhoneOutlined />,

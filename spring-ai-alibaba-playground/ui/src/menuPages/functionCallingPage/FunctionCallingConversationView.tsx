@@ -5,6 +5,7 @@ import CodeInfo from "./components/CodeInfo";
 import {
   ChatMessage,
   useConversationContext,
+  BaseMessage,
 } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
 import { getMcp } from "../../api/mcp";
@@ -12,12 +13,18 @@ import { mapStoredMessagesToUIMessages, scrollToBottom } from "../../utils";
 // 导入通用气泡组件
 import ResponseBubble from "../components/ResponseBubble";
 import RequestBubble from "../components/RequestBubble";
-import { FunctionCallingUiMessage } from "./types";
 import { Message } from "../chatPage/types";
 import { useStyles } from "./style";
+import { getToolCalling } from "../../api/toolCalling";
 
 interface FunctionCallingConversationViewProps {
   conversationId: string;
+}
+
+interface FunctionCallingUiMessage extends BaseMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
 }
 
 const FunctionCallingConversationView = ({
@@ -33,7 +40,8 @@ const FunctionCallingConversationView = ({
   const {
     activeConversation,
     chooseActiveConversation,
-    updateActiveConversation,
+    processSendMessage,
+    appendAssistantMessage,
   } = useConversationContext();
 
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数
@@ -107,109 +115,60 @@ const FunctionCallingConversationView = ({
     }
   }, [location.search, activeConversation]);
 
-  const updateConversationMessages = (
-    messageContent: string,
-    role: "assistant",
-    isError: boolean = false,
-    userTimestamp: number,
-    userMessage: FunctionCallingUiMessage
-  ) => {
-    if (!activeConversation) return;
-
-    const assistantTimestamp = Date.now();
-    const assistantMessage: FunctionCallingUiMessage = {
-      role: role,
-      content: messageContent,
-      timestamp: assistantTimestamp,
-      isError: isError,
-    };
-    const assistantUiMessage = mapStoredMessagesToUIMessages([
-      assistantMessage,
-    ])[0];
-
-    setMessages((prev) => [...prev, assistantUiMessage]);
-
-    const existingUserMessage = activeConversation.messages.find(
-      (msg) => msg.timestamp === userTimestamp && msg.role === "user"
-    );
-
-    const baseMessages = existingUserMessage
-      ? activeConversation.messages
-      : [...activeConversation.messages, userMessage];
-
-    const finalMessages = baseMessages
-      .filter((msg) => !(msg as FunctionCallingUiMessage).isLoading)
-      .concat([assistantMessage]);
-
-    if (isError) {
-      console.log("更新错误后的消息列表:", finalMessages);
-    }
-
-    updateActiveConversation({
-      ...activeConversation,
-      messages: finalMessages as FunctionCallingUiMessage[],
-    });
-  };
-
   const handleSendMessage = async (text: string) => {
-    if (!text.trim() || isLoading || !activeConversation) return;
-    setIsLoading(true);
-    setInputContent("");
-    const userTimestamp = Date.now();
-    const userMessage: FunctionCallingUiMessage = {
+    const createMessage = (
+      text: string,
+      timestamp: number
+    ): FunctionCallingUiMessage => ({
       role: "user",
       content: text,
-      timestamp: userTimestamp,
-    };
-
-    const userUiMessage = mapStoredMessagesToUIMessages([userMessage])[0];
-    setMessages((prev) => [...prev, userUiMessage]);
-
-    const updatedWithUserMessage = [
-      ...activeConversation.messages,
-      userMessage,
-    ] as FunctionCallingUiMessage[];
-    updateActiveConversation({
-      ...activeConversation,
-      messages: updatedWithUserMessage,
+      timestamp,
     });
 
-    try {
-      // TODO: 服务端接口还没完成，目前 mcp 和 function calling 似乎都一样
-      const response = await getMcp(text, conversationId);
-      // 服务端状态码并不统一，此处 0 并不代表成功
-      if (response.code !== 10000 || !response.data) {
-        throw new Error(response.message || "获取数据失败");
-      }
-      // TODO: 目前接口还没定下来，这里的类型问题暂时忽略
-      // @ts-ignore
-      const isToolCall = response.data.toolName;
-      if (isToolCall) {
-        // TODO: 加入一个工具调用节点, 而且还需要是阻塞下方消息正文渲染的
+    const sendRequest = async (
+      text: string,
+      userTimestamp: number,
+      userMessage: FunctionCallingUiMessage
+    ) => {
+      const result = await getToolCalling(text, conversationId);
+
+      let toolText = "";
+      // 如果是工具调用，可以先显示工具调用的中间状态
+      if (result.toolName) {
+        toolText = `调用工具: ${result.toolName}\n${result.toolParameters}`;
+        appendAssistantMessage(
+          toolText,
+          "assistant",
+          result.status !== "SUCCESS",
+          userTimestamp,
+          userMessage
+        );
       }
 
-      // @ts-ignore
-      const responseText = response.data.toolResult as string;
+      // 显示最终结果
+      const responseText =
+        result.toolResult || result.toolResponse || "工具调用失败";
 
-      updateConversationMessages(
-        responseText,
+      const totalText = toolText
+        ? `<tool>${toolText}</tool>\n${responseText}`
+        : responseText;
+
+      appendAssistantMessage(
+        totalText,
         "assistant",
-        false,
+        result.status !== "SUCCESS",
         userTimestamp,
         userMessage
       );
-    } catch (error) {
-      console.error("处理Function Calling请求错误:", error);
-      updateConversationMessages(
-        "抱歉，处理您的请求时出现错误。",
-        "assistant",
-        true,
-        userTimestamp,
-        userMessage
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    await processSendMessage({
+      text,
+      sendRequest,
+      createMessage,
+      setLoading: setIsLoading,
+      setInputContent,
+    });
   };
 
   return (
@@ -236,7 +195,7 @@ const FunctionCallingConversationView = ({
             className={`${styles.card} ${styles.resultPanel}`}
             // ref={msgContainerRef}
           >
-            <h2 className={styles.panelTitle}>天气查询功能演示</h2>
+            <h2 className={styles.panelTitle}>地图查询功能演示</h2>
             <div className={styles.messagesContainer} ref={msgContainerRef}>
               {messages.length === 0 && !conversationId ? (
                 <ResponseBubble

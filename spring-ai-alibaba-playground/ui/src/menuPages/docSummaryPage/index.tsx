@@ -313,7 +313,7 @@ const DocSummaryPage: React.FC = () => {
           style={{ fontSize: 20, margin: "0 auto", textAlign: "center" }}
           type="secondary"
         >
-          论文课件、财报合同、翻总结
+          论文课件、财报合同、翻译总结
         </Text>
 
         {/* 上传区域 */}

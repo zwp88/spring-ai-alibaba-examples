@@ -1,7 +1,7 @@
 import { message } from "antd";
 import type { GetProp, UploadProps } from "antd";
-import { ChatMessage, Message } from "./menuPages/chatPage/types";
-import { AiCapabilities } from "./stores/conversation.store";
+import { ChatMessage } from "./stores/conversation.store";
+import { Message } from "./menuPages/functionCallingPage/types";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 

@@ -1,34 +1,40 @@
-import { Input, Button, Tabs, message, theme, Form, Spin } from "antd";
-import { ExportOutlined, CopyOutlined } from "@ant-design/icons";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import {
-  MOCK_MCP_SERVERS,
-  GITHUB_TOOLS,
-  DEFAULT_TOKEN_PLACEHOLDER,
-  MOCK_SERVER_CONFIG,
-} from "./const";
+  Input,
+  Button,
+  Tabs,
+  message,
+  theme,
+  Form,
+  Spin,
+  Checkbox,
+  Empty,
+  Badge,
+} from "antd";
+import { ExportOutlined } from "@ant-design/icons";
 import {
-  requestMcpServerList,
   formatMcpServerListData,
   generateFormFields,
   name2iconMap,
 } from "./utils";
-import { McpServerFormatted, McpToolFormatted } from "./types";
+import { McpServerFormatted, McpToolFormatted, FormField } from "./types";
 import { useStyles } from "./style";
 import React, { useState, useEffect } from "react";
+import { getMcpList, runMcp } from "../../api/mcp";
+// import ResponseBubble from "../../menuPages/components/ResponseBubble";
 
 const { TabPane } = Tabs;
 const { Item: FormItem } = Form;
+
+// const DEFAULT_TOKEN_PLACEHOLDER = "<您的令牌>";
 
 const McpLandingView = () => {
   const { styles } = useStyles();
   const [isFetchingServers, setIsFetchingServers] = useState(false);
   const [isExecutingTool, setIsExecutingTool] = useState(false);
   const [executionResult, setExecutionResult] = useState<any>(null);
-  const [selectedServer, setSelectedServer] = useState("github");
+  const [selectedServer, setSelectedServer] = useState("");
   const [selectedTool, setSelectedTool] = useState("");
-  const [githubToken, setGithubToken] = useState(DEFAULT_TOKEN_PLACEHOLDER);
+  // const [githubToken, setGithubToken] = useState(DEFAULT_TOKEN_PLACEHOLDER);
   const [activeTab, setActiveTab] = useState("stdio");
   const [form] = Form.useForm();
 
@@ -37,21 +43,44 @@ const McpLandingView = () => {
     null
   );
   const [currentTool, setCurrentTool] = useState<McpToolFormatted | null>(null);
-  const [formFields, setFormFields] = useState<any[]>([]);
+  const [formFields, setFormFields] = useState<FormField[]>([]);
+
+  const [rightPanelTab, setRightPanelTab] = useState("intro");
+
+  const adaptApiResponse = (apiServers: any[]): any[] => {
+    return apiServers.map((server) => ({
+      id: server.id,
+      name: server.name,
+      desc: server.desc || null,
+      env: server.env || {},
+      toolList: server.toolList || [],
+    }));
+  };
 
   useEffect(() => {
     const loadServers = async () => {
       setIsFetchingServers(true);
       try {
-        // TODO: 目前这是 MOCK 的
-        const serverData = await requestMcpServerList();
-        const parsedData = formatMcpServerListData(serverData);
+        const serverData = await getMcpList();
+        console.log("serverData", serverData);
 
-        setServerList([parsedData]);
-        setCurrentServer(parsedData);
+        if (serverData && serverData.code === 10000) {
+          // Adapt the API response to our internal types
+          const adaptedData = adaptApiResponse(serverData.data);
+          const parsedData = formatMcpServerListData(adaptedData);
+          setServerList(parsedData);
+
+          // Select the first server by default if available
+          if (parsedData.length > 0) {
+            setSelectedServer(parsedData[0].id);
+            setCurrentServer(parsedData[0]);
+          }
+        } else {
+          message.error("加载 MCP servers: 数据格式无效");
+        }
       } catch (error) {
-        console.error("Error loading MCP servers:", error);
-        message.error("Failed to load MCP servers");
+        console.error("加载 MCP servers 失败:", error);
+        message.error("加载 MCP servers 失败");
       } finally {
         setIsFetchingServers(false);
       }
@@ -65,22 +94,34 @@ const McpLandingView = () => {
       const tool = currentServer.tools.find((t) => t.id === selectedTool);
       if (tool) {
         setCurrentTool(tool);
-        const fields = generateFormFields(tool.params);
+        const fields = generateFormFields(tool.schema);
         setFormFields(fields);
         form.resetFields();
       }
     }
   }, [selectedTool, currentServer, form]);
 
+  useEffect(() => {
+    if (selectedTool) {
+      setRightPanelTab("form");
+    }
+  }, [selectedTool]);
+
+  useEffect(() => {
+    if (executionResult) {
+      setRightPanelTab("result");
+    }
+  }, [executionResult]);
+
   const getIconByName = (iconName: string): React.ReactNode => {
     return name2iconMap[iconName] || name2iconMap.Default;
   };
 
-  const handleServerChange = (value: string) => {
-    setSelectedServer(value);
+  const handleServerChange = (serverId: string) => {
+    setSelectedServer(serverId);
     setSelectedTool("");
 
-    const server = serverList.find((s) => s.id === value);
+    const server = serverList.find((s) => s.id === serverId);
     if (server) {
       setCurrentServer(server);
     }
@@ -90,22 +131,22 @@ const McpLandingView = () => {
     setSelectedTool(value);
   };
 
-  const handleConnect = () => {
-    console.log("Connecting with token:", githubToken);
-  };
+  // const handleConnect = () => {
+  //   if (githubToken === DEFAULT_TOKEN_PLACEHOLDER || !githubToken.trim()) {
+  //     message.error("请输入有效的 GitHub Token");
+  //     return;
+  //   }
 
-  const handleCopyConfig = () => {
-    navigator.clipboard.writeText(MOCK_SERVER_CONFIG);
-    message.success("Configuration copied to clipboard");
-  };
+  //   message.success("GitHub Token 已保存");
+  // };
 
-  const serverDescription =
-    MOCK_MCP_SERVERS.find((server) => server.id === selectedServer)
-      ?.description || "";
+  // const handleCopyConfig = () => {
+  //   navigator.clipboard.writeText(MOCK_SERVER_CONFIG);
+  //   message.success("配置已复制到剪贴板");
+  // };
 
-  const selectedServerIcon =
-    MOCK_MCP_SERVERS.find((server) => server.id === selectedServer)?.icon ||
-    "CloudOutlined";
+  const serverDescription = currentServer?.description || "";
+  const selectedServerIcon = currentServer?.icon || "CloudOutlined";
 
   const handleFormSubmit = async (values: any) => {
     if (!currentServer || !currentTool) return;
@@ -114,11 +155,21 @@ const McpLandingView = () => {
     setExecutionResult(null);
 
     try {
-      // TODO: 调用
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
-      // console.log("Parameters:", values);
-      // setExecutionResult(mockResult);
-      // message.success(`Successfully executed ${currentTool.name}`);
+      const toolName = currentTool.name;
+      const params = JSON.stringify(values);
+      const prompt = `${toolName}(${params})`;
+
+      const response = await runMcp(currentServer.id, prompt);
+
+      if (response.code === 10000) {
+        setExecutionResult({
+          success: true,
+          data: response.data,
+        });
+        message.success(`执行 ${currentTool.name} 成功`);
+      } else {
+        throw new Error(response.message || "执行失败");
+      }
     } catch (error) {
       console.error("调用失败", error);
       message.error("调用失败");
@@ -131,7 +182,7 @@ const McpLandingView = () => {
     }
   };
 
-  const toolsToDisplay = currentServer?.tools || GITHUB_TOOLS;
+  const toolsToDisplay = currentServer?.tools || [];
 
   // 添加动态生成客户端列表的代码
   const clientIconNames = [
@@ -161,6 +212,201 @@ const McpLandingView = () => {
     icon: getIconByName(clientIconNames[index]),
   }));
 
+  const renderFormItem = (field: FormField) => {
+    if (field.fieldType === "checkbox") {
+      return (
+        <FormItem
+          key={field.key}
+          label={field.label}
+          name={field.key}
+          valuePropName="checked"
+          rules={[
+            {
+              required: field.required,
+              message: `请选择${field.label}`,
+            },
+          ]}
+        >
+          <Checkbox>{field.description}</Checkbox>
+        </FormItem>
+      );
+    }
+
+    return (
+      <FormItem
+        key={field.key}
+        label={field.label}
+        name={field.key}
+        rules={[
+          {
+            required: field.required,
+            message: `请输入${field.label}`,
+          },
+        ]}
+        tooltip={field.description}
+      >
+        <Input type={field.fieldType} placeholder={field.placeholder} />
+      </FormItem>
+    );
+  };
+
+  const hasResult = executionResult !== null;
+
+  const getToolTabTitle = () => {
+    return (
+      <span>
+        工具表单
+        {currentTool && <Badge dot style={{ marginLeft: 6 }} />}
+      </span>
+    );
+  };
+
+  const getResultTabTitle = () => {
+    return (
+      <span>
+        执行结果
+        {hasResult && <Badge dot style={{ marginLeft: 6 }} />}
+      </span>
+    );
+  };
+
+  const renderMcpIntroduction = () => {
+    return (
+      <div className={styles.introContainer}>
+        <h2>什么是 MCP?</h2>
+        <p>
+          MCP (Model Context Protocol) 是一种允许 AI
+          模型调用各种工具和服务的协议。 通过 MCP，AI
+          模型可以访问外部功能，如数据查询、计算、代码执行等。
+        </p>
+        <h3>主要特点</h3>
+        <ul>
+          <li>工具调用：AI 模型可以调用各种预定义的工具</li>
+          <li>参数传递：支持结构化参数传递</li>
+          <li>结果返回：工具执行结果会返回给 AI 模型</li>
+          <li>跨平台：支持不同的 AI 平台和模型</li>
+        </ul>
+        <h3>使用方法</h3>
+        <ol>
+          <li>从左侧选择一个 MCP 服务器</li>
+          <li>从中间栏选择一个工具</li>
+          <li>填写工具所需的参数</li>
+          <li>点击执行按钮运行工具</li>
+          <li>在"结果"标签页查看执行结果</li>
+        </ol>
+      </div>
+    );
+  };
+
+  const renderToolForm = () => {
+    if (!currentTool) {
+      return (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={
+            <span>
+              请先从中间栏选择一个工具
+              <br />
+              {currentServer
+                ? `在 ${currentServer.name} 服务器中有 ${toolsToDisplay.length} 个可用工具`
+                : "请先选择服务器"}
+            </span>
+          }
+        />
+      );
+    }
+
+    return (
+      <div className={styles.toolFormContainer}>
+        <div className={styles.toolDescription}>{currentTool.description}</div>
+
+        <Form
+          form={form}
+          layout="vertical"
+          className={styles.toolForm}
+          onFinish={handleFormSubmit}
+        >
+          {formFields.map((field) => renderFormItem(field))}
+
+          <FormItem>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className={styles.submitButton}
+              loading={isExecutingTool}
+            >
+              执行
+            </Button>
+          </FormItem>
+        </Form>
+      </div>
+    );
+  };
+
+  const renderResult = () => {
+    if (!executionResult) {
+      return (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={
+            <span>
+              尚未执行任何工具
+              <br />
+              {currentTool
+                ? `请在"工具表单"标签页执行 ${currentTool.name}`
+                : "请先选择一个工具"}
+            </span>
+          }
+        />
+      );
+    }
+
+    const formatResultContent = () => {
+      if (executionResult.success) {
+        const jsonData = JSON.stringify(executionResult.data, null, 2);
+        return "```json\n" + jsonData + "\n```";
+      } else {
+        return "**执行失败**\n\n" + executionResult.error;
+      }
+    };
+
+    const resultContent = formatResultContent();
+    const timestamp = new Date().getTime();
+
+    return (
+      <div className={styles.resultContainer}>
+        {/* <div className={styles.responseBubbleContainer}>
+          <ResponseBubble
+            content={resultContent}
+            timestamp={timestamp}
+            isError={!executionResult.success}
+          />
+        </div> */}
+
+        <div className={styles.jsonResultContainer}>
+          <div className={styles.resultHeader}>
+            <span
+              className={
+                executionResult.success
+                  ? styles.successHeader
+                  : styles.errorHeader
+              }
+            >
+              {executionResult.success ? "执行成功" : "执行失败"}
+            </span>
+          </div>
+          <div className={styles.resultContent}>
+            {executionResult.success ? (
+              <pre>{JSON.stringify(executionResult.data, null, 2)}</pre>
+            ) : (
+              <div className={styles.errorMessage}>{executionResult.error}</div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.container}>
@@ -169,7 +415,7 @@ const McpLandingView = () => {
             <span className={styles.panelTitle}>MCP Servers</span>
           </div>
           <div className={styles.serverList}>
-            {MOCK_MCP_SERVERS.map((server) => (
+            {serverList.map((server) => (
               <div
                 key={server.id}
                 className={`${styles.serverItem} ${
@@ -194,10 +440,13 @@ const McpLandingView = () => {
               <span className={styles.serverIcon}>
                 {getIconByName(selectedServerIcon)}
               </span>
-              <span className={styles.serverName}>{selectedServer}</span>
+              <span className={styles.serverName}>
+                {currentServer?.name || ""}
+              </span>
             </div>
           </div>
-          <div className={styles.serverDescription}>{serverDescription}</div>
+          {/* TODO： 目前好像没有工具描述 */}
+          {/* <div className={styles.serverDescription}>{serverDescription}</div> */}
 
           <div className={styles.toolsSection}>
             <div className={styles.sectionTitle}>Tools</div>
@@ -222,150 +471,29 @@ const McpLandingView = () => {
         <div className={styles.connectPanel}>
           <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>
-              {currentTool ? `使用 ${currentTool.name}` : "连接 MCP 服务器"}
+              {currentTool ? `使用 ${currentTool.name}` : "MCP 服务"}
             </span>
           </div>
 
-          {currentTool ? (
-            <div className={styles.toolFormContainer}>
-              <div className={styles.toolDescription}>
-                {currentTool.description}
-              </div>
-
-              <Form
-                form={form}
-                layout="vertical"
-                className={styles.toolForm}
-                onFinish={handleFormSubmit}
-              >
-                {formFields.map((field) => (
-                  <FormItem
-                    key={field.key}
-                    label={field.label}
-                    name={field.key}
-                    rules={[
-                      {
-                        required: field.required,
-                        message: `请输入${field.label}`,
-                      },
-                    ]}
-                  >
-                    <Input
-                      type={field.fieldType}
-                      placeholder={field.placeholder}
-                    />
-                  </FormItem>
-                ))}
-
-                <FormItem>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className={styles.submitButton}
-                    loading={isExecutingTool}
-                  >
-                    执行
-                  </Button>
-                </FormItem>
-              </Form>
-
-              {executionResult && (
-                <div className={styles.executionResult}>
-                  <div className={styles.resultHeader}>
-                    <span
-                      className={
-                        executionResult.success
-                          ? styles.successHeader
-                          : styles.errorHeader
-                      }
-                    >
-                      {executionResult.success ? "执行成功" : "执行失败"}
-                    </span>
-                  </div>
-                  <div className={styles.resultContent}>
-                    {executionResult.success ? (
-                      <pre>{JSON.stringify(executionResult.data, null, 2)}</pre>
-                    ) : (
-                      <div className={styles.errorMessage}>
-                        {executionResult.error}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Tabs
-              activeKey={activeTab}
-              onChange={setActiveTab}
-              className={styles.connectTabs}
-            >
-              <TabPane tab="Stdio" key="stdio">
-                <div className={styles.configContainer}>
-                  <div className={styles.configCode}>
-                    <SyntaxHighlighter
-                      language="json"
-                      style={vscDarkPlus}
-                      customStyle={{
-                        margin: 0,
-                        padding: "16px",
-                        fontSize: "13px",
-                        lineHeight: 1.5,
-                        borderRadius: "8px",
-                        position: "relative",
-                      }}
-                      showLineNumbers={true}
-                      wrapLines={true}
-                    >
-                      {MOCK_SERVER_CONFIG}
-                    </SyntaxHighlighter>
-                    <Button
-                      type="text"
-                      icon={<CopyOutlined />}
-                      className={styles.copyButton}
-                      onClick={handleCopyConfig}
-                    />
-                  </div>
-                </div>
-                <div className={styles.clientsSection}>
-                  <h3 className={styles.clientsTitle}>Available Clients</h3>
-                  <div className={styles.clientsList}>
-                    {availableClients.map((client, index) => (
-                      <div key={index} className={styles.clientItem}>
-                        <span className={styles.clientIcon}>{client.icon}</span>
-                        <span className={styles.clientName}>{client.name}</span>
-                        <ExportOutlined className={styles.clientArrow} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </TabPane>
-              <TabPane tab="Streamable HTTP" key="streamable">
-                <div className={styles.tokenInputSection}>
-                  <div className={styles.tokenLabel}>
-                    GITHUB_PERSONAL_ACCESS_TOKEN
-                  </div>
-                  <Input
-                    className={styles.tokenInput}
-                    value={githubToken}
-                    onChange={(e) => setGithubToken(e.target.value)}
-                    placeholder={DEFAULT_TOKEN_PLACEHOLDER}
-                  />
-                  <Button
-                    type="primary"
-                    className={styles.connectButton}
-                    onClick={handleConnect}
-                  >
-                    连接
-                  </Button>
-                </div>
-              </TabPane>
-            </Tabs>
-          )}
+          <Tabs
+            activeKey={rightPanelTab}
+            onChange={setRightPanelTab}
+            className={styles.rightPanelTabs}
+          >
+            <TabPane tab="介绍" key="intro">
+              {renderMcpIntroduction()}
+            </TabPane>
+            <TabPane tab={getToolTabTitle()} key="form">
+              {renderToolForm()}
+            </TabPane>
+            <TabPane tab={getResultTabTitle()} key="result">
+              {renderResult()}
+            </TabPane>
+          </Tabs>
         </div>
       </div>
 
-      {/* TODO: 统一加一个过渡的动画，现在的页面切换看着有点生硬 */}
+      {/* 加载中 */}
       {isFetchingServers && (
         <div className={styles.loadingOverlay}>
           <Spin size="large" />

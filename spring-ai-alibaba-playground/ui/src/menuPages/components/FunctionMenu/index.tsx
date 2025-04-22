@@ -27,8 +27,12 @@ import {
   useConversationContext,
 } from "../../../stores/conversation.store";
 import { functionMenuItems } from "./const";
-import { useFunctionMenuStore } from "../../../stores/functionMenu.store";
+import {
+  useFunctionMenuStore,
+  MenuPage,
+} from "../../../stores/functionMenu.store";
 import { useNavigate } from "react-router-dom";
+import { FunctionMenuItem } from "../../../types";
 
 export interface ConversationItem {
   key: string;
@@ -43,9 +47,10 @@ const FunctionMenu = () => {
     activeConversation,
     chooseActiveConversation,
     deleteConversation,
-    updateConversations,
     clearActiveConversation,
     updateConversationTitle,
+    updateActiveConversation,
+    createConversation,
   } = useConversationContext();
   const { initModelOptionList, modelOptionList, chooseModel, currentModel } =
     useModelConfigContext();
@@ -63,8 +68,12 @@ const FunctionMenu = () => {
     initModelOptionList();
   }, []);
 
-  const onAddConversation = (conversation: Conversation) => {
-    updateConversations([...conversations, conversation]);
+  const onAddConversation = (item: FunctionMenuItem) => {
+    const newConversation = createConversation(item.key as MenuPage, []);
+    if (newConversation) {
+      chooseActiveConversation(newConversation.id);
+      navigate(`/${item.key}/${newConversation.id}`);
+    }
   };
 
   const onConversationClick = (conversationId: string) => {
@@ -84,11 +93,8 @@ const FunctionMenu = () => {
         }
 
         chooseActiveMenuPage(conversation.type);
-
         chooseActiveConversation(conversationId);
-
-        const path = `/${conversation.type}/${conversationId}`;
-        navigate(path);
+        navigate(`/${conversation.type}/${conversationId}`);
       }
     } catch (error) {
       console.error("处理会话点击出错:", error);
@@ -96,7 +102,6 @@ const FunctionMenu = () => {
   };
 
   const handleNewChat = () => {
-    clearActiveConversation();
     navigate("/chat");
   };
 
