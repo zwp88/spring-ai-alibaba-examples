@@ -586,7 +586,7 @@ export const useStyles = createStyles(({ token, css }) => {
       font-size: 16px;
     `,
     introContainer: css`
-      padding: 0 16px;
+      /* padding: 0 16px; */
       h2 {
         color: ${token.colorTextHeading};
         margin-bottom: 16px;

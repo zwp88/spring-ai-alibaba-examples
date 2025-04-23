@@ -49,12 +49,12 @@ export const useStyle = createStyles(({ token, css }) => {
       flex-direction: column;
       width: 100%;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
       padding: 4px 0;
       border-bottom: 1px solid ${token.colorBorderSecondary};
     `,
     functionMenuItem: css`
-      padding: 10px 16px;
+      padding: 8px 16px;
       cursor: pointer;
       border-radius: ${token.borderRadius}px;
 
@@ -96,7 +96,7 @@ export const useStyle = createStyles(({ token, css }) => {
       display: flex;
       align-items: center;
       padding: 8px 12px;
-      margin: 4px 0;
+      margin: 2px 0;
       cursor: pointer;
       border-radius: ${token.borderRadius}px;
       transition: background-color 0.2s ease;
@@ -183,7 +183,7 @@ export const useStyle = createStyles(({ token, css }) => {
       z-index: 10;
     `,
     menuTitle: css`
-      color: #e3e3e377;
+      color: ${token.colorTextTertiary};
       font-size: 14px;
     `,
   };

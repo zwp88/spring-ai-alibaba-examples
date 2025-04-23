@@ -255,7 +255,7 @@ const McpLandingView = () => {
   const getToolTabTitle = () => {
     return (
       <span>
-        工具表单
+        参数表单
         {currentTool && <Badge dot style={{ marginLeft: 6 }} />}
       </span>
     );
@@ -449,7 +449,7 @@ const McpLandingView = () => {
           {/* <div className={styles.serverDescription}>{serverDescription}</div> */}
 
           <div className={styles.toolsSection}>
-            <div className={styles.sectionTitle}>Tools</div>
+            <div className={styles.sectionTitle}>工具列表</div>
             <div className={styles.toolsList}>
               {toolsToDisplay.map((tool) => (
                 <div
@@ -497,7 +497,7 @@ const McpLandingView = () => {
       {isFetchingServers && (
         <div className={styles.loadingOverlay}>
           <Spin size="large" />
-          <div className={styles.loadingText}>Loading MCP Servers...</div>
+          <div className={styles.loadingText}>加载 MCP 服务器...</div>
         </div>
       )}
     </div>
