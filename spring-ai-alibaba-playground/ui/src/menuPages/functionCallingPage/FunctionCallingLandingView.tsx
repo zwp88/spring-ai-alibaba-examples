@@ -40,7 +40,7 @@ const FunctionCallingLandingView = () => {
             value={inputContent}
             onChange={setInputContent}
             onSubmit={handleCreateConversation}
-            placeholder="请输入您想查询的地区和日期，例如：北京今天的天气..."
+            placeholder="请输入您想查询的地区和基础设施信息，例如：北京今天的天气..."
             className={styles.sender}
             loading={isLoading}
           />
