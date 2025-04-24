@@ -141,6 +141,10 @@ java -Dspring.ai.mcp.server.stdio=true \
 
 #### WebFlux 客户端
 
+##### 代码示例
+
+代码文件为 org.springframework.ai.mcp.sample.client.ClientSse，可以直接运行测试。
+
 ```java
 // 配置 WebFlux 客户端
 var transport = new WebFluxSseClientTransport(
@@ -157,7 +161,25 @@ System.out.println("\n>>> QUESTION: " + userInput);
 System.out.println("\n>>> ASSISTANT: " + chatClient.prompt(userInput).call().content());
 ```
 
+##### mcp setting 配置示例
+
+在 cursor、cline 等 MCP 客户端中，本示例可以使用如下配置：
+
+```json
+{
+  "mcpServers": {
+    "weather-local": {
+      "url": "http://localhost:8080/sse"
+    }
+  }
+}
+```
+
 #### STDIO 客户端
+
+##### 代码示例
+
+代码文件为 org.springframework.ai.mcp.sample.client.ClientStdio，可以直接运行测试。
 
 ```java
 var stdioParams = ServerParameters.builder("java")
@@ -172,14 +194,35 @@ var transport = new StdioClientTransport(stdioParams);
 new SampleClient(transport).run();
 ```
 
+##### mcp setting 配置示例
+
+在 cursor、cline 等 MCP 客户端中，本示例可以使用如下配置：
+
+```json
+{
+  "mcpServers": {
+    "weather-local": {
+      "command": "java",
+      "args": [
+        "-Dspring.ai.mcp.server.stdio=true",
+        "-Dspring.main.web-application-type=none",
+        "-Dlogging.pattern.console=",
+        "-jar",
+        "target/mcp-starter-webflux-server-0.0.1-SNAPSHOT.jar"
+      ]
+    }
+  }
+}
+```
+
 ## 工具调用示例
 
 ### 获取天气预报
 
 ```java
 CallToolResult weatherResult = client.callTool(
-    new CallToolRequest("getWeatherForecastByLocation",
-        Map.of("latitude", "39.9042", "longitude", "116.4074"))
+        new CallToolRequest("getWeatherForecastByLocation",
+                Map.of("latitude", "39.9042", "longitude", "116.4074"))
 );
 ```
 
@@ -187,8 +230,8 @@ CallToolResult weatherResult = client.callTool(
 
 ```java
 CallToolResult airQualityResult = client.callTool(
-    new CallToolRequest("getAirQuality",
-        Map.of("latitude", "39.9042", "longitude", "116.4074"))
+        new CallToolRequest("getAirQuality",
+                Map.of("latitude", "39.9042", "longitude", "116.4074"))
 );
 ```
 
@@ -214,19 +257,19 @@ CallToolResult airQualityResult = client.callTool(
 ```java
 @Service
 public class MyNewService {
-    @Tool(description = "新工具描述")
-    public String myNewTool(String input) {
-        // 实现工具逻辑
-        return "处理结果: " + input;
-    }
+   @Tool(description = "新工具描述")
+   public String myNewTool(String input) {
+      // 实现工具逻辑
+      return "处理结果: " + input;
+   }
 }
 
 // 在 McpServerApplication 中注册
 @Bean
 public ToolCallbackProvider myTools(MyNewService myNewService) {
-    return MethodToolCallbackProvider.builder()
-        .toolObjects(myNewService)
-        .build();
+   return MethodToolCallbackProvider.builder()
+           .toolObjects(myNewService)
+           .build();
 }
 ```
 
