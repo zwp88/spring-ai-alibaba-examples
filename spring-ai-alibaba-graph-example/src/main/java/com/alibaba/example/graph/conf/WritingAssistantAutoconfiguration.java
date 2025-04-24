@@ -54,54 +54,53 @@ import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 @Configuration
 public class WritingAssistantAutoconfiguration {
 
-    @Bean
-    public StateGraph writingAssistantGraph(ChatModel chatModel) throws GraphStateException {
+	@Bean
+	public StateGraph writingAssistantGraph(ChatModel chatModel) throws GraphStateException {
 
-        ChatClient chatClient = ChatClient.builder(chatModel)
-                .defaultAdvisors(new SimpleLoggerAdvisor())
-                .build();
+		ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
 
-        AgentStateFactory<OverAllState> stateFactory = (inputs) -> {
-            OverAllState state = new OverAllState();
-            state.registerKeyAndStrategy("original_text", new ReplaceStrategy());
-            state.registerKeyAndStrategy("summary", new ReplaceStrategy());
-            state.registerKeyAndStrategy("summary_feedback", new ReplaceStrategy());
-            state.registerKeyAndStrategy("reworded", new ReplaceStrategy());
-            state.registerKeyAndStrategy("title", new ReplaceStrategy());
-            state.input(inputs);
-            return state;
-        };
+		AgentStateFactory<OverAllState> stateFactory = (inputs) -> {
+			OverAllState state = new OverAllState();
+			state.registerKeyAndStrategy("original_text", new ReplaceStrategy());
+			state.registerKeyAndStrategy("summary", new ReplaceStrategy());
+			state.registerKeyAndStrategy("summary_feedback", new ReplaceStrategy());
+			state.registerKeyAndStrategy("reworded", new ReplaceStrategy());
+			state.registerKeyAndStrategy("title", new ReplaceStrategy());
+			state.input(inputs);
+			return state;
+		};
 
-        StateGraph graph = new StateGraph("Writing Assistant with Feedback Loop", stateFactory)
-                .addNode("summarizer", node_async(new SummarizerNode(chatClient)))
-                .addNode("feedback_classifier", node_async(new SummaryFeedbackClassifierNode(chatClient, "summary")))
-                .addNode("reworder", node_async(new RewordingNode(chatClient)))
-                .addNode("title_generator", node_async(new TitleGeneratorNode(chatClient)))
+		StateGraph graph = new StateGraph("Writing Assistant with Feedback Loop", stateFactory)
+			.addNode("summarizer", node_async(new SummarizerNode(chatClient)))
+			.addNode("feedback_classifier", node_async(new SummaryFeedbackClassifierNode(chatClient, "summary")))
+			.addNode("reworder", node_async(new RewordingNode(chatClient)))
+			.addNode("title_generator", node_async(new TitleGeneratorNode(chatClient)))
 
-                .addEdge(START, "summarizer")
-                .addEdge("summarizer", "feedback_classifier")
-                .addConditionalEdges("feedback_classifier", edge_async(new FeedbackDispatcher()),
-                        Map.of("positive", "reworder", "negative", "summarizer"))
-                .addEdge("reworder", "title_generator")
-                .addEdge("title_generator", END);
+			.addEdge(START, "summarizer")
+			.addEdge("summarizer", "feedback_classifier")
+			.addConditionalEdges("feedback_classifier", edge_async(new FeedbackDispatcher()),
+					Map.of("positive", "reworder", "negative", "summarizer"))
+			.addEdge("reworder", "title_generator")
+			.addEdge("title_generator", END);
 
-        // 添加 PlantUML 打印
-        GraphRepresentation representation = graph.getGraph(GraphRepresentation.Type.PLANTUML, "writing assistant flow");
-        System.out.println("\n=== Writing Assistant UML Flow ===");
-        System.out.println(representation.content());
-        System.out.println("==================================\n");
+		// 添加 PlantUML 打印
+		GraphRepresentation representation = graph.getGraph(GraphRepresentation.Type.PLANTUML,
+				"writing assistant flow");
+		System.out.println("\n=== Writing Assistant UML Flow ===");
+		System.out.println(representation.content());
+		System.out.println("==================================\n");
 
-        return graph;
-    }
+		return graph;
+	}
 
-    @Bean
-    public ChatModel chatModel(@Value("${spring.ai.dashscope.api-key:#{null}}") String apiKey) {
-        DashScopeChatOptions options = DashScopeChatOptions.builder()
-                .withModel(DashScopeApi.ChatModel.QWEN_PLUS.getModel())
-                .build();
+	@Bean
+	public ChatModel chatModel(@Value("${spring.ai.dashscope.api-key:#{null}}") String apiKey) {
+		DashScopeChatOptions options = DashScopeChatOptions.builder()
+			.withModel(DashScopeApi.ChatModel.QWEN_PLUS.getModel())
+			.build();
 
-        DashScopeApi dashScopeApi = new DashScopeApi(apiKey);
-        return new DashScopeChatModel(dashScopeApi, options);
-    }
+		DashScopeApi dashScopeApi = new DashScopeApi(apiKey);
+		return new DashScopeChatModel(dashScopeApi, options);
+	}
 
 }

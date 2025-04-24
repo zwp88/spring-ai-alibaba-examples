@@ -33,22 +33,23 @@ import java.util.Map;
  */
 public class SummarizerNode implements NodeAction {
 
-    private final ChatClient chatClient;
+	private final ChatClient chatClient;
 
-    public SummarizerNode(ChatClient chatClient) {
-        this.chatClient = chatClient;
-    }
+	public SummarizerNode(ChatClient chatClient) {
+		this.chatClient = chatClient;
+	}
 
-    @Override
-    public Map<String, Object> apply(OverAllState state) throws Exception {
-        String text = (String) state.value("original_text").orElse("");
-        String prompt = "请对以下中文文本进行简洁明了的摘要：\n\n" + text;
+	@Override
+	public Map<String, Object> apply(OverAllState state) {
+		String text = (String) state.value("original_text").orElse("");
+		String prompt = "请对以下中文文本进行简洁明了的摘要：\n\n" + text;
 
-        ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
-        String summary = response.getResult().getOutput().getText();
+		ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
+		String summary = response.getResult().getOutput().getText();
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("summary", summary);
-        return result;
-    }
+		Map<String, Object> result = new HashMap<>();
+		result.put("summary", summary);
+		return result;
+	}
+
 }

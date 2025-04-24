@@ -32,22 +32,24 @@ import java.util.Map;
  * @since 2025/4/24 16:00
  */
 public class RewordingNode implements NodeAction {
-    private final ChatClient chatClient;
 
-    public RewordingNode(ChatClient chatClient) {
-        this.chatClient = chatClient;
-    }
+	private final ChatClient chatClient;
 
-    @Override
-    public Map<String, Object> apply(OverAllState state) throws Exception {
-        String summary = (String) state.value("summary").orElse("");
-        String prompt = "请将以下摘要用更优美、生动的语言改写，同时保持信息不变：\n\n" + summary;
+	public RewordingNode(ChatClient chatClient) {
+		this.chatClient = chatClient;
+	}
 
-        ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
-        String reworded = response.getResult().getOutput().getText();
+	@Override
+	public Map<String, Object> apply(OverAllState state) {
+		String summary = (String) state.value("summary").orElse("");
+		String prompt = "请将以下摘要用更优美、生动的语言改写，同时保持信息不变：\n\n" + summary;
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("reworded", reworded);
-        return result;
-    }
+		ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
+		String reworded = response.getResult().getOutput().getText();
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("reworded", reworded);
+		return result;
+	}
+
 }

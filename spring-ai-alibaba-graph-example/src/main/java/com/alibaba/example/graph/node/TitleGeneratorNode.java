@@ -33,22 +33,23 @@ import java.util.Map;
  */
 public class TitleGeneratorNode implements NodeAction {
 
-    private final ChatClient chatClient;
+	private final ChatClient chatClient;
 
-    public TitleGeneratorNode(ChatClient chatClient) {
-        this.chatClient = chatClient;
-    }
+	public TitleGeneratorNode(ChatClient chatClient) {
+		this.chatClient = chatClient;
+	}
 
-    @Override
-    public Map<String, Object> apply(OverAllState state) throws Exception {
-        String content = (String) state.value("reworded").orElse("");
-        String prompt = "请为以下内容生成一个简洁有吸引力的中文标题：\n\n" + content;
+	@Override
+	public Map<String, Object> apply(OverAllState state) {
+		String content = (String) state.value("reworded").orElse("");
+		String prompt = "请为以下内容生成一个简洁有吸引力的中文标题：\n\n" + content;
 
-        ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
-        String title = response.getResult().getOutput().getText();
+		ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
+		String title = response.getResult().getOutput().getText();
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("title", title);
-        return result;
-    }
+		Map<String, Object> result = new HashMap<>();
+		result.put("title", title);
+		return result;
+	}
+
 }
