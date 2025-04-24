@@ -1,0 +1,10 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: spring-ai-alibaba-graph-example
+
+  ai:
+    dashscope:
+      api-key: sk-6b76c9f5936a4a5d8facb6daa5cd3b58
