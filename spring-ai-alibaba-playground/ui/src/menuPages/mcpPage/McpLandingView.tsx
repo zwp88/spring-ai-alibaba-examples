@@ -4,10 +4,8 @@ import {
   Tabs,
   message,
   Form,
-  Spin,
   Checkbox,
   Empty,
-  Badge,
   Typography,
 } from "antd";
 import {
@@ -20,16 +18,17 @@ import { useStyles } from "./style";
 import React, { useState, useEffect } from "react";
 import { getMcpList, runMcp } from "../../api/mcp";
 import CardTab from "../components/CardTab";
-// import ResponseBubble from "../../menuPages/components/ResponseBubble";
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import json from "react-syntax-highlighter/dist/esm/languages/hljs/json";
+import { githubGist } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 
-const { TabPane } = Tabs;
+SyntaxHighlighter.registerLanguage("json", json);
+
 const { Item: FormItem } = Form;
-
-// const DEFAULT_TOKEN_PLACEHOLDER = "<您的令牌>";
 
 const McpLandingView = () => {
   const { styles } = useStyles();
-  const [isFetchingServers, setIsFetchingServers] = useState(false);
   const [isExecutingTool, setIsExecutingTool] = useState(false);
   const [executionResult, setExecutionResult] = useState<any>(null);
   const [selectedServer, setSelectedServer] = useState("");
@@ -44,8 +43,6 @@ const McpLandingView = () => {
   const [currentTool, setCurrentTool] = useState<McpToolFormatted | null>(null);
   const [formFields, setFormFields] = useState<FormField[]>([]);
 
-  const [rightPanelTab, setRightPanelTab] = useState("intro");
-
   const adaptApiResponse = (apiServers: any[]): any[] => {
     return apiServers.map((server) => ({
       id: server.id,
@@ -58,18 +55,14 @@ const McpLandingView = () => {
 
   useEffect(() => {
     const loadServers = async () => {
-      setIsFetchingServers(true);
+      // setIsFetchingServers(true);
       try {
         const serverData = await getMcpList();
-        console.log("serverData", serverData);
-
         if (serverData && serverData.code === 10000) {
-          // Adapt the API response to our internal types
           const adaptedData = adaptApiResponse(serverData.data);
           const parsedData = formatMcpServerListData(adaptedData);
           setServerList(parsedData);
 
-          // Select the first server by default if available
           if (parsedData.length > 0) {
             setSelectedServer(parsedData[0].id);
             setCurrentServer(parsedData[0]);
@@ -81,7 +74,7 @@ const McpLandingView = () => {
         console.error("加载 MCP servers 失败:", error);
         message.error("加载 MCP servers 失败");
       } finally {
-        setIsFetchingServers(false);
+        // setIsFetchingServers(false);
       }
     };
 
@@ -93,24 +86,27 @@ const McpLandingView = () => {
       const tool = currentServer.tools.find((t) => t.id === selectedTool);
       if (tool) {
         setCurrentTool(tool);
-        const fields = generateFormFields(tool.schema);
-        setFormFields(fields);
+        // 生成工具参数的表单字段
+        const toolFields = generateFormFields(tool.schema);
+
+        // 生成环境变量的表单字段
+        const envFields = Object.entries(currentServer.env || {}).map(
+          ([key]) => ({
+            key,
+            label: `${key}`,
+            fieldType: "text",
+            required: true,
+            description: `请输入 ${key}`,
+            placeholder: `请输入 ${key}`,
+          })
+        );
+
+        // 合并工具参数和环境变量的表单字段
+        setFormFields([...envFields, ...toolFields]);
         form.resetFields();
       }
     }
   }, [selectedTool, currentServer, form]);
-
-  useEffect(() => {
-    if (selectedTool) {
-      setRightPanelTab("form");
-    }
-  }, [selectedTool]);
-
-  useEffect(() => {
-    if (executionResult) {
-      setRightPanelTab("result");
-    }
-  }, [executionResult]);
 
   const getIconByName = (iconName: string): React.ReactNode => {
     return name2iconMap[iconName] || name2iconMap.Default;
@@ -128,6 +124,7 @@ const McpLandingView = () => {
 
   const handleToolChange = (value: string) => {
     setSelectedTool(value);
+    setActiveTab("form");
   };
 
   const selectedServerIcon = currentServer?.icon || "CloudOutlined";
@@ -140,7 +137,20 @@ const McpLandingView = () => {
 
     try {
       const toolName = currentTool.name;
-      const params = JSON.stringify(values);
+      // 分离环境变量和工具参数
+      const envKeys = Object.keys(currentServer.env || {});
+      const envValues = Object.fromEntries(
+        envKeys.map((key) => [key, values[key]])
+      );
+      const toolParams = Object.fromEntries(
+        Object.entries(values).filter(([key]) => !envKeys.includes(key))
+      );
+
+      const params = JSON.stringify({
+        ...toolParams,
+        env: envValues, // 添加环境变量到请求参数
+      });
+
       const prompt = `${toolName}(${params})`;
 
       const response = await runMcp(currentServer.id, prompt);
@@ -151,6 +161,7 @@ const McpLandingView = () => {
           data: response.data,
         });
         message.success(`执行 ${currentTool.name} 成功`);
+        setActiveTab("result");
       } else {
         throw new Error(response.message || "执行失败");
       }
@@ -161,6 +172,7 @@ const McpLandingView = () => {
         success: false,
         error: String(error),
       });
+      setActiveTab("result");
     } finally {
       setIsExecutingTool(false);
     }
@@ -206,11 +218,8 @@ const McpLandingView = () => {
     );
   };
 
-  const hasResult = executionResult !== null;
-
   const handleTabChange = (key: string) => {
     setActiveTab(key);
-    setRightPanelTab(key);
   };
 
   const renderMcpIntroduction = () => {
@@ -296,7 +305,7 @@ const McpLandingView = () => {
               尚未执行任何工具
               <br />
               {currentTool
-                ? `请在"工具表单"标签页执行 ${currentTool.name}`
+                ? `请在"参数表单"标签页执行 ${currentTool.name}`
                 : "请先选择一个工具"}
             </span>
           }
@@ -315,12 +324,28 @@ const McpLandingView = () => {
                   : styles.errorHeader
               }
             >
-              {executionResult.success ? "执行成功" : "执行失败"}
+              {executionResult.success ? (
+                <>
+                  <CheckCircleOutlined /> 执行成功
+                </>
+              ) : (
+                <>
+                  <CloseCircleOutlined /> 执行失败
+                </>
+              )}
             </span>
           </div>
           <div className={styles.resultContent}>
             {executionResult.success ? (
-              <pre>{JSON.stringify(executionResult.data, null, 2)}</pre>
+              <SyntaxHighlighter
+                language="json"
+                style={githubGist}
+                className="syntax-highlighter"
+                wrapLines={true}
+                wrapLongLines={true}
+              >
+                {JSON.stringify(executionResult.data, null, 2)}
+              </SyntaxHighlighter>
             ) : (
               <div className={styles.errorMessage}>{executionResult.error}</div>
             )}
@@ -336,7 +361,7 @@ const McpLandingView = () => {
         <div className={styles.selectionPanel}>
           <div className={styles.panelHeader}>
             <Typography.Text className={styles.panelTitle}>
-              MCP Servers
+              MCP 服务器
             </Typography.Text>
           </div>
           <div className={styles.serverList}>
@@ -396,19 +421,19 @@ const McpLandingView = () => {
         {/* 右边栏 */}
         <div className={styles.connectPanel}>
           <CardTab
-            title={currentTool ? `使用 ${currentTool.name}` : "MCP 服务"}
+            title={currentTool ? `使用 ${currentTool.name}` : "功能体验"}
             activeKey={activeTab}
             onTabChange={handleTabChange}
             defaultActiveKey="intro"
             items={[
               {
                 key: "intro",
-                label: "介绍",
+                label: "MCP 介绍",
                 children: renderMcpIntroduction(),
               },
               {
                 key: "form",
-                label: "工具表单",
+                label: "参数表单",
                 children: renderToolForm(),
               },
               {

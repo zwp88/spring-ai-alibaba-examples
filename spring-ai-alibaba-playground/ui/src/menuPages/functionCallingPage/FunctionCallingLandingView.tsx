@@ -45,7 +45,7 @@ const FunctionCallingLandingView = () => {
             onChange={setInputContent}
             onSubmit={handleCreateConversation}
             placeholder="查询某地的基础设施信息..."
-            // className={styles.sender}
+            className={styles.sender}
             loading={isLoading}
           />
         </div>

@@ -28,6 +28,7 @@ export interface McpServerFormatted {
   icon: string;
   description: string;
   tools: McpToolFormatted[];
+  env?: Record<string, string>;
 }
 
 export interface McpToolFormatted {

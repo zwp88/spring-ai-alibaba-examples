@@ -43,12 +43,10 @@ export const useStyles = createStyles(({ token, css }) => ({
     border-radius: ${token.borderRadiusLG}px;
     box-shadow: ${token.boxShadow};
     padding: 16px;
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* margin-top: auto; */
   `,
   sender: css`
     width: 100%;
+    margin-bottom: 6px;
   `,
   resultPanel: css`
     /* height: calc(100% - 16px); */

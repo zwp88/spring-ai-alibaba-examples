@@ -439,7 +439,6 @@ export const useStyles = createStyles(({ token, css }) => {
       }
     `,
 
-    // New styles for tabs and client section
     connectTabs: css`
       width: 100%;
       .ant-tabs-nav {
@@ -530,41 +529,72 @@ export const useStyles = createStyles(({ token, css }) => {
     `,
     submitButton: css`
       margin-top: 8px;
+      width: 100%;
     `,
 
-    // Execution result styles
     executionResult: css`
       margin-top: 16px;
       border: 1px solid ${token.colorBorder};
       border-radius: 8px;
       overflow: hidden;
     `,
+    resultContainer: css`
+      height: 100%;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    `,
+    jsonResultContainer: css`
+      flex: 1;
+      background: ${token.colorBgContainer};
+      border-radius: ${token.borderRadiusLG}px;
+      box-shadow: ${token.boxShadowSecondary};
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    `,
     resultHeader: css`
-      padding: 8px 16px;
-      background-color: ${token.colorBgContainer};
-      border-bottom: 1px solid ${token.colorBorder};
-      font-weight: 500;
+      padding: 12px 16px;
+      border-bottom: 1px solid ${token.colorBorderSecondary};
+      display: flex;
+      align-items: center;
+      gap: 8px;
     `,
     successHeader: css`
       color: ${token.colorSuccess};
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
     `,
     errorHeader: css`
       color: ${token.colorError};
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
     `,
     resultContent: css`
-      padding: 16px;
-      background-color: ${token.colorBgElevated};
-      max-height: 300px;
-      overflow-y: auto;
+      flex: 1;
+      overflow: auto;
+      position: relative;
 
-      pre {
-        margin: 0;
-        white-space: pre-wrap;
-        word-wrap: break-word;
+      .syntax-highlighter {
+        margin: 0 !important;
+        padding: 16px !important;
+        background: ${token.colorBgContainer} !important;
+        font-family: ${token.fontFamilyCode} !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        height: 100% !important;
       }
     `,
     errorMessage: css`
+      padding: 16px;
       color: ${token.colorError};
+      font-size: 14px;
+      line-height: 1.5;
     `,
 
     // Loading overlay styles
@@ -605,22 +635,6 @@ export const useStyles = createStyles(({ token, css }) => {
       ol {
         padding-left: 20px;
       }
-    `,
-    resultContainer: css`
-      display: flex;
-      flex-direction: column;
-      height: calc(100% - 24px);
-      gap: 16px;
-    `,
-    // responseBubbleContainer: css`
-    //   flex: 1;
-    //   overflow-y: auto;
-    //   padding: 0 0 16px;
-    //   border-bottom: 1px solid ${token.colorBorderSecondary};
-    // `,
-    jsonResultContainer: css`
-      height: 100%;
-      /* flex: 1; */
     `,
   };
 });

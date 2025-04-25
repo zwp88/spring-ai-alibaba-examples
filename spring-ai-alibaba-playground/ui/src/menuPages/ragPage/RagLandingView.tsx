@@ -39,7 +39,7 @@ const RagLandingView = () => {
             onChange={setInputContent}
             onSubmit={handleCreateConversation}
             placeholder="可以询问关于SAA相关的问题..."
-            className={styles.sender}
+            // className={styles.sender}
             loading={isLoading}
           />
         </div>

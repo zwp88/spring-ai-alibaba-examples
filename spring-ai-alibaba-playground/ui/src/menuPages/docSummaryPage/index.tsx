@@ -18,6 +18,8 @@ import {
   PaperClipOutlined,
   FilePdfOutlined,
   FileTextOutlined,
+  EyeOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import {
   uploadFile,
@@ -86,6 +88,10 @@ const DocSummaryPage: React.FC = () => {
   const [currentId, setCurrentId] = useState<string>("");
   // 是否请求成功
   const [isSuccess, setIsSuccess] = useState(false);
+  const [viewContentItem, setViewContentItem] = useState<StorageData | null>(
+    null
+  );
+  const [isViewContentModalOpen, setIsViewContentModalOpen] = useState(false);
 
   // 组件挂载时从本地存储加载历史记录
   useEffect(() => {
@@ -202,14 +208,22 @@ const DocSummaryPage: React.FC = () => {
   };
 
   /**
-   * 处理历史记录项点击
+   * 查看内容
    */
-  const handleFileClick = (file: StorageData) => {
-    try {
-      const { id, content } = file;
-      const params = new URLSearchParams();
-      console.log("content: ", content);
+  const handleViewContent = (item: StorageData, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setViewContentItem(item);
+    setIsViewContentModalOpen(true);
+  };
 
+  /**
+   * 去对话
+   */
+  const handleStartChat = (item: StorageData, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const { id, content } = item;
+      const params = new URLSearchParams();
       params.append("prompt", content);
       params.append("conversationId", id);
 
@@ -220,9 +234,14 @@ const DocSummaryPage: React.FC = () => {
         params.append("deepThink", "true");
       }
 
-      navigate(`/chat/${id}?${params.toString()}`);
+      // 使用文件名或链接作为对话标题
+      const chatTitle = item.file?.name || item.link || "文档解析对话";
+      const newConversation = createConversation(MenuPage.Chat, [], chatTitle);
+
+      navigate(`/chat/${newConversation.id}?${params.toString()}`);
     } catch (error) {
       console.error("创建聊天对话错误:", error);
+      message.error("创建对话失败，请重试");
     }
   };
 
@@ -309,12 +328,10 @@ const DocSummaryPage: React.FC = () => {
   return (
     <BasePage title="文档总结">
       <div className={styles.docContainer}>
-        <Text
-          style={{ fontSize: 20, margin: "0 auto", textAlign: "center" }}
-          type="secondary"
-        >
-          论文课件、财报合同、翻译总结
-        </Text>
+        <div className={styles.titleSection}>
+          <Text className={styles.mainTitle}>文档总结</Text>
+          <Text className={styles.subTitle}>论文课件、财报合同、翻译总结</Text>
+        </div>
 
         {/* 上传区域 */}
         <div
@@ -361,11 +378,7 @@ const DocSummaryPage: React.FC = () => {
               itemLayout="horizontal"
               dataSource={fileHistory}
               renderItem={(item) => (
-                <List.Item
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleFileClick(item)}
-                  className={styles.fileHistoryItem}
-                >
+                <List.Item className={styles.fileHistoryItem}>
                   <List.Item.Meta
                     avatar={
                       <Avatar
@@ -395,6 +408,23 @@ const DocSummaryPage: React.FC = () => {
                       </Space>
                     }
                   />
+                  <div className={styles.actionButtons}>
+                    <Button
+                      className={`${styles.actionButton} view-content`}
+                      icon={<EyeOutlined />}
+                      onClick={(e) => handleViewContent(item, e)}
+                    >
+                      查看内容
+                    </Button>
+                    <Button
+                      className={`${styles.actionButton} start-chat`}
+                      icon={<MessageOutlined />}
+                      onClick={(e) => handleStartChat(item, e)}
+                      type="primary"
+                    >
+                      去对话
+                    </Button>
+                  </div>
                 </List.Item>
               )}
             />
@@ -462,6 +492,22 @@ const DocSummaryPage: React.FC = () => {
               </div>
             )}
             <ReactMarkdown>{resultContent}</ReactMarkdown>
+          </div>
+        </Modal>
+
+        {/* 查看内容弹窗 */}
+        <Modal
+          title="文件解析内容"
+          open={isViewContentModalOpen}
+          onCancel={() => {
+            setIsViewContentModalOpen(false);
+            setViewContentItem(null);
+          }}
+          footer={null}
+          width={800}
+        >
+          <div style={{ maxHeight: "60vh", overflow: "auto" }}>
+            <ReactMarkdown>{viewContentItem?.content || ""}</ReactMarkdown>
           </div>
         </Modal>
       </div>
