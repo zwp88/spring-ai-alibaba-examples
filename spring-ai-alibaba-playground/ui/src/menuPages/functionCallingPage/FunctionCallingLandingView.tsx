@@ -19,7 +19,11 @@ const FunctionCallingLandingView = () => {
 
     setIsLoading(true);
     try {
-      const newConversation = createConversation(MenuPage.Mcp, [], content);
+      const newConversation = createConversation(
+        MenuPage.ToolCalling,
+        [],
+        content
+      );
       navigate(
         `/tool-calling/${newConversation.id}?prompt=${encodeURIComponent(
           content
@@ -40,7 +44,7 @@ const FunctionCallingLandingView = () => {
             value={inputContent}
             onChange={setInputContent}
             onSubmit={handleCreateConversation}
-            placeholder="请输入您想查询的地区和基础设施信息，例如：北京今天的天气..."
+            placeholder="查询某地的基础设施信息..."
             className={styles.sender}
             loading={isLoading}
           />
@@ -48,7 +52,7 @@ const FunctionCallingLandingView = () => {
       </div>
 
       <div className={styles.rightPanel}>
-        <OutputResult messages={[]} title="地图查询功能演示" />
+        <OutputResult messages={[]} title="地图查询&中英翻译功能演示" />
       </div>
     </div>
   );

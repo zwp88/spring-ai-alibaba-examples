@@ -61,13 +61,11 @@ export const formatMcpServerListData = (
     const iconName = getIconNameByServerName(server.name);
 
     const tools = server.toolList.map((tool: McpTool) => {
-      // Parse JSON schema string to object
       let parsedParams: Record<string, any> = {};
       let schema: any = null;
 
       try {
         schema = JSON.parse(tool.params);
-        // For form generation, we extract properties from the JSON schema
         if (schema && schema.properties) {
           parsedParams = Object.entries(schema.properties).reduce(
             (acc, [key, propDef]: [string, any]) => {
@@ -78,7 +76,7 @@ export const formatMcpServerListData = (
           );
         }
       } catch (error) {
-        console.error(`Error parsing params for tool ${tool.name}:`, error);
+        console.error(`转换表单参数错误 ${tool.name}:`, error);
       }
 
       return {
@@ -96,6 +94,7 @@ export const formatMcpServerListData = (
       icon: iconName,
       description: server.desc || "",
       tools,
+      env: server.env,
     };
   });
 };

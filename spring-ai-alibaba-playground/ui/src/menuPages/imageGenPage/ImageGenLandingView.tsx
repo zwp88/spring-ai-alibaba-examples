@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import Masonry from "react-masonry-css";
@@ -7,6 +7,7 @@ import TemplateImage from "./components/templateImage";
 import BasePage from "../components/BasePage";
 import { useConversationContext } from "../../stores/conversation.store";
 import { MenuPage } from "../../stores/functionMenu.store";
+import AnimatedSection from "../components/AnimatedSection";
 
 interface ImageItem {
   id: string;
@@ -21,6 +22,7 @@ const ImageGenLandingView: React.FC = () => {
   const [templateImages, setTemplateImages] = useState<ImageItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { createConversation } = useConversationContext();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // 加载创意模板图片
   useEffect(() => {
@@ -50,7 +52,11 @@ const ImageGenLandingView: React.FC = () => {
     if (!prompt.trim()) return;
     setIsLoading(true);
     try {
-      const newConversation = createConversation(MenuPage.ImageGen, []);
+      const newConversation = createConversation(
+        MenuPage.ImageGen,
+        [],
+        prompt.slice(0, 10)
+      );
       navigate(
         `/image-gen/${newConversation.id}?prompt=${encodeURIComponent(prompt)}`
       );
@@ -61,37 +67,41 @@ const ImageGenLandingView: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.inputArea}>
-        <Sender
-          value={inputContent}
-          onChange={setInputContent}
-          onSubmit={handleCreateConversation}
-          placeholder="输入提示词开始生成图片..."
-          className={styles.sender}
-          loading={isLoading}
-        />
-      </div>
+    <BasePage title="AI 图像生成">
+      <div className={styles.container} ref={containerRef}>
+        <div className={styles.inputArea}>
+          <Sender
+            value={inputContent}
+            onChange={setInputContent}
+            onSubmit={handleCreateConversation}
+            placeholder="输入提示词开始生成图片..."
+            className={styles.sender}
+            loading={isLoading}
+          />
+        </div>
 
-      <div>
-        <h2 style={{ margin: "0 0 16px" }}>创意灵感</h2>
-        <Masonry
-          breakpointCols={breakpointColumns}
-          className={styles.masonryGrid}
-          columnClassName={styles.masonryColumn}
-        >
-          {[...templateImages].map((image) => (
-            <TemplateImage
-              key={image.id}
-              id={image.id}
-              path={image.path}
-              prompt={image.prompt}
-              onUseCreative={handleUseTemplate}
-            />
-          ))}
-        </Masonry>
+        <div>
+          <h2 style={{ margin: "0 0 16px" }}>创意灵感</h2>
+          <Masonry
+            breakpointCols={breakpointColumns}
+            className={styles.masonryGrid}
+            columnClassName={styles.masonryColumn}
+          >
+            {[...templateImages].map((image, index) => (
+              <AnimatedSection delay={0.1 * index} key={image.id}>
+                <TemplateImage
+                  key={image.id}
+                  id={image.id}
+                  path={image.path}
+                  prompt={image.prompt}
+                  onUseCreative={handleUseTemplate}
+                />
+              </AnimatedSection>
+            ))}
+          </Masonry>
+        </div>
       </div>
-    </div>
+    </BasePage>
   );
 };
 
