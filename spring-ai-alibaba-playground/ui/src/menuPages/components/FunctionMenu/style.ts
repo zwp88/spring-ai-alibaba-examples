@@ -19,12 +19,12 @@ export const useStyle = createStyles(({ token, css }) => {
     `,
     menu: css`
       background: ${token.colorBgLayout}80;
-      max-width: 280px;
+      max-width: 260px;
       min-width: 0px;
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 0 16px;
+      padding: 0 12px;
       box-sizing: border-box;
       overflow-y: auto;
       overflow-x: hidden;

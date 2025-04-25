@@ -1,20 +1,19 @@
 import * as React from "react";
 import { useState } from "react";
 import { Steps, Typography, theme, Tabs, Button, Space } from "antd";
-import {
-  EyeOutlined,
-  LinkOutlined,
-  ArrowRightOutlined,
-} from "@ant-design/icons";
+import { EyeOutlined, LinkOutlined } from "@ant-design/icons";
 import { Card, Image } from "antd";
 import { useStyles } from "../../style";
 import { motion, AnimatePresence } from "framer-motion";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import CardTab from "../../../components/CardTab";
+import { codeInfoStepList } from "./constant";
+
+// 添加全局样式来隐藏滚动条
 
 const { Step } = Steps;
-const { Paragraph, Title, Link } = Typography;
-const { TabPane } = Tabs;
+const { Paragraph, Title } = Typography;
 
 const codeSummaries: { [key: string]: { code: string; language: string } } = {
   frontend: {
@@ -466,89 +465,38 @@ const ArchitectureFlow: React.FC = () => {
 
   return (
     <>
-      <Typography>
-        <Paragraph className={styles.codeInfoIntro}>
-          Spring AI Tool Calling 关键实现
-        </Paragraph>
-      </Typography>
-
       <Steps
         direction="vertical"
         current={4}
         className={styles.codeInfoSteps}
         progressDot={(iconDot) => iconDot}
       >
-        <Step
-          title={
-            <div className={styles.codeInfoStepTitle}>
-              <span className={styles.codeInfoTitleText}>用户侧</span>
-              <CustomDot index={0} />
-            </div>
-          }
-          description={
-            <div className={styles.codeInfoStepDesc}>
-              输入能够触发工具调用的 Prompt 提示词，对应工具函数的 Description
-              描述；
-            </div>
-          }
-          className={styles.codeInfoStepItem}
-        />
-        <Step
-          title={
-            <div className={styles.codeInfoStepTitle}>
-              <span className={styles.codeInfoTitleText}>AI 大模型</span>
-              <CustomDot index={1} />
-            </div>
-          }
-          description={
-            <div className={styles.codeInfoStepDesc}>
-              AI 大模型判断是否调用函数，此时的 finish_reason 字段为
-              `TOOL_CALL`；
-            </div>
-          }
-          className={styles.codeInfoStepItem}
-        />
-        <Step
-          title={
-            <div className={styles.codeInfoStepTitle}>
-              <span className={styles.codeInfoTitleText}>Spring AI</span>
-              <CustomDot index={2} />
-            </div>
-          }
-          description={
-            <div className={styles.codeInfoStepDesc}>
-              Spring AI
-              在已经注册工具函数元数据中查找对应的函数，并组装参数发起调用；
-            </div>
-          }
-          className={styles.codeInfoStepItem}
-        />
-        <Step
-          title={
-            <div className={styles.codeInfoStepTitle}>
-              <span className={styles.codeInfoTitleText}>AI 大模型</span>
-              <CustomDot index={3} />
-            </div>
-          }
-          description={
-            <div className={styles.codeInfoStepDesc}>
-              接受工具函数调用响应，并返回最终结果给用户。
-            </div>
-          }
-          className={styles.codeInfoStepItem}
-        />
+        {codeInfoStepList.map((step, i) => (
+          <Step
+            key={`step-${i}`}
+            className={styles.codeInfoStepItem}
+            title={
+              <div className={styles.codeInfoStepTitle}>
+                <span className={styles.codeInfoTitleText}>{step.title}</span>
+                <CustomDot index={step.index} />
+              </div>
+            }
+            description={
+              <div className={styles.codeInfoStepDesc}>{step.description}</div>
+            }
+          />
+        ))}
       </Steps>
-      <Paragraph className={styles.codeInfoIntro}>
+      {/* <Paragraph className={styles.codeInfoIntro}>
         至此，Spring AI 中工具调用流程结束。通过 Spring
         AI，开发者可以很方便的注册和管理工具元数据信息，开发自己的 AI 应用。
-      </Paragraph>
+      </Paragraph> */}
     </>
   );
 };
 
 const Documentation: React.FC = () => {
   const { styles } = useStyles();
-  const { token } = theme.useToken();
 
   return (
     <div className={styles.documentationContainer}>
@@ -569,7 +517,16 @@ const Documentation: React.FC = () => {
         此外，开发者可以在提示中引用多个函数 bean
         名称，以提供更灵活的信息检索能力。
       </Paragraph>
-      <Title level={4}>参考文档</Title>
+    </div>
+  );
+};
+
+const Reference: React.FC = () => {
+  const { styles } = useStyles();
+
+  return (
+    <div className={styles.documentationContainer}>
+      {/* <Title level={4}>参考文档</Title> */}
       <Space
         direction="vertical"
         size="middle"
@@ -596,7 +553,7 @@ const Documentation: React.FC = () => {
               如何注册和使用函数调用 API
             </div>
           </div>
-          <ArrowRightOutlined className="arrow-icon" />
+          <LinkOutlined className="arrow-icon" />
         </Button>
 
         <Button
@@ -617,7 +574,7 @@ const Documentation: React.FC = () => {
               工具调用 API 的技术规范与实现
             </div>
           </div>
-          <ArrowRightOutlined className="arrow-icon" />
+          <LinkOutlined className="arrow-icon" />
         </Button>
 
         <Button
@@ -638,7 +595,7 @@ const Documentation: React.FC = () => {
               通义千问/百炼等模型的函数调用与工具集成教程
             </div>
           </div>
-          <ArrowRightOutlined className="arrow-icon" />
+          <LinkOutlined className="arrow-icon" />
         </Button>
       </Space>
     </div>
@@ -649,30 +606,37 @@ const CodeInfo: React.FC = () => {
   const { styles } = useStyles();
   const [activeTab, setActiveTab] = useState("documentation");
 
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
+  };
+
   return (
-    <Card
-      title="Spring AI Alibaba Tool Calling"
-      bordered={false}
-      className={styles.codeInfoContainer}
-      bodyStyle={{
-        flex: 1,
-        overflow: "auto",
-        padding: "16px 24px",
-      }}
-    >
-      <Tabs
+    <div className={styles.codeInfoContainer}>
+      <CardTab
+        title="Spring AI Alibaba Tool Calling"
         activeKey={activeTab}
-        onChange={setActiveTab}
-        className={styles.codeInfoTabs}
-      >
-        <TabPane tab="文档说明" key="documentation">
-          <Documentation />
-        </TabPane>
-        <TabPane tab="架构流程" key="architecture">
-          <ArchitectureFlow />
-        </TabPane>
-      </Tabs>
-    </Card>
+        onTabChange={handleTabChange}
+        // defaultActiveKey="documentation"
+        items={[
+          {
+            key: "documentation",
+            label: "文档说明",
+            children: <Documentation />,
+          },
+          {
+            key: "architecture",
+            label: "架构流程",
+            children: <ArchitectureFlow />,
+          },
+          {
+            key: "reference",
+            label: "参考文档",
+            children: <Reference />,
+          },
+        ]}
+        className={styles.codeInfoContainer}
+      />
+    </div>
   );
 };
 

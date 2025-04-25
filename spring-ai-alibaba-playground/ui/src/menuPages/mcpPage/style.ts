@@ -33,7 +33,8 @@ export const useStyles = createStyles(({ token, css }) => {
       margin: 8px 0 0;
     `,
     selectionPanel: css`
-      width: 280px;
+      min-width: 232px;
+      max-width: 280px;
       height: 100%;
       background: ${token.colorBgContainer};
       border-radius: ${token.borderRadiusLG}px;
@@ -42,7 +43,7 @@ export const useStyles = createStyles(({ token, css }) => {
       margin-right: 12px;
     `,
     toolsPanel: css`
-      flex: 1;
+      flex: 2;
       height: 100%;
       background: ${token.colorBgContainer};
       border-radius: ${token.borderRadiusLG}px;
@@ -53,7 +54,7 @@ export const useStyles = createStyles(({ token, css }) => {
       margin-right: 12px;
     `,
     connectPanel: css`
-      flex: 1;
+      flex: 3;
       width: 360px;
       height: 100%;
       background: ${token.colorBgContainer};
@@ -91,7 +92,7 @@ export const useStyles = createStyles(({ token, css }) => {
       background: ${token.colorBgTextHover};
     `,
     serverIcon: css`
-      margin-right: 12px;
+      margin-right: 4px;
       font-size: 18px;
       width: 24px;
       height: 24px;
@@ -111,12 +112,12 @@ export const useStyles = createStyles(({ token, css }) => {
       display: flex;
       align-items: center;
     `,
-    serverDescription: css`
-      padding: 12px 16px;
-      font-size: 14px;
-      color: ${token.colorTextSecondary};
-      border-bottom: 1px solid ${token.colorBorderSecondary};
-    `,
+    // serverDescription: css`
+    //   padding: 8px 12px;
+    //   font-size: 14px;
+    //   color: ${token.colorTextSecondary};
+    //   border-bottom: 1px solid ${token.colorBorderSecondary};
+    // `,
     toolsSection: css`
       flex: 1;
       display: flex;
@@ -192,7 +193,7 @@ export const useStyles = createStyles(({ token, css }) => {
         height: 100%;
       }
       .ant-tabs-tabpane {
-        padding: 16px;
+        padding: 0 16px;
         height: 100%;
         overflow-y: auto;
       }

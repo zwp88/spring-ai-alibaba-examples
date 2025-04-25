@@ -7,6 +7,7 @@ import TemplateImage from "./components/templateImage";
 import BasePage from "../components/BasePage";
 import { useConversationContext } from "../../stores/conversation.store";
 import { MenuPage } from "../../stores/functionMenu.store";
+import AnimatedSection from "../components/AnimatedSection";
 
 interface ImageItem {
   id: string;
@@ -80,14 +81,16 @@ const ImageGenLandingView: React.FC = () => {
           className={styles.masonryGrid}
           columnClassName={styles.masonryColumn}
         >
-          {[...templateImages].map((image) => (
-            <TemplateImage
-              key={image.id}
-              id={image.id}
-              path={image.path}
-              prompt={image.prompt}
-              onUseCreative={handleUseTemplate}
-            />
+          {[...templateImages].map((image, index) => (
+            <AnimatedSection delay={0.1 * index} key={image.id}>
+              <TemplateImage
+                key={image.id}
+                id={image.id}
+                path={image.path}
+                prompt={image.prompt}
+                onUseCreative={handleUseTemplate}
+              />
+            </AnimatedSection>
           ))}
         </Masonry>
       </div>

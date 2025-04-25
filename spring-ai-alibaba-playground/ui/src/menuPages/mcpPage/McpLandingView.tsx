@@ -3,14 +3,13 @@ import {
   Button,
   Tabs,
   message,
-  theme,
   Form,
   Spin,
   Checkbox,
   Empty,
   Badge,
+  Typography,
 } from "antd";
-import { ExportOutlined } from "@ant-design/icons";
 import {
   formatMcpServerListData,
   generateFormFields,
@@ -20,6 +19,7 @@ import { McpServerFormatted, McpToolFormatted, FormField } from "./types";
 import { useStyles } from "./style";
 import React, { useState, useEffect } from "react";
 import { getMcpList, runMcp } from "../../api/mcp";
+import CardTab from "../components/CardTab";
 // import ResponseBubble from "../../menuPages/components/ResponseBubble";
 
 const { TabPane } = Tabs;
@@ -34,9 +34,8 @@ const McpLandingView = () => {
   const [executionResult, setExecutionResult] = useState<any>(null);
   const [selectedServer, setSelectedServer] = useState("");
   const [selectedTool, setSelectedTool] = useState("");
-  // const [githubToken, setGithubToken] = useState(DEFAULT_TOKEN_PLACEHOLDER);
-  const [activeTab, setActiveTab] = useState("stdio");
   const [form] = Form.useForm();
+  const [activeTab, setActiveTab] = useState("intro");
 
   const [serverList, setServerList] = useState<McpServerFormatted[]>([]);
   const [currentServer, setCurrentServer] = useState<McpServerFormatted | null>(
@@ -131,21 +130,6 @@ const McpLandingView = () => {
     setSelectedTool(value);
   };
 
-  // const handleConnect = () => {
-  //   if (githubToken === DEFAULT_TOKEN_PLACEHOLDER || !githubToken.trim()) {
-  //     message.error("请输入有效的 GitHub Token");
-  //     return;
-  //   }
-
-  //   message.success("GitHub Token 已保存");
-  // };
-
-  // const handleCopyConfig = () => {
-  //   navigator.clipboard.writeText(MOCK_SERVER_CONFIG);
-  //   message.success("配置已复制到剪贴板");
-  // };
-
-  const serverDescription = currentServer?.description || "";
   const selectedServerIcon = currentServer?.icon || "CloudOutlined";
 
   const handleFormSubmit = async (values: any) => {
@@ -183,34 +167,6 @@ const McpLandingView = () => {
   };
 
   const toolsToDisplay = currentServer?.tools || [];
-
-  // 添加动态生成客户端列表的代码
-  const clientIconNames = [
-    "CodeOutlined",
-    "EditOutlined",
-    "ThunderboltOutlined",
-    "StarOutlined",
-    "DesktopOutlined",
-    "CommentOutlined",
-    "ApiOutlined",
-    "MessageOutlined",
-  ];
-
-  const clientNames = [
-    "VS Code",
-    "Cursor",
-    "Windsurf",
-    "Claude",
-    "Cline",
-    "ChatWise",
-    "Cherry Studio",
-    "DeepChat",
-  ];
-
-  const availableClients = clientNames.map((name, index) => ({
-    name,
-    icon: getIconByName(clientIconNames[index]),
-  }));
 
   const renderFormItem = (field: FormField) => {
     if (field.fieldType === "checkbox") {
@@ -252,22 +208,9 @@ const McpLandingView = () => {
 
   const hasResult = executionResult !== null;
 
-  const getToolTabTitle = () => {
-    return (
-      <span>
-        参数表单
-        {currentTool && <Badge dot style={{ marginLeft: 6 }} />}
-      </span>
-    );
-  };
-
-  const getResultTabTitle = () => {
-    return (
-      <span>
-        执行结果
-        {hasResult && <Badge dot style={{ marginLeft: 6 }} />}
-      </span>
-    );
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
+    setRightPanelTab(key);
   };
 
   const renderMcpIntroduction = () => {
@@ -361,28 +304,8 @@ const McpLandingView = () => {
       );
     }
 
-    const formatResultContent = () => {
-      if (executionResult.success) {
-        const jsonData = JSON.stringify(executionResult.data, null, 2);
-        return "```json\n" + jsonData + "\n```";
-      } else {
-        return "**执行失败**\n\n" + executionResult.error;
-      }
-    };
-
-    const resultContent = formatResultContent();
-    const timestamp = new Date().getTime();
-
     return (
       <div className={styles.resultContainer}>
-        {/* <div className={styles.responseBubbleContainer}>
-          <ResponseBubble
-            content={resultContent}
-            timestamp={timestamp}
-            isError={!executionResult.success}
-          />
-        </div> */}
-
         <div className={styles.jsonResultContainer}>
           <div className={styles.resultHeader}>
             <span
@@ -412,7 +335,9 @@ const McpLandingView = () => {
       <div className={styles.container}>
         <div className={styles.selectionPanel}>
           <div className={styles.panelHeader}>
-            <span className={styles.panelTitle}>MCP Servers</span>
+            <Typography.Text className={styles.panelTitle}>
+              MCP Servers
+            </Typography.Text>
           </div>
           <div className={styles.serverList}>
             {serverList.map((server) => (
@@ -427,7 +352,6 @@ const McpLandingView = () => {
                   {getIconByName(server.icon)}
                 </span>
                 <span className={styles.serverName}>{server.name}</span>
-                <ExportOutlined className={styles.serverArrow} />
               </div>
             ))}
           </div>
@@ -449,7 +373,9 @@ const McpLandingView = () => {
           {/* <div className={styles.serverDescription}>{serverDescription}</div> */}
 
           <div className={styles.toolsSection}>
-            <div className={styles.sectionTitle}>工具列表</div>
+            <Typography.Text className={styles.sectionTitle}>
+              工具列表
+            </Typography.Text>
             <div className={styles.toolsList}>
               {toolsToDisplay.map((tool) => (
                 <div
@@ -460,7 +386,7 @@ const McpLandingView = () => {
                   onClick={() => handleToolChange(tool.id)}
                 >
                   <span className={styles.toolName}>{tool.name}</span>
-                  <ExportOutlined className={styles.toolArrow} />
+                  {/* <ExportOutlined className={styles.toolArrow} /> */}
                 </div>
               ))}
             </div>
@@ -469,37 +395,39 @@ const McpLandingView = () => {
 
         {/* 右边栏 */}
         <div className={styles.connectPanel}>
-          <div className={styles.panelHeader}>
-            <span className={styles.panelTitle}>
-              {currentTool ? `使用 ${currentTool.name}` : "MCP 服务"}
-            </span>
-          </div>
-
-          <Tabs
-            activeKey={rightPanelTab}
-            onChange={setRightPanelTab}
-            className={styles.rightPanelTabs}
-          >
-            <TabPane tab="介绍" key="intro">
-              {renderMcpIntroduction()}
-            </TabPane>
-            <TabPane tab={getToolTabTitle()} key="form">
-              {renderToolForm()}
-            </TabPane>
-            <TabPane tab={getResultTabTitle()} key="result">
-              {renderResult()}
-            </TabPane>
-          </Tabs>
+          <CardTab
+            title={currentTool ? `使用 ${currentTool.name}` : "MCP 服务"}
+            activeKey={activeTab}
+            onTabChange={handleTabChange}
+            defaultActiveKey="intro"
+            items={[
+              {
+                key: "intro",
+                label: "介绍",
+                children: renderMcpIntroduction(),
+              },
+              {
+                key: "form",
+                label: "工具表单",
+                children: renderToolForm(),
+              },
+              {
+                key: "result",
+                label: "执行结果",
+                children: renderResult(),
+              },
+            ]}
+          ></CardTab>
         </div>
       </div>
 
       {/* 加载中 */}
-      {isFetchingServers && (
+      {/* {isFetchingServers && (
         <div className={styles.loadingOverlay}>
           <Spin size="large" />
           <div className={styles.loadingText}>加载 MCP 服务器...</div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
