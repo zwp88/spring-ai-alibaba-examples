@@ -12,7 +12,6 @@
 
     <groupId>com.alibaba.cloud.ai.example</groupId>
     <artifactId>spring-ai-alibaba-vector-databases-example</artifactId>
-    <version>1.0.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>vector-simple-example</module>
