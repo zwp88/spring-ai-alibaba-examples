@@ -2,7 +2,7 @@ import { createStyles } from "antd-style";
 
 export const useStyles = createStyles(({ token, css }) => ({
   container: css`
-    height: calc(100vh - 116px);
+    min-height: calc(100vh - 116px);
     padding: 48px 12px 12px;
     display: flex;
     flex-direction: column;

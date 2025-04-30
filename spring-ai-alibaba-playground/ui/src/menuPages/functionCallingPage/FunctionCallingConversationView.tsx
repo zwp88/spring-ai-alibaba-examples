@@ -8,7 +8,6 @@ import {
   BaseMessage,
 } from "../../stores/conversation.store";
 import BasePage from "../components/BasePage";
-import { getMcp } from "../../api/mcp";
 import { mapStoredMessagesToUIMessages, scrollToBottom } from "../../utils";
 // 导入通用气泡组件
 import ResponseBubble from "../components/ResponseBubble";
@@ -195,7 +194,7 @@ const FunctionCallingConversationView = ({
             className={`${styles.card} ${styles.resultPanel}`}
             // ref={msgContainerRef}
           >
-            <h2 className={styles.panelTitle}>地图查询功能演示</h2>
+            <h2 className={styles.panelTitle}>地图查询&中英翻译功能演示</h2>
             <div className={styles.messagesContainer} ref={msgContainerRef}>
               {messages.length === 0 && !conversationId ? (
                 <ResponseBubble

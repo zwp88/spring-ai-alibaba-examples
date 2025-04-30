@@ -45,7 +45,6 @@ const customTheme = {
 
 const Independent: React.FC = () => {
   const { actualTheme, toggleTheme } = useTheme();
-  const { token } = theme.useToken();
   const { styles } = useStyle();
   const isDark = actualTheme === "dark";
 
@@ -122,22 +121,6 @@ const Independent: React.FC = () => {
           </a>
         </Tooltip>
       </Space>
-      {/* <Space className={styles.bottomLinkWrapper}>
-        <Tooltip title={"Question Feedback"}>
-          <a
-            href="https://github.com/alibaba/spring-ai-alibaba/issues"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button icon={<FormOutlined />} />
-          </a>
-        </Tooltip>
-        <Tooltip title={"Contact Us By Dingding"}>
-          <a target="_blank" rel="noopener noreferrer">
-            <Button icon={<DingtalkOutlined />} onClick={showDingTalkModal} />
-          </a>
-        </Tooltip>
-      </Space> */}
 
       <div className={styles.layout}>
         <FunctionMenu />
@@ -168,6 +151,7 @@ const Independent: React.FC = () => {
               </React.Fragment>
             ))}
           </Routes>
+
           <Layout.Footer className={styles.footer}>
             © 2024-2025 Spring AI Alibaba Community
           </Layout.Footer>

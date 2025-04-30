@@ -11,7 +11,6 @@ const RequestBubble: React.FC<RequestBubbleProps> = ({
   content,
   timestamp,
 }) => {
-  const { token } = theme.useToken();
   const { styles } = useStyle();
 
   return (

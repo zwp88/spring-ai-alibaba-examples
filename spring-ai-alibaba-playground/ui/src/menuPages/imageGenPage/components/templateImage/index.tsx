@@ -16,6 +16,7 @@ const TemplateImage: React.FC<TemplateImageProps> = ({
 }) => {
   return (
     <div
+      key={`template-image-${id}`}
       style={{
         position: "relative",
         marginBottom: "16px",
