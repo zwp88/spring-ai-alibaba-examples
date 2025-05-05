@@ -21,4 +21,4 @@
 - Spring AI  和 Spring AI Alibaba API 的使用；
 - AI 项目的最佳实践 等。
 
-项目已经初步建设完成，接下来会根据主干仓库添加和删除某些 Example 示例，请关注 Spring AI Alibaba 以了解更多信息。
+项目已经初步建设完成，接下来会根据主干仓库的变更来添加和删除一些 Example 示例，如果想参与贡献，一起建设，请关注 Spring AI Alibaba 了解更多信息 🎉。
