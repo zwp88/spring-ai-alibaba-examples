@@ -10,9 +10,9 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>dynamic-mcp-server-example</artifactId>
-    <description>Dynamic MCP Server Example</description>
-    <name>Dynamic MCP Server Example</name>
+    <artifactId>nacos-dynamic-mcp-server-example</artifactId>
+    <description>Nacos Dynamic MCP Server Example</description>
+    <name>Nacos Dynamic MCP Server Example</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -29,7 +29,7 @@
         <!-- Dynamic Mcp Server -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-mcp-dynamic-server</artifactId>
+            <artifactId>spring-ai-alibaba-mcp-nacos-dynamic-server</artifactId>
             <version>1.0.0-M6.2-SNAPSHOT</version>
         </dependency>
 

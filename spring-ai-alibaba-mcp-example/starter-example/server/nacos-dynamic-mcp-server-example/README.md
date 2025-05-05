@@ -1,6 +1,6 @@
 # Spring AI MCP + Nacos 示例项目
 
-本项目是一个基于 [spring-ai-alibaba-mcp-dynamic-server](https://github.com/spring-projects/spring-ai-alibaba) 的简单示例，展示如何构建一个动态的mcp server提供服务。
+本项目是一个基于 [spring-ai-alibaba-mcp-nacos-dynamic-server](https://github.com/spring-projects/spring-ai-alibaba) 的简单示例，展示如何构建一个动态的mcp server提供服务。
 
 ## 🧩 主要依赖
 
@@ -33,7 +33,7 @@
 ```yaml
 spring:
   application:
-    name: spring-ai-alibaba-dynamic-mcp-server-example
+    name: spring-ai-alibaba-nacos-dynamic-mcp-server-example
   ai:
     mcp:
       server:
