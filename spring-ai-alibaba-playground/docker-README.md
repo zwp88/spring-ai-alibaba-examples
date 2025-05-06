@@ -62,11 +62,10 @@ mkdir -p src/main/resources/rag/markdown
 Linux/macOS:
 ```bash
 docker run -d -p 8080:8080 \
-  -v "$(pwd)/src/main/resources/mcp-libs:/app/resources/mcp-libs" \
-  -v "$(pwd)/src/main/resources/rag/markdown:/app/resources/rag/markdown" \
-  -v "$(pwd)/src/main/resources/db:/app/resources/db" \
+  -v "$(pwd)/src/main/resources/mcp-libs:/app/mcp-libs" \
+  -v "$(pwd)/src/main/resources/rag/markdown:/app/rag/markdown" \
+  -v "$(pwd)/src/main/resources:/app/src/main/resources" \
   -v "$(pwd)/logs:/app/logs" \
-  -e SPRING_PROFILES_ACTIVE=prod \
   --name spring-ai-alibaba-playground \
   spring-ai-alibaba-playground
 ```
@@ -74,11 +73,10 @@ docker run -d -p 8080:8080 \
 Windows (PowerShell):
 ```powershell
 docker run -d -p 8080:8080 `
-  -v "$($PWD)/src/main/resources/mcp-libs:/app/resources/mcp-libs" `
-  -v "$($PWD)/src/main/resources/rag/markdown:/app/resources/rag/markdown" `
-  -v "$($PWD)/src/main/resources/db:/app/resources/db" `
+  -v "$($PWD)/src/main/resources/mcp-libs:/app/mcp-libs" `
+  -v "$($PWD)/src/main/resources/rag/markdown:/app/rag/markdown" `
+  -v "$($PWD)/src/main/resources:/app/src/main/resources" `
   -v "$($PWD)/logs:/app/logs" `
-  -e SPRING_PROFILES_ACTIVE=prod `
   --name spring-ai-alibaba-playground `
   spring-ai-alibaba-playground
 ```

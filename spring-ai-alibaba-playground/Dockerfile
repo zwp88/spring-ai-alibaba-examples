@@ -1,19 +1,3 @@
-# 多阶段构建 - 构建阶段
-FROM maven:3.9-eclipse-temurin-17 AS builder
-
-WORKDIR /build
-
-# 复制pom.xml并下载依赖项，利用Docker缓存
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-# 复制源代码
-COPY src/ ./src/
-COPY ui/ ./ui/
-
-# 构建应用
-RUN mvn clean package -DskipTests
-
 # 运行阶段
 FROM registry.cn-hangzhou.aliyuncs.com/jast-docker/openjdk:17-slim
 
@@ -32,7 +16,7 @@ RUN apt-get update && \
     npm --version
 
 # 从构建阶段复制构建好的jar
-COPY --from=builder /build/target/app.jar ./app.jar
+COPY target/app.jar ./app.jar
 
 # 创建需要挂载的目录
 RUN mkdir -p /app/resources/mcp-libs \
@@ -41,14 +25,13 @@ RUN mkdir -p /app/resources/mcp-libs \
     /app/logs
 
 # 声明挂载点
-VOLUME ["/app/resources/mcp-libs", "/app/resources/db", "/app/resources/rag/markdown", "/app/logs"]
+VOLUME ["/app/resources/mcp-libs", "/app/src/main/resources", "/app/resources/rag/markdown", "/app/logs"]
 
 # 设置环境变量
-ENV SPRING_PROFILES_ACTIVE=prod \
-    BAIDU_TRANSLATE_APP_ID= \
-    BAIDU_TRANSLATE_SECRET_KEY= \
-    BAIDU_MAP_API_KEY= \
-    AI_DASHSCOPE_API_KEY=sk-0bcceb77ead94ddfae6a69a41ac570bd \
+ENV BAIDU_TRANSLATE_APP_ID=${BAIDU_TRANSLATE_APP_ID} \
+    BAIDU_TRANSLATE_SECRET_KEY=${BAIDU_TRANSLATE_SECRET_KEY} \
+    BAIDU_MAP_API_KEY=${BAIDU_MAP_API_KEY} \
+    AI_DASHSCOPE_API_KEY=${AI_DASHSCOPE_API_KEY} \
     TZ=Asia/Shanghai
 
 # 暴露应用端口

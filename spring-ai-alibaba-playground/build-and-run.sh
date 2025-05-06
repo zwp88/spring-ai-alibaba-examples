@@ -25,27 +25,19 @@ fi
 
 # 构建项目
 print_message "开始构建项目..."
-mvn clean install -DskipTests || { print_error "Maven构建失败"; exit 1; }
+~/Software/apache-maven-3.9.9/bin/mvn clean install -DskipTests || { print_error "Maven构建失败"; exit 1; }
 
 # 构建Docker镜像
 print_message "构建Docker镜像..."
 docker build -t spring-ai-alibaba-playground . || { print_error "Docker构建失败"; exit 1; }
 
-# 创建必要的目录
-#print_message "创建必要的目录..."
-#mkdir -p logs
-#mkdir -p src/main/resources/db
-#mkdir -p src/main/resources/mcp-libs
-#mkdir -p src/main/resources/rag/markdown
-
 # 运行容器
 print_message "启动容器..."
 docker run -d -p 8080:8080 \
-  -v "$(pwd)/src/main/resources/mcp-libs:/app/resources/mcp-libs" \
-  -v "$(pwd)/src/main/resources/rag/markdown:/app/resources/rag/markdown" \
-  -v "$(pwd)/src/main/resources/db:/app/resources/db" \
+  -v "$(pwd)/src/main/resources/mcp-libs:/app/mcp-libs" \
+  -v "$(pwd)/src/main/resources/rag/markdown:/app/rag/markdown" \
+  -v "$(pwd)/src/main/resources:/app/src/main/resources" \
   -v "$(pwd)/logs:/app/logs" \
-  -e SPRING_PROFILES_ACTIVE=prod \
   --name spring-ai-alibaba-playground \
   spring-ai-alibaba-playground
 
