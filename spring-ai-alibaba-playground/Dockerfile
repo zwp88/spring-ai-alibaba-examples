@@ -1,10 +1,26 @@
-# 使用JDK 17运行环境
+# 多阶段构建 - 构建阶段
+FROM maven:3.9-eclipse-temurin-17 AS builder
+
+WORKDIR /build
+
+# 复制pom.xml并下载依赖项，利用Docker缓存
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# 复制源代码
+COPY src/ ./src/
+COPY ui/ ./ui/
+
+# 构建应用
+RUN mvn clean package -DskipTests
+
+# 运行阶段
 FROM registry.cn-hangzhou.aliyuncs.com/jast-docker/openjdk:17-slim
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装Node.js和npm
+# 安装Node.js和npm (用于前端构建，如果需要)
 RUN apt-get update && \
     apt-get install -y curl gnupg wget && \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
@@ -15,28 +31,32 @@ RUN apt-get update && \
     node --version && \
     npm --version
 
-# 复制本地已构建的jar文件
-COPY target/app.jar ./app.jar
+# 从构建阶段复制构建好的jar
+COPY --from=builder /build/target/app.jar ./app.jar
 
 # 创建需要挂载的目录
-RUN mkdir -p /app/resources/mcp-libs
-RUN mkdir -p /app/resources/rag/markdown
-RUN mkdir -p /app/logs
+RUN mkdir -p /app/resources/mcp-libs \
+    /app/resources/rag/markdown \
+    /app/resources/db \
+    /app/logs
 
 # 声明挂载点
-VOLUME ["/app/resources/mcp-libs", "/app/resources/db","/app/resources/rag/markdown", "/app/logs"]
+VOLUME ["/app/resources/mcp-libs", "/app/resources/db", "/app/resources/rag/markdown", "/app/logs"]
 
 # 设置环境变量
-ENV BAIDU_TRANSLATE_APP_ID=
-ENV BAIDU_TRANSLATE_SECRET_KEY=
-ENV BAIDU_MAP_API_KEY=
-ENV AI_DASHSCOPE_API_KEY=sk-0bcceb77ead94ddfae6a69a41ac570bd
+ENV SPRING_PROFILES_ACTIVE=prod \
+    BAIDU_TRANSLATE_APP_ID= \
+    BAIDU_TRANSLATE_SECRET_KEY= \
+    BAIDU_MAP_API_KEY= \
+    AI_DASHSCOPE_API_KEY=sk-0bcceb77ead94ddfae6a69a41ac570bd \
+    TZ=Asia/Shanghai
 
 # 暴露应用端口
 EXPOSE 8080
 
-# 启动命令
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# 启动命令，添加JVM优化参数
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
 
 # 健康检查
-HEALTHCHECK --interval=30s --timeout=3s CMD wget -q -O /dev/null http://localhost:8080/actuator/health || exit 1 
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget -q -O /dev/null http://localhost:8080/actuator/health || exit 1 
