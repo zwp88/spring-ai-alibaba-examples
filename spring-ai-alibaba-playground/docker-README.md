@@ -124,7 +124,7 @@ docker rm spring-ai-alibaba-playground
 
 ### 常见问题
 
-1. **数据库错误**：确保 `src/main/resources/db` 目录下存在 `saa.db` 文件。如果不存在，应用将自动创建。
+1. **数据库错误**：确保 `src/main/resources/db` 目录下存在 `saa.db` 文件。
 
 2. **9411 端口错误**：这是 Zipkin 服务未启动导致的，不影响应用的正常使用。
 
