@@ -49,6 +49,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/ai")
 public class Demo {
+
     @Value("classpath:/prompts/system-qa.st")
     private Resource systemResource;
 
@@ -132,7 +133,7 @@ public class Demo {
     @GetMapping(value = "/rag", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ChatResponse> generate(@RequestParam(value = "message",
             defaultValue = "how to get start with spring ai alibaba?") String message) throws IOException {
-        SearchRequest searchRequest = SearchRequest.defaults();
+        SearchRequest searchRequest = SearchRequest.builder().topK(2).build();
         String promptTemplate = systemResource.getContentAsString(StandardCharsets.UTF_8);
 
         return ChatClient.builder(chatModel)
