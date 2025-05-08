@@ -72,6 +72,8 @@
 		<module>spring-ai-alibaba-more-platform-and-model-example</module>
 		<module>spring-ai-alibaba-chat-memory-example</module>
 		<module>spring-ai-alibaba-usecase-example</module>
+                <module>spring-ai-alibaba-graph-example</module>
+		
         </modules>
 
 	<dependencyManagement>
@@ -177,6 +179,17 @@
 			<releases>
 				<enabled>false</enabled>
 			</releases>
+		</repository>
+		<repository>
+			<id>sonatype</id>
+			<name>OSS Sonatype</name>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>aliyunmaven</id>

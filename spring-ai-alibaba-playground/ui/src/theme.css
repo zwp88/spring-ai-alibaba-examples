@@ -4,11 +4,31 @@
   animation: none !important;
 } */
 
+/* 全局字体配置 */
+:root {
+  --font-family-base: -apple-system, "PingFang SC", "Microsoft YaHei",
+    "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-family-code: "SF Mono", SFMono-Regular, ui-monospace, "Cascadia Mono",
+    "Segoe UI Mono", "Liberation Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+/* 应用字体 */
 body {
   margin: 0;
   padding: 0;
+  font-family: var(--font-family-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   /* 默认浅色主题 */
   background-color: #ffffff;
+}
+
+/* 代码字体 */
+code,
+pre,
+.monaco-editor {
+  font-family: var(--font-family-code);
 }
 
 body.dark-theme {

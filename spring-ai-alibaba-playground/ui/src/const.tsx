@@ -8,11 +8,6 @@ import {
   SmileOutlined,
   RobotFilled,
   UserOutlined,
-  PlusOutlined,
-  PictureOutlined,
-  DatabaseOutlined,
-  ApiOutlined,
-  ToolOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import DocSummaryPage from "./menuPages/docSummaryPage";
@@ -21,12 +16,12 @@ import ImageGenPage from "./menuPages/ImageGenPage";
 import McpPage from "./menuPages/McpPage";
 import MultiModalPage from "./menuPages/MultiModalPage";
 import RagPage from "./menuPages/RagPage";
-import { FunctionMenuItem } from "./types";
 import { Bubble, Prompts, Welcome } from "@ant-design/x";
 import { Space, GetProp, Tag, message, Typography, Image, Button } from "antd";
 import ReactMarkdown from "react-markdown";
 import ChatPage from "./menuPages/chatPage";
 import { MenuPage } from "./stores/functionMenu.store";
+import AnimatedSection from "./menuPages/components/AnimatedSection";
 
 export const BASE_URL = "/api/v1";
 export const DEFAULT_MODEL = "qwen-plus";
@@ -195,32 +190,34 @@ export const conversationsMap: Record<
 // 默认会话界面
 export const PlaceholderNode = ({ className, onPromptsItemClick }) => {
   return (
-    <Space direction="vertical" size={16} className={className}>
-      <Welcome
-        variant="borderless"
-        icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-        title="你好，我是 Spring AI Alibaba"
-        styles={{
-          description: {
-            fontSize: 16,
-            width: "1000px",
-          },
-        }}
-        description="一个基于 Spring AI Alibaba 框架构建的 AI 助手，通过 RAG 技术嵌入了 Spring AI Alibaba 领域知识。"
-      />
-      <Prompts
-        // title="你想了解什么？"
-        items={placeholderPromptsItems}
-        styles={{
-          list: {
-            width: "100%",
-          },
-          item: {
-            flex: 1,
-          },
-        }}
-        onItemClick={onPromptsItemClick}
-      />
-    </Space>
+    <AnimatedSection>
+      <Space direction="vertical" size={16} className={className}>
+        <Welcome
+          variant="borderless"
+          icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
+          title="你好，我是 Spring AI Alibaba"
+          styles={{
+            description: {
+              fontSize: 16,
+              width: "1000px",
+            },
+          }}
+          description="一个基于 Spring AI Alibaba 框架构建的 AI 助手，通过 RAG 技术嵌入了 Spring AI Alibaba 领域知识。"
+        />
+        <Prompts
+          // title="你想了解什么？"
+          items={placeholderPromptsItems}
+          styles={{
+            list: {
+              width: "100%",
+            },
+            item: {
+              flex: 1,
+            },
+          }}
+          onItemClick={onPromptsItemClick}
+        />
+      </Space>
+    </AnimatedSection>
   );
 };
