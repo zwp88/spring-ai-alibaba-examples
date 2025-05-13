@@ -44,6 +44,7 @@
 		<module>client/starter-default-client</module>
 		<module>client/starter-webflux-client</module>
 		<module>client/starter-streamable-client</module>
+		<module>client/nacos-mcp-client-example</module>
 	</modules>
 
 	<dependencyManagement>

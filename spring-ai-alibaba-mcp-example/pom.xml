@@ -38,7 +38,7 @@
 	<modules>
 		<module>manul-example</module>
 		<module>starter-example</module>
-	</modules>
+    </modules>
 
 	<build>
 		<plugins>
