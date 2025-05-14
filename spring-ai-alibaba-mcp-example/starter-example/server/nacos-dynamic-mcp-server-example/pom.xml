@@ -31,6 +31,7 @@
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-mcp-nacos-dynamic-server</artifactId>
             <version>1.0.0-M8.1-SNAPSHOT</version>
+
             <exclusions>
                 <exclusion>
                     <artifactId>spring-ai-mcp</artifactId>
