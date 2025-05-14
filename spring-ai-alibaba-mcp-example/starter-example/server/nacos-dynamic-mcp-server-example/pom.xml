@@ -31,13 +31,53 @@
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-mcp-nacos-dynamic-server</artifactId>
             <version>1.0.0-M8.1-SNAPSHOT</version>
+
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-ai-mcp</artifactId>
+                    <groupId>org.springframework.ai</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- MCP Server WebFlux 支持 -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-mcp-server-webflux-spring-boot-starter</artifactId>
-            <version>1.0.0-M6</version>
+            <artifactId>spring-ai-starter-mcp-server</artifactId>
+            <version>1.0.0-M8</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-ai-mcp</artifactId>
+                    <groupId>org.springframework.ai</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
+            <version>1.0.0-M8</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-ai-mcp</artifactId>
+                    <groupId>org.springframework.ai</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-mcp</artifactId>
+            <version>1.0.0-M8</version>
+        </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-spring-webflux</artifactId>
+            <version>0.9.0</version>
         </dependency>
 
     </dependencies>

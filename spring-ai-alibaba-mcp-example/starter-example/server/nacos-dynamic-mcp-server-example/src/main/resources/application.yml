@@ -16,11 +16,14 @@ spring:
       mcp:
         nacos:
           enabled: true
-          server-addr:
-          service-namespace: public
-          service-group: DEFAULT_GROUP
-          username:
+          server-addr: localhost:8848
+          username: nacos
           password:
+          dynamic:
+            enabled: true
+            service-namespace: public
+            service-group: DEFAULT_GROUP
+            service-names: echo-server
 
 server:
-  port: 8081
+  port: 8090
