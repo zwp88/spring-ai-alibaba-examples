@@ -1,4 +1,4 @@
-# DashScope Chat API
+# Openai Chat API
 
 ### Chat Client Simple Chat
 GET http://127.0.0.1:10003/openai/chat-client/simple/chat
