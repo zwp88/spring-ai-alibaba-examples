@@ -51,6 +51,7 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-elasticsearch-store-spring-boot-starter</artifactId>
+			<version>1.0.0-M6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>co.elastic.clients</groupId>

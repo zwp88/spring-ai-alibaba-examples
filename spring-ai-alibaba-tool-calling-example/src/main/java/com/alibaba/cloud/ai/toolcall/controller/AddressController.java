@@ -16,7 +16,7 @@
 
 package com.alibaba.cloud.ai.toolcall.controller;
 
-import com.alibaba.cloud.ai.toolcalling.baidumap.MapSearchService;
+import com.alibaba.cloud.ai.toolcalling.baidumap.BaiduMapSearchInfoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.client.ChatClient;
@@ -42,8 +42,11 @@ public class AddressController {
     @GetMapping("/chat")
     public String chatWithBaiduMap(@RequestParam(value = "address", defaultValue = "北京") String address,
                                    @RequestParam(value = "facilityType", defaultValue = "bank") String facilityType) throws JsonProcessingException {
-        MapSearchService.Request query = new MapSearchService.Request(address, facilityType);
-        return dashScopeChatClient.prompt(new ObjectMapper().writeValueAsString(query)).tools("baiDuMapGetAddressInformationFunction").call().content();
+        BaiduMapSearchInfoService.Request query = new BaiduMapSearchInfoService.Request(address);
+        return dashScopeChatClient.prompt(new ObjectMapper().writeValueAsString(query))
+                .toolNames("baiDuMapGetAddressInformationFunction")
+                .call()
+                .content();
 
     }
 
