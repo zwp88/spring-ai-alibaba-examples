@@ -44,4 +44,14 @@ public class AppConfig {
 		));
 	}
 
+	//RedisMemory的另一种写法
+	@Bean
+	public RedisChatMemory redisChatMemory() {
+		return new RedisChatMemory(
+				"127.0.0.1",
+				6379,
+				null
+		);
+	}
+
 }
