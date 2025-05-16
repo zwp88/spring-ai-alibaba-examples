@@ -48,7 +48,7 @@
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter</artifactId>
-            <version>${spring-ai-alibaba.version}</version>
+            <version>1.0.0-M6.1</version>
         </dependency>
         <!--spring-ai-alibaba-graph-core 开发中 -->
         <dependency>

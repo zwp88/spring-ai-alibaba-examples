@@ -45,7 +45,8 @@ public class Application {
 			.withModel(DashScopeApi.ChatModel.QWEN_PLUS.getModel())
 			.build();
 
-		return DashScopeChatModel.builder().dashScopeApi(new DashScopeApi(apiKey)).defaultOptions(options).build();
+		DashScopeApi dashScopeApi = new DashScopeApi(apiKey);
+		return new DashScopeChatModel(dashScopeApi, options);
 	}
 
 }
