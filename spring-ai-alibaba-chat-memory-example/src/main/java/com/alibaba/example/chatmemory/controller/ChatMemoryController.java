@@ -158,7 +158,7 @@ public class ChatMemoryController {
 	 */
 	@GetMapping("/getRedisMemory")
 	public List<Message> getRedisMemory(String chatId) {
-		List<Message> chatRecord =  redisMemory.get(chatId, 10);
+		List<Message> chatRecord =  redisMemory.get(chatId);
 		return chatRecord;
 	}
 
