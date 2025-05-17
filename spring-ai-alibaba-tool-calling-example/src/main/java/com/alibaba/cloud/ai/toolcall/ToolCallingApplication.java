@@ -16,21 +16,17 @@
  */
 package com.alibaba.cloud.ai.toolcall;
 
-import com.alibaba.cloud.ai.toolcall.component.baidutranslate.BaidutranslateProperties;
-import com.alibaba.cloud.ai.toolcall.component.weather.WeatherProperties;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 /**
  * @author 北极星
  */
 @SpringBootApplication
-@EnableConfigurationProperties({WeatherProperties.class, BaidutranslateProperties.class})
 public class ToolCallingApplication {
 
     public static void main(String[] args) {

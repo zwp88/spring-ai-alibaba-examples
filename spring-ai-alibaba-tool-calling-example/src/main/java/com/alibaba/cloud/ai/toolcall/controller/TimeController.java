@@ -1,6 +1,6 @@
 package com.alibaba.cloud.ai.toolcall.controller;
 
-import com.alibaba.cloud.ai.toolcall.component.time.method.TimeTools;
+import com.alibaba.cloud.ai.toolcall.compoment.TimeTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class TimeController {
 
     private final ChatClient dashScopeChatClient;
+    private final TimeTools timeTools;
 
-    public TimeController(ChatClient.Builder chatClientBuilder) {
+    public TimeController(ChatClient.Builder chatClientBuilder, TimeTools timeTools) {
         this.dashScopeChatClient = chatClientBuilder.build();
+        this.timeTools = timeTools;
     }
 
     /**
-     * 无工具版
+     * No Tool
      */
     @GetMapping("/chat")
     public String simpleChat(@RequestParam(value = "query", defaultValue = "请告诉我现在北京时间几点了") String query) {
@@ -26,19 +28,11 @@ public class TimeController {
     }
 
     /**
-     * 调用工具版 - function
-     */
-    @GetMapping("/chat-tool-function")
-    public String chatTranslateFunction(@RequestParam(value = "query", defaultValue = "请告诉我现在北京时间几点了") String query) {
-        return dashScopeChatClient.prompt(query).tools("getCityTimeFunction").call().content();
-    }
-
-    /**
-     * 调用工具版 - method
+     * Methods as Tools
      */
     @GetMapping("/chat-tool-method")
     public String chatTranslateMethod(@RequestParam(value = "query", defaultValue = "请告诉我现在北京时间几点了") String query) {
-        return dashScopeChatClient.prompt(query).tools(new TimeTools()).call().content();
+        return dashScopeChatClient.prompt(query).tools(timeTools).call().content();
     }
 
 }
