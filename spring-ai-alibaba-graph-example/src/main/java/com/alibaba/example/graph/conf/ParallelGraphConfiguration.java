@@ -18,12 +18,8 @@
 
 package com.alibaba.example.graph.conf;
 
-import com.alibaba.cloud.ai.graph.GraphRepresentation;
-import com.alibaba.cloud.ai.graph.StateGraph;
-import com.alibaba.cloud.ai.graph.GraphStateException;
-import com.alibaba.cloud.ai.graph.OverAllState;
+import com.alibaba.cloud.ai.graph.*;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
-import com.alibaba.cloud.ai.graph.state.AgentStateFactory;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -53,16 +49,15 @@ public class ParallelGraphConfiguration {
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
         // 状态工厂注册字段与策略
-        AgentStateFactory<OverAllState> factory = inputs -> {
+        OverAllStateFactory factory = () -> {
             OverAllState s = new OverAllState();
             s.registerKeyAndStrategy("inputText", new ReplaceStrategy());
             s.registerKeyAndStrategy("sentiment", new ReplaceStrategy());
             s.registerKeyAndStrategy("keywords", new ReplaceStrategy());
             s.registerKeyAndStrategy("analysis", new ReplaceStrategy());
-            s.input(inputs);
             return s;
         };
-        StateGraph graph = new StateGraph("ParallelDemo", factory)
+        StateGraph graph = new StateGraph("ParallelDemo", factory.create())
                 // 注册节点
                 .addNode("start", node_async(new InputNode()))
                 .addNode("sentiment", node_async(new SentimentAnalysisNode(client, "inputText")))

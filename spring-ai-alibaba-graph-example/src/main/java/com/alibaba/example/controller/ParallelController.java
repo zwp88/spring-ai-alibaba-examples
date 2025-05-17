@@ -24,6 +24,8 @@ import com.alibaba.cloud.ai.graph.GraphStateException;
 import com.alibaba.cloud.ai.graph.RunnableConfig;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.checkpoint.config.SaverConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,7 +44,8 @@ import java.util.Map;
 public class ParallelController {
     private final CompiledGraph engine;
 
-    public ParallelController(StateGraph parallelGraph) throws GraphStateException {
+    @Autowired
+    public ParallelController(@Qualifier("parallelGraph") StateGraph parallelGraph) throws GraphStateException {
         SaverConfig saverConfig = SaverConfig.builder().build();
         //  编译时可设中断点
         this.engine = parallelGraph.compile(
@@ -53,12 +56,12 @@ public class ParallelController {
     }
 
     @GetMapping
-    public Map<String, Object> analyze(@RequestParam String text) {
+    public Map<String, Object> analyze(@RequestParam("text") String text) {
         return engine.invoke(Map.of("inputText", text)).get().data();
     }
 
     @GetMapping(path = "/stream", produces = "text/event-stream")
-    public Flux<Map<String, Object>> analyzeStream(@RequestParam String text) {
+    public Flux<Map<String, Object>> analyzeStream(@RequestParam("text") String text) {
         RunnableConfig cfg = RunnableConfig.builder()
                 .streamMode(CompiledGraph.StreamMode.SNAPSHOTS)
                 .build();
