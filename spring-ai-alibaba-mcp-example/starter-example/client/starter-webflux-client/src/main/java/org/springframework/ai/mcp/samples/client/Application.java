@@ -27,7 +27,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication(exclude = {
-        org.springframework.ai.autoconfigure.mcp.client.SseHttpClientTransportAutoConfiguration.class
+        org.springframework.ai.mcp.client.autoconfigure.SseHttpClientTransportAutoConfiguration.class
 })
 public class Application {
 

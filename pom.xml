@@ -41,10 +41,10 @@
 		<maven.compiler.target>17</maven.compiler.target>
 
 		<!-- Spring AI -->
-		<spring-ai.version>1.0.0-M6</spring-ai.version>
+		<spring-ai.version>1.0.0-M8</spring-ai.version>
 
 		<!-- Spring AI Alibaba -->
-		<spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version>
+		<spring-ai-alibaba.version>1.0.0-M8.1-SNAPSHOT</spring-ai-alibaba.version>
 
 		<!-- Spring Boot -->
 		<spring-boot.version>3.4.0</spring-boot.version>
@@ -72,7 +72,7 @@
 		<module>spring-ai-alibaba-more-platform-and-model-example</module>
 		<module>spring-ai-alibaba-chat-memory-example</module>
 		<module>spring-ai-alibaba-usecase-example</module>
-                <module>spring-ai-alibaba-graph-example</module>
+        <module>spring-ai-alibaba-graph-example</module>
 		
         </modules>
 

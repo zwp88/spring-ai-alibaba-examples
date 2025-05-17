@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-memory-jdbc</artifactId>
-			<version>1.0.0-M8.1-SNAPSHOT</version>
+			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 
 		<dependency>
@@ -69,13 +69,19 @@
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-memory-redis</artifactId>
-			<version>1.0.0-M8.1-SNAPSHOT</version>
+			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 			<version>5.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.32</version>
 		</dependency>
 
 	</dependencies>
