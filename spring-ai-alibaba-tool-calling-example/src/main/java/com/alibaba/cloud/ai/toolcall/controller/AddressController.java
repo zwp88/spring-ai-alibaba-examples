@@ -15,7 +15,7 @@
  */
 package com.alibaba.cloud.ai.toolcall.controller;
 
-import com.alibaba.cloud.ai.toolcall.compoment.AddressInformationTools;
+import com.alibaba.cloud.ai.toolcall.component.AddressInformationTools;
 import com.alibaba.cloud.ai.toolcalling.baidumap.BaiduMapSearchInfoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

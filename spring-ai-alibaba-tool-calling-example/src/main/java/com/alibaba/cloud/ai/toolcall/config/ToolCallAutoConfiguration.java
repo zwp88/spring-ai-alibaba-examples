@@ -15,8 +15,8 @@
  */
 package com.alibaba.cloud.ai.toolcall.config;
 
-import com.alibaba.cloud.ai.toolcall.compoment.AddressInformationTools;
-import com.alibaba.cloud.ai.toolcall.compoment.TimeTools;
+import com.alibaba.cloud.ai.toolcall.component.AddressInformationTools;
+import com.alibaba.cloud.ai.toolcall.component.TimeTools;
 import com.alibaba.cloud.ai.toolcalling.baidumap.BaiduMapSearchInfoService;
 import com.alibaba.cloud.ai.toolcalling.time.GetCurrentTimeByTimeZoneIdService;
 import org.springframework.ai.chat.client.ChatClient;

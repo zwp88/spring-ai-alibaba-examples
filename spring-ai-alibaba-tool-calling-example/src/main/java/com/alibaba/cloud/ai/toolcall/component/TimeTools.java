@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.cloud.ai.toolcall.compoment;
+package com.alibaba.cloud.ai.toolcall.component;
 
 import com.alibaba.cloud.ai.toolcalling.time.GetCurrentTimeByTimeZoneIdService;
 import org.springframework.ai.tool.annotation.Tool;

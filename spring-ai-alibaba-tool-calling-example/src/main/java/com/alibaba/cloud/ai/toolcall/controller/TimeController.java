@@ -15,7 +15,7 @@
  */
 package com.alibaba.cloud.ai.toolcall.controller;
 
-import com.alibaba.cloud.ai.toolcall.compoment.TimeTools;
+import com.alibaba.cloud.ai.toolcall.component.TimeTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
