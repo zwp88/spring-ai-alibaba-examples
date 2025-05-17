@@ -64,15 +64,18 @@ public class AddressController {
      */
     @GetMapping("/chat-method-tool-callback")
     public String chatWithBaiduMap(@RequestParam(value = "address", defaultValue = "北京") String address) throws JsonProcessingException {
-        Method method = ReflectionUtils.findMethod(AddressInformationTools.class, "getAddressInformation");
+        Method method = ReflectionUtils.findMethod(AddressInformationTools.class, "getAddressInformation", String.class);
         if (method == null) {
             throw new RuntimeException("Method not found");
         }
-        BaiduMapSearchInfoService.Request query = new BaiduMapSearchInfoService.Request(address);
-        return dashScopeChatClient.prompt(new ObjectMapper().writeValueAsString(query))
+        return dashScopeChatClient.prompt(address)
                 .toolCallbacks(MethodToolCallback.builder()
                         .toolDefinition(ToolDefinition.builder(method)
-                                .description("Get the current date and time in the user's timezone")
+                                .description("Search for places using Baidu Maps API "
+                                        + "or Get detail information of a address and facility query with baidu map or "
+                                        + "Get address information of a place with baidu map or "
+                                        + "Get detailed information about a specific place with baidu map")
+                                .name("getAddressInformation")
                                 .build())
                         .toolMethod(method)
                         .toolObject(addressTools)
