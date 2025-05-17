@@ -18,14 +18,8 @@
 
 package com.alibaba.example;
 
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 /**
  * @author yHong
