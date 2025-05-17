@@ -19,7 +19,6 @@ package org.springframework.ai.mcp.samples.client;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
