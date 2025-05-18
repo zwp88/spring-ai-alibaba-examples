@@ -29,8 +29,8 @@ public class BaiduTranslateController {
     private final ChatClient dashScopeChatClient;
 
 
-    public BaiduTranslateController(ChatClient.Builder chatClientBuilder, BaiduTranslateService baiduTranslateService) {
-        this.dashScopeChatClient = chatClientBuilder.build();
+    public BaiduTranslateController(ChatClient chatClient, BaiduTranslateService baiduTranslateService) {
+        this.dashScopeChatClient = chatClient;
     }
 
     /**

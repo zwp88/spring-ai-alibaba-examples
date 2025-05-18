@@ -30,8 +30,8 @@ public class WeatherController {
     private final ChatClient dashScopeChatClient;
     private final WeatherService weatherService;
 
-    public WeatherController(ChatClient.Builder chatClientBuilder, WeatherService weatherService) {
-        this.dashScopeChatClient = chatClientBuilder.build();
+    public WeatherController(ChatClient chatClient, WeatherService weatherService) {
+        this.dashScopeChatClient = chatClient;
         this.weatherService = weatherService;
     }
 

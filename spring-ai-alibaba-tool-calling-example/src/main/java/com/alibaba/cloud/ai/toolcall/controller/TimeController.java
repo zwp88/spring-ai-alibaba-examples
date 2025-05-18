@@ -29,8 +29,8 @@ public class TimeController {
     private final ChatClient dashScopeChatClient;
     private final TimeTools timeTools;
 
-    public TimeController(ChatClient.Builder chatClientBuilder, TimeTools timeTools) {
-        this.dashScopeChatClient = chatClientBuilder.build();
+    public TimeController(ChatClient chatClient, TimeTools timeTools) {
+        this.dashScopeChatClient = chatClient;
         this.timeTools = timeTools;
     }
 

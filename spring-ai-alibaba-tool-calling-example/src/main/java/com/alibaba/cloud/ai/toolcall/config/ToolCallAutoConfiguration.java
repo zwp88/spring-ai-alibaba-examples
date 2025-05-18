@@ -15,11 +15,13 @@
  */
 package com.alibaba.cloud.ai.toolcall.config;
 
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.toolcall.component.AddressInformationTools;
 import com.alibaba.cloud.ai.toolcall.component.TimeTools;
 import com.alibaba.cloud.ai.toolcalling.baidumap.BaiduMapSearchInfoService;
 import com.alibaba.cloud.ai.toolcalling.time.GetCurrentTimeByTimeZoneIdService;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +43,10 @@ public class ToolCallAutoConfiguration {
 
     @Bean
     public ChatClient chatClient(ChatModel chatModel) {
-        return ChatClient.builder(chatModel).build();
+        return ChatClient.builder(chatModel)
+                .defaultAdvisors(new SimpleLoggerAdvisor())
+                .defaultOptions(DashScopeChatOptions.builder().build())
+                .build();
     }
 
 }
