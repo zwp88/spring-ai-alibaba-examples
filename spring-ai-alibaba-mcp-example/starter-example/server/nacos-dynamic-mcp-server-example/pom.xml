@@ -29,7 +29,7 @@
         <!-- Dynamic Mcp Server -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-mcp-nacos-dynamic-server</artifactId>
+            <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
             <version>1.0.0-M8.1-SNAPSHOT</version>
 
             <exclusions>
