@@ -55,10 +55,13 @@ public class ClassificationAssistant {
 						""")
 				.defaultAdvisors(
 						new PromptChatMemoryAdvisor(chatMemory), // Chat Memory
-						new QuestionAnswerAdvisor(
-								classificationVectorStore,
-								SearchRequest.builder().topK(5).similarityThresholdAll().build() // RAG
-						),
+						QuestionAnswerAdvisor
+								.builder(classificationVectorStore)
+								.searchRequest(SearchRequest.builder()
+										.topK(5)
+										.similarityThresholdAll()
+										.build())
+								.build(),
 						new SimpleLoggerAdvisor()
 				)
 				.build();
