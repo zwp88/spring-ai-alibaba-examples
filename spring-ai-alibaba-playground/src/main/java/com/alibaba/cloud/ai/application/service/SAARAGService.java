@@ -18,6 +18,7 @@
 package com.alibaba.cloud.ai.application.service;
 
 import com.alibaba.cloud.ai.application.config.rag.VectorStoreDelegate;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -72,16 +73,19 @@ public class SAARAGService {
 						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
 						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
 				).advisors(
-						new QuestionAnswerAdvisor(
-								vectorStoreDelegate.getVectorStore(vectorStoreType),
-								SearchRequest.builder()
-										// TODO all documents retrieved from ADB are under 0.1
-//										.similarityThreshold(0.6d)
-										.topK(6)
-										.build()
-						)
+						QuestionAnswerAdvisor
+								.builder(vectorStoreDelegate.getVectorStore(vectorStoreType))
+								.searchRequest(
+										SearchRequest.builder()
+												// TODO all documents retrieved from ADB are under 0.1
+//												.similarityThreshold(0.6d)
+												.topK(6)
+												.build()
+								)
+								.build()
 				).stream()
 				.content();
 	}
+
 
 }

@@ -1,8 +1,6 @@
 package com.alibaba.example.chatmemory.config;
 
 import com.alibaba.cloud.ai.memory.jdbc.SQLiteChatMemory;
-import com.alibaba.cloud.ai.memory.redis.RedisChatMemory;
-
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.context.annotation.Bean;
@@ -30,30 +28,6 @@ public class AppConfig {
 	public MessageChatMemoryAdvisor jdbcMessageChatMemoryAdvisor(
 			ChatMemory sqLiteChatMemory
 	) {
-
 		return new MessageChatMemoryAdvisor(sqLiteChatMemory);
 	}
-
-	@Bean
-	public MessageChatMemoryAdvisor redisMessageChatMemoryAdvisor() {
-
-		return new MessageChatMemoryAdvisor(new RedisChatMemory(
-				"127.0.0.1",
-				6379,
-				null,
-				10
-		));
-	}
-
-	//RedisMemory的另一种写法
-	@Bean
-	public RedisChatMemory redisChatMemory() {
-		return new RedisChatMemory(
-				"127.0.0.1",
-				6379,
-				null,
-				10
-		);
-	}
-
 }
