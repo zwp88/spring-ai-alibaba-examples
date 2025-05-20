@@ -7,16 +7,16 @@
 ```xml
 <!-- Dynamic Mcp Server -->
 <dependency>
-  <groupId>com.alibaba.cloud.ai</groupId>
-  <artifactId>spring-ai-alibaba-mcp-dynamic-server</artifactId>
-  <version>1.0.0-M6.2-SNAPSHOT</version>
+    <groupId>com.alibaba.cloud.ai</groupId>
+    <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
+    <version>1.0.0-RC1.1</version>
 </dependency>
 
         <!-- MCP Server (WebMVC) -->
 <dependency>
-<groupId>com.alibaba.cloud.ai</groupId>
-<artifactId>spring-ai-alibaba-starter</artifactId>
-<version>${spring-ai-alibaba.version}</version>
+    <groupId>com.alibaba.cloud.ai</groupId>
+    <artifactId>spring-ai-alibaba-starter-mcp-server</artifactId>
+    <version>1.0.0-RC1.1</version>
 </dependency>
 ```
 

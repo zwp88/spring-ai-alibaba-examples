@@ -36,10 +36,6 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-
-		<!-- Spring AI -->
-		<spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version>
-		<spring-ai.version>1.0.0-M6</spring-ai.version>
 	</properties>
 
 	<dependencies>
@@ -51,19 +47,18 @@
 
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter</artifactId>
+			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pdf-document-reader</artifactId>
-			<version>${spring-ai.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
+			<artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
 		</dependency>
 
 		<dependency>

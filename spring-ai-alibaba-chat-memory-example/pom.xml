@@ -49,11 +49,10 @@
 
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter</artifactId>
+			<artifactId>spring-ai-alibaba-starter-memory</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 
-		<!-- 包含此依赖的 Chat Memory 尚未发布。需要 install 运行！ -->
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-memory-jdbc</artifactId>

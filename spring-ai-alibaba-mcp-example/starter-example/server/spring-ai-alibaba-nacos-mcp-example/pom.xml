@@ -31,21 +31,21 @@
         <!-- Spring ai alibaba Starter -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter</artifactId>
+            <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
             <version>${spring-ai-alibaba.version}</version>
         </dependency>
         <!-- MCP Nacos 注册支持 -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
-            <version>1.0.0-M6.2-SNAPSHOT</version>
+            <version>${spring-ai-alibaba.version}</version>
         </dependency>
 
         <!-- MCP Server WebMvc 支持（也可换成 WebFlux） -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-mcp-server-webmvc-spring-boot-starter</artifactId>
-            <version>1.0.0-M6</version>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+            <version>${spring-ai.version}</version>
         </dependency>
 
     </dependencies>

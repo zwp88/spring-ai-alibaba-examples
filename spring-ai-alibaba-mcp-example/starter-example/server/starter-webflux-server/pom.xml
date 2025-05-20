@@ -22,7 +22,6 @@
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
-            <version>${spring-ai.version}</version>
         </dependency>
 
         <dependency>
