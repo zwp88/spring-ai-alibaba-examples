@@ -17,9 +17,14 @@
 
 package com.alibaba.example.chatmemory.controller;
 
+import com.alibaba.cloud.ai.memory.jdbc.MysqlChatMemoryRepository;
 import com.alibaba.cloud.ai.memory.redis.RedisChatMemory;
+import com.alibaba.cloud.ai.memory.redis.RedisChatMemoryRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -47,22 +52,21 @@ public class ChatMemoryController {
 
 	private final MessageChatMemoryAdvisor jdbcChatMemory;
 
-	private final MessageChatMemoryAdvisor redisChatMemory;
+	private final MysqlChatMemoryRepository mysqlChatMemoryRepository;
 
-	//RedisMemory的另一种写法
-	private final RedisChatMemory redisMemory;
+	private final RedisChatMemoryRepository redisChatMemoryRepository;
 
 	public ChatMemoryController(
 			ChatModel chatModel,
 			@Qualifier("jdbcMessageChatMemoryAdvisor") MessageChatMemoryAdvisor jdbcChatMemory,
-			@Qualifier("redisMessageChatMemoryAdvisor") MessageChatMemoryAdvisor redisChatMemory,
-			RedisChatMemory redisMemory
+			MysqlChatMemoryRepository mysqlChatMemoryRepository,
+			RedisChatMemoryRepository redisChatMemoryRepository
 	) {
 
 		this.jdbcChatMemory = jdbcChatMemory;
-		this.redisChatMemory = redisChatMemory;
+		this.mysqlChatMemoryRepository = mysqlChatMemoryRepository;
+		this.redisChatMemoryRepository = redisChatMemoryRepository;
 		this.chatClient = ChatClient.builder(chatModel).build();
-		this.redisMemory = redisMemory;
 	}
 
 	/**
@@ -109,43 +113,49 @@ public class ChatMemoryController {
 	}
 
 	/**
-	 * Redis Chat Memory 实现
+	 * 流式聊天接口（基于 MySQL Chat Memory）
+	 */
+	@GetMapping("/mysql")
+	public Flux<String> mysql(
+			@RequestParam("prompt") String prompt,
+			@RequestParam("chatId") String chatId,
+			HttpServletResponse response) {
+
+		response.setCharacterEncoding("UTF-8");
+
+		ChatMemory chatMemory = MessageWindowChatMemory.builder()
+				.chatMemoryRepository(mysqlChatMemoryRepository)
+				.maxMessages(10)
+				.build();
+
+		return chatClient.prompt(prompt)
+				.advisors(new MessageChatMemoryAdvisor(chatMemory))
+				.advisors(a -> a
+						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+				)
+				.stream()
+				.content();
+	}
+	/**
+	 * 流式聊天接口（基于 Redis Chat Memory）
 	 */
 	@GetMapping("/redis")
 	public Flux<String> redis(
 			@RequestParam("prompt") String prompt,
 			@RequestParam("chatId") String chatId,
-			HttpServletResponse response
-	) {
+			HttpServletResponse response) {
 
 		response.setCharacterEncoding("UTF-8");
 
-		return chatClient.prompt(prompt).advisors(
-				redisChatMemory
-		).advisors(
-				a -> a
-						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
-		).stream().content();
-	}
-
-	//RedisMemory的另一种写法
-	/**
-	 * chat对话
-	 */
-	@GetMapping("/chat")
-	public Flux<String> redisChat(
-			@RequestParam("prompt") String prompt,
-			@RequestParam("chatId") String chatId,
-			HttpServletResponse response
-	) {
-
-		response.setCharacterEncoding("UTF-8");
+		ChatMemory chatMemory = MessageWindowChatMemory.builder()
+				.chatMemoryRepository(redisChatMemoryRepository)
+				.maxMessages(10)
+				.build();
 
 		return chatClient.prompt(prompt)
-				.advisors(new MessageChatMemoryAdvisor(redisMemory))
-				.advisors(
-				a -> a
+				.advisors(new MessageChatMemoryAdvisor(chatMemory))
+				.advisors(a -> a
 						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
 						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
 				)
@@ -153,18 +163,4 @@ public class ChatMemoryController {
 				.content();
 	}
 
-	/**
-	 * 获取当前对话历史
-	 */
-	@GetMapping("/getRedisMemory")
-	public List<Message> getRedisMemory(String chatId) {
-		List<Message> chatRecord =  redisMemory.get(chatId);
-		return chatRecord;
-	}
-
-	//删除历史对话
-	@DeleteMapping("/deleteRedisMemory")
-	public void deleteHistory(String chatId) {
-		redisMemory.clear(String.valueOf(chatId));
-	}
 }

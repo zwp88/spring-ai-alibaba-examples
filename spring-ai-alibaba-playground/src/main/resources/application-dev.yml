@@ -40,6 +40,10 @@ spring:
     #     stdio:
     #       servers-configuration: classpath:/mcp-servers-config.json
 
+    mcp:
+      client:
+        toolcallback:
+          enabled: true
     # 需要配置相关 tools 的信息
     alibaba:
      playground:
