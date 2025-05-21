@@ -23,7 +23,7 @@ Add to the POM the Spring AI Alibaba boot starter:
 ```xml
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-alibaba-starter</artifactId>
+    <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
     <version>1.0.0-M8.1</version>
 </dependency>
 ```
