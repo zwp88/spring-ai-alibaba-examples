@@ -25,12 +25,11 @@
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
     <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-    <version>1.0.0-RC1.1</version>
 </dependency>
 <dependency>
-    <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-graph-core</artifactId>
-    <version>1.0.0-RC1.1</version>
+<groupId>com.alibaba.cloud.ai</groupId>
+<artifactId>spring-ai-alibaba-graph-core</artifactId>
+<version>1.0.0-M6.2-SNAPSHOT</version> <!-- 该版本目前开发中， 可下载源码使用 -->
 </dependency>
 ```
 

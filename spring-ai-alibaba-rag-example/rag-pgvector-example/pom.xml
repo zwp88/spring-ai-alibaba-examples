@@ -17,7 +17,7 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.alibaba.cloud.ai</groupId>
@@ -36,6 +36,8 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+
+		<!-- Spring AI -->
 	</properties>
 
 	<dependencies>
@@ -54,11 +56,13 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-pdf-document-reader</artifactId>
+			<version>${spring-ai.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+			<artifactId>spring-ai-pgvector-store</artifactId>
+			<version>${spring-ai.version}</version>
 		</dependency>
 
 		<dependency>

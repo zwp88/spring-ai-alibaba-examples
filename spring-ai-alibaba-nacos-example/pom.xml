@@ -10,7 +10,7 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>spring-ai-alibaba-nacos-example</artifactId>
+	<artifactId>spring-ai-alibaba-nacos-prompt-example</artifactId>
 	<description>Spring AI Alibaba Nacos Example</description>
 	<name>Spring AI Alibaba Nacos Examples</name>
 
@@ -31,7 +31,7 @@
 
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+			<artifactId>spring-ai-alibaba-starter-nacos-prompt</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 
