@@ -7,7 +7,7 @@
 ```xml
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>
+    <artifactId>spring-ai-starter-mcp-client</artifactId>
     <version>1.0.0-M6</version>
 </dependency>
 ```

@@ -18,26 +18,21 @@
 package com.alibaba.example.chatmemory.controller;
 
 import com.alibaba.cloud.ai.memory.jdbc.MysqlChatMemoryRepository;
-import com.alibaba.cloud.ai.memory.redis.RedisChatMemory;
 import com.alibaba.cloud.ai.memory.redis.RedisChatMemoryRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.List;
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
+import static org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor.TOP_K;
 
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 /**
  * @author yuluo
@@ -82,12 +77,11 @@ public class ChatMemoryController {
 		response.setCharacterEncoding("UTF-8");
 
 		return chatClient.prompt(prompt).advisors(
-				new MessageChatMemoryAdvisor(
-						new InMemoryChatMemory())
+				MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build()
 		).advisors(
 				a -> a
-						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+						.param(CONVERSATION_ID, chatId)
+						.param(TOP_K, 100)
 		).stream().content();
 	}
 
@@ -107,8 +101,8 @@ public class ChatMemoryController {
 				.advisors(jdbcChatMemory)
 				.advisors(
 						a -> a
-								.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-								.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+								.param(CONVERSATION_ID, chatId)
+								.param(TOP_K, 100)
 				).stream().content();
 	}
 
@@ -129,10 +123,10 @@ public class ChatMemoryController {
 				.build();
 
 		return chatClient.prompt(prompt)
-				.advisors(new MessageChatMemoryAdvisor(chatMemory))
+				.advisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
 				.advisors(a -> a
-						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+						.param(CONVERSATION_ID, chatId)
+						.param(TOP_K, 100)
 				)
 				.stream()
 				.content();
@@ -154,10 +148,10 @@ public class ChatMemoryController {
 				.build();
 
 		return chatClient.prompt(prompt)
-				.advisors(new MessageChatMemoryAdvisor(chatMemory))
+				.advisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
 				.advisors(a -> a
-						.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-						.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100)
+						.param(CONVERSATION_ID, chatId)
+						.param(TOP_K, 100)
 				)
 				.stream()
 				.content();
