@@ -36,6 +36,7 @@
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 
 		<dependency>
@@ -50,8 +51,7 @@
 		-->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-elasticsearch-store-spring-boot-starter</artifactId>
-			<version>1.0.0-M6</version>
+			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId>co.elastic.clients</groupId>
@@ -80,7 +80,6 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-advisors-vector-store</artifactId>
-			<version>1.0.0-M8</version>
 		</dependency>
 
 		<dependency>
