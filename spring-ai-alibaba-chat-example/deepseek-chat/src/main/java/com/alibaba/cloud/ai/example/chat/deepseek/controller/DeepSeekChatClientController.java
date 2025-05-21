@@ -16,17 +16,16 @@
  */
 package com.alibaba.cloud.ai.example.chat.deepseek.controller;
 
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.deepseek.DeepSeekChatModel;
-import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeepSeekChatClientController {
 
     private static final String DEFAULT_PROMPT = "你好，介绍下你自己！";
-
 
     private final ChatClient DeepSeekChatClient;
 
