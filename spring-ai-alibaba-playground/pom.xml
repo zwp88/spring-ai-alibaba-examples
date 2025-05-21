@@ -107,7 +107,7 @@
 
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter-memory-jdbc</artifactId>
+			<artifactId>spring-ai-alibaba-starter-memory</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 

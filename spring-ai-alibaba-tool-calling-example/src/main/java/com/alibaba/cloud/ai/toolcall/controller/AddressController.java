@@ -69,7 +69,7 @@ public class AddressController {
         }
         return dashScopeChatClient.prompt(address)
                 .toolCallbacks(MethodToolCallback.builder()
-                        .toolDefinition(ToolDefinition.builder(method)
+                        .toolDefinition(ToolDefinition.builder()
                                 .description("Search for places using Baidu Maps API "
                                         + "or Get detail information of a address and facility query with baidu map or "
                                         + "Get address information of a place with baidu map or "

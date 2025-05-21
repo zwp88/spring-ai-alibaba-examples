@@ -1,4 +1,4 @@
-# Spring AI Alibaba Nacos Example
+# Spring AI Alibaba Nacos Prompt Example
 
 演示如何使用 Nacos 的动态配置管理功能管理 Spring AI Alibaba 的 Prompt。达到动态 Prompt 的效果。
 
