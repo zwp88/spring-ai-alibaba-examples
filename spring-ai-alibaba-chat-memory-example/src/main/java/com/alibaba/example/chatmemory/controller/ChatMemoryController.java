@@ -20,18 +20,21 @@ package com.alibaba.example.chatmemory.controller;
 import com.alibaba.cloud.ai.memory.jdbc.MysqlChatMemoryRepository;
 import com.alibaba.cloud.ai.memory.redis.RedisChatMemoryRepository;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 import static org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor.TOP_K;
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 
 /**

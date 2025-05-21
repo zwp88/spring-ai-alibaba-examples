@@ -2,9 +2,8 @@ package ai.spring.demo.ai.playground;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
 
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.reader.TextReader;
@@ -32,8 +31,10 @@ public class Application  {
 	// In the real world, ingesting documents would often happen separately, on a CI
 	// server or similar.
 	@Bean
-	CommandLineRunner ingestTermOfServiceToVectorStore(EmbeddingModel embeddingModel, VectorStore vectorStore,
-			@Value("classpath:rag/terms-of-service.txt") Resource termsOfServiceDocs) {
+	CommandLineRunner ingestTermOfServiceToVectorStore(
+			VectorStore vectorStore,
+			@Value("classpath:rag/terms-of-service.txt") Resource termsOfServiceDocs
+	) {
 
 		return args -> {
 			// Ingest the document into the vector store
