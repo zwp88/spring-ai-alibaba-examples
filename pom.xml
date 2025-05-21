@@ -95,24 +95,12 @@
 			</dependency>
 			<dependency>
 				<groupId>com.alibaba.cloud.ai</groupId>
-				<artifactId>spring-ai-alibaba-starter-nacos-mcp-client</artifactId>
+				<artifactId>spring-ai-alibaba-bom</artifactId>
 				<version>${spring-ai-alibaba.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
-			<dependency>
-				<groupId>com.alibaba.cloud.ai</groupId>
-				<artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
-				<version>${spring-ai-alibaba.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.alibaba.cloud.ai</groupId>
-				<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-				<version>${spring-ai-alibaba.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.alibaba.cloud.ai</groupId>
-				<artifactId>spring-ai-alibaba-starter-arms-observation</artifactId>
-				<version>${spring-ai-alibaba.version}</version>
-			</dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 
