@@ -1,8 +1,8 @@
 package com.alibaba.example.chatmemory.config;
 
-import com.alibaba.cloud.ai.memory.jdbc.SQLiteChatMemory;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,7 +16,7 @@ public class AppConfig {
 
 	@Bean
 	public ChatMemory SQLiteChatMemory() {
-
+		
 		return new SQLiteChatMemory(
 				null,
 				null,
@@ -28,6 +28,6 @@ public class AppConfig {
 	public MessageChatMemoryAdvisor jdbcMessageChatMemoryAdvisor(
 			ChatMemory sqLiteChatMemory
 	) {
-		return new MessageChatMemoryAdvisor(sqLiteChatMemory);
+		return MessageChatMemoryAdvisor.builder(sqLiteChatMemory).build();
 	}
 }

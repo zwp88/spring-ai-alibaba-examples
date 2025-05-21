@@ -100,7 +100,11 @@ public class BeanController {
     @GetMapping("/chat-model-format")
     public String chatModel(@RequestParam(value = "query", defaultValue = "以影子为作者，写一篇200字左右的有关人工智能诗篇") String query) {
         String template = query + "{format}";
-        Prompt prompt = new PromptTemplate(template, Map.of("format", format)).create();
+        Prompt prompt =
+                // TODO 这里的第二个参数
+//                new PromptTemplate(template, Map.of("format", format)).create();
+        new PromptTemplate(template).create();
+        
 
         String result = chatModel.call(prompt).getResult().getOutput().getText();
         log.info("result: {}", result);

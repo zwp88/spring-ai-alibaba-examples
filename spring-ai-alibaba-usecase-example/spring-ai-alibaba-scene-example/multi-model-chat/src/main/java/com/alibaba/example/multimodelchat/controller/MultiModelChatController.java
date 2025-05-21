@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 
-import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -46,8 +46,6 @@ public class MultiModelChatController {
     private final ChatClient ollamaChatClient;
 
     private final ChatClient dashScopeChatClient;
-
-    private final InMemoryChatMemoryRepository inMemoryChatMemory = new InMemoryChatMemoryRepository() ;
 
     public MultiModelChatController(OllamaChatModel ollamaChatModel, DashScopeChatModel dashScopeChatModel) {
         this.ollamaChatClient = ChatClient.builder(ollamaChatModel).build();
@@ -74,20 +72,18 @@ public class MultiModelChatController {
         // Retrieve response streams from both models
         Flux<String> ollamaStream = ollamaChatClient.prompt()
                 .user(prompt)
-                // TODO
-//                .advisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
-//                .advisors(memoryAdvisor -> memoryAdvisor
-//                        .param(CONVERSATION_ID, conversationId)
-//                        .param(VectorStoreChatMemoryAdvisor.TOP_K, 100))
+                .advisors(MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
+                .advisors(memoryAdvisor -> memoryAdvisor
+                        .param(CONVERSATION_ID, conversationId)
+                        .param(VectorStoreChatMemoryAdvisor.TOP_K, 100))
                 .stream().content();
 
         Flux<String> dashScopeStream = dashScopeChatClient.prompt()
                 .user(prompt)
-                // TODO
-//                .advisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
-//                .advisors(memoryAdvisor -> memoryAdvisor
-//                        .param(CONVERSATION_ID, conversationId)
-//                        .param(VectorStoreChatMemoryAdvisor.TOP_K, 100))
+                .advisors(MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
+                .advisors(memoryAdvisor -> memoryAdvisor
+                        .param(CONVERSATION_ID, conversationId)
+                        .param(VectorStoreChatMemoryAdvisor.TOP_K, 100))
                 .stream().content();
 
         // Wrap each stream in SSE events with source identifiers
