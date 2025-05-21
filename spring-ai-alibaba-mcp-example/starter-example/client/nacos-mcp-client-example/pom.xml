@@ -44,8 +44,7 @@
 
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
-            <version>${spring-ai-alibaba.version}</version>
+            <artifactId>spring-ai-alibaba-starter-nacos-mcp-client</artifactId>
         </dependency>
 
         <dependency>
