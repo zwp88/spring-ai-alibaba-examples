@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-opensearch-example</artifactId>
+    <artifactId>vector-opensearch-example</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-ai-alibaba-opensearch-example</name>
     <description>spring-ai-alibaba-opensearch-example</description>
