@@ -10,14 +10,14 @@ MCP Server 注册到 Nacos 中，并通过注解式工具（Tool）提供服务�
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
     <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
-    <version>1.0.0-M6.2-SNAPSHOT</version>
+    <version>1.0.0-RC1.1</version>
 </dependency>
 
         <!-- MCP Server (WebMVC) -->
 <dependency>
-<groupId>com.alibaba.cloud.ai</groupId>
-<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-<version>${spring-ai-alibaba.version}</version>
+    <groupId>com.alibaba.cloud.ai</groupId>
+    <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+    <version>1.0.0-RC1.1</version>
 </dependency>
 ```
 
@@ -79,10 +79,10 @@ mvn spring-boot:run
 @Service
 public class WeatherService {
 
-    @Tool(description = "Get weather information by city name")
-    public String getWeather(String cityName) {
-        return "Sunny in " + cityName;
-    }
+  @Tool(description = "Get weather information by city name")
+  public String getWeather(String cityName) {
+    return "Sunny in " + cityName;
+  }
 }
 ```
 

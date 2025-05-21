@@ -4,23 +4,19 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.alibaba.cloud.ai</groupId>
+	<parent>
+		<groupId>com.alibaba.cloud.ai</groupId>
+		<artifactId>spring-ai-alibaba-examples</artifactId>
+		<version>${revision}</version>
+	</parent>
+
 	<artifactId>spring-ai-alibaba-playground</artifactId>
-	<version>1.0.0-RC1</version>
+	<version>${revision}</version>
 
 	<description>Spring AI Alibaba Playground</description>
 	<name>Spring AI Alibaba Playground</name>
 
 	<properties>
-		<!-- Spring AI Alibaba -->
-		<spring-ai-alibaba.version>1.0.0-M8.1-SNAPSHOT</spring-ai-alibaba.version>
-
-		<!-- Spring AI -->
-		<spring-ai.version>1.0.0-M8</spring-ai.version>
-
-		<!-- Spring Boot -->
-		<spring-boot.version>3.3.3</spring-boot.version>
-
 		<!-- Node and npm -->
 		<node.version>v20.12.2</node.version>
 		<npm.version>10.9.2</npm.version>

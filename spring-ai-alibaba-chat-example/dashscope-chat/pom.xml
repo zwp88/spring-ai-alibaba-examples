@@ -43,6 +43,7 @@
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>
