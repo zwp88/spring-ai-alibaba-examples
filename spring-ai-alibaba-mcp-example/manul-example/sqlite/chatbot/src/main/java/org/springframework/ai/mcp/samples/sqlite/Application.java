@@ -1,23 +1,23 @@
 package org.springframework.ai.mcp.samples.sqlite;
 
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.List;
-import java.util.Scanner;
-
+import io.modelcontextprotocol.client.McpClient;
+import io.modelcontextprotocol.client.McpSyncClient;
+import io.modelcontextprotocol.client.transport.ServerParameters;
+import io.modelcontextprotocol.client.transport.StdioClientTransport;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
-import org.springframework.ai.mcp.client.McpClient;
-import org.springframework.ai.mcp.client.McpSyncClient;
-import org.springframework.ai.mcp.client.stdio.ServerParameters;
-import org.springframework.ai.mcp.client.stdio.StdioClientTransport;
-import org.springframework.ai.mcp.spring.McpFunctionCallback;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.List;
+import java.util.Scanner;
 
 @SpringBootApplication
 public class Application {
@@ -28,13 +28,13 @@ public class Application {
 
 	@Bean
 	public CommandLineRunner interactiveChat(ChatClient.Builder chatClientBuilder,
-			List<McpFunctionCallback> functionCallbacks,
+			List<McpSyncClient> mcpClients,
 			ConfigurableApplicationContext context) {
 		return args -> {
 
 			var chatClient = chatClientBuilder
-					.defaultFunctions(functionCallbacks.toArray(new McpFunctionCallback[0]))
-					.defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
+					.defaultToolCallbacks(new SyncMcpToolCallbackProvider(mcpClients))
+					.defaultAdvisors(MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
 					.build();
 
 			var scanner = new Scanner(System.in);
@@ -42,7 +42,7 @@ public class Application {
 
 			try {
 				while (true) {
-					System.out.print("\n USER: ");
+					System.out.print("\nUSER: ");
 					String input = scanner.nextLine();
 
 					if (input.equalsIgnoreCase("exit")) {
@@ -61,16 +61,6 @@ public class Application {
 		};
 	}
 
-	@Bean
-	public List<McpFunctionCallback> functionCallbacks(McpSyncClient mcpClient) {
-
-		var callbacks = mcpClient.listTools(null)
-				.tools()
-				.stream()
-				.map(tool -> new McpFunctionCallback(mcpClient, tool))
-				.toList();
-		return callbacks;
-	}
 
 	@Bean(destroyMethod = "close")
 	public McpSyncClient mcpClient() {
@@ -80,8 +70,8 @@ public class Application {
 						getDbPath())
 				.build();
 
-		var mcpClient = McpClient.using(new StdioClientTransport(stdioParams))
-				.requestTimeout(Duration.ofSeconds(10)).sync();
+		var mcpClient = McpClient.sync(new StdioClientTransport(stdioParams))
+				.requestTimeout(Duration.ofSeconds(10)).build();
 
 		var init = mcpClient.initialize();
 

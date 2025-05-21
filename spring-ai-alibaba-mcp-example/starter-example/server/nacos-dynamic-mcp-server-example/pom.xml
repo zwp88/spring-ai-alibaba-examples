@@ -29,52 +29,8 @@
         <!-- Dynamic Mcp Server -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
+            <artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
             <version>${spring-ai-alibaba.version}</version>
-
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-ai-mcp</artifactId>
-                    <groupId>org.springframework.ai</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- MCP Server WebFlux 支持 -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-server</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-ai-mcp</artifactId>
-                    <groupId>org.springframework.ai</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-ai-mcp</artifactId>
-                    <groupId>org.springframework.ai</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-mcp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.modelcontextprotocol.sdk</groupId>
-            <artifactId>mcp</artifactId>
-            <version>0.9.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.modelcontextprotocol.sdk</groupId>
-            <artifactId>mcp-spring-webflux</artifactId>
-            <version>0.9.0</version>
         </dependency>
 
     </dependencies>
