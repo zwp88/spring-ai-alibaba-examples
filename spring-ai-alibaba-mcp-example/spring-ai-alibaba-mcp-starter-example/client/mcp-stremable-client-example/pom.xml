@@ -9,7 +9,7 @@
 		<artifactId>spring-ai-alibaba-mcp-starter-example</artifactId>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
-	<artifactId>mcp-stremable-client-exmaple</artifactId>
+	<artifactId>mcp-stremable-client-example</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Spring AI - MCP STREAMABLE WEBFLUX Client EXAMPLE</name>
 
