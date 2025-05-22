@@ -5,6 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>spring-ai-alibaba-playground</artifactId>
+	<groupId>com.alibaba.cloud.ai</groupId>
 	<version>${revision}</version>
 
 	<description>Spring AI Alibaba Playground</description>
