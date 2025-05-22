@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import javax.sql.DataSource;
-
 /**
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
@@ -18,22 +16,13 @@ import javax.sql.DataSource;
 
 @Configuration
 public class AppConfig {
-	
+
 	@Bean
-	public DataSource dataSource() {
+	public ChatMemory SQLiteChatMemory() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName("org.sqlite.JDBC");
 		dataSource.setUrl("jdbc:sqlite:spring-ai-alibaba-chat-memory-example/src/main/resources/chat-memory.db");
-		return dataSource;
-	}
-	
-	@Bean
-	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-		return new JdbcTemplate(dataSource);
-	}
-	
-	@Bean
-	public ChatMemory SQLiteChatMemory(JdbcTemplate jdbcTemplate) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		return MessageWindowChatMemory.builder()
 				.chatMemoryRepository(SQLiteChatMemoryRepository.sqliteBuilder()
 						.jdbcTemplate(jdbcTemplate)
@@ -43,8 +32,8 @@ public class AppConfig {
 
 	@Bean
 	public MessageChatMemoryAdvisor jdbcMessageChatMemoryAdvisor(
-			ChatMemory sqLiteChatMemory
+			ChatMemory SQLiteChatMemory
 	) {
-		return MessageChatMemoryAdvisor.builder(sqLiteChatMemory).build();
+		return MessageChatMemoryAdvisor.builder(SQLiteChatMemory).build();
 	}
 }
