@@ -95,6 +95,7 @@ public class SAAVideoService  {
         }
 
         // 5. 创建包含问题和帧图片的用户消息
+        //TODO 需要适配UserMessage新的构造参数
         UserMessage message = new UserMessage(prompt, mediaList);
 
         // 6. 调用AI服务进行分析

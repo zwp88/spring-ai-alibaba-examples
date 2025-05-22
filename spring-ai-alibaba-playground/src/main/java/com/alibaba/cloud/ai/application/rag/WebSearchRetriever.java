@@ -37,6 +37,7 @@ import org.springframework.lang.Nullable;
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
+//TOOD spring-ai新版本不支持DocumentRanker，对象缺失
 public class WebSearchRetriever implements DocumentRetriever {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebSearchRetriever.class);

@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
  * Incorporate DeepSeek-R1's reasoning content into the output
  */
 
+//TODO spring-ai新版本不支持AdvisedRequest&AdvisedResponse
 public class ReasoningContentAdvisor implements BaseAdvisor {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReasoningContentAdvisor.class);

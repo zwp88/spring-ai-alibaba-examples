@@ -84,6 +84,7 @@ public class SAAImageService {
 	public Flux<String> image2Text(String prompt, MultipartFile file) throws IOException {
 
 		String filePath = FilesUtils.saveTempFile(file, "/tmp/image/");
+		//TODO 需适配UserMessage新的构造参数
 		UserMessage message = new UserMessage(
 				prompt,
 				new Media(
