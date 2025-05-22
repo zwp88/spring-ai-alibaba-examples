@@ -31,7 +31,6 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
-import org.springframework.ai.rag.postretrieval.ranking.DocumentRanker;
 import org.springframework.ai.rag.preretrieval.query.expansion.QueryExpander;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,7 +66,7 @@ public class SAAWebSearchService {
 			DataClean dataCleaner,
 			QueryExpander queryExpander,
 			IQSSearchEngine searchEngine,
-			DocumentRanker documentRanker,
+//			DocumentRanker documentRanker,
 			QueryTransformer queryTransformer,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
 			@Qualifier("dashscopeChatModel") ChatModel chatModel,
@@ -99,7 +98,7 @@ public class SAAWebSearchService {
 				.dataCleaner(dataCleaner)
 				.maxResults(2)
 				.enableRanker(true)
-				.documentRanker(documentRanker)
+//				.documentRanker(documentRanker)
 				.build();
 	}
 
