@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.method.MethodToolCallback;
+import org.springframework.ai.util.json.schema.JsonSchemaGenerator;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,6 +76,7 @@ public class AddressController {
                                         + "Get address information of a place with baidu map or "
                                         + "Get detailed information about a specific place with baidu map")
                                 .name("getAddressInformation")
+                                .inputSchema(JsonSchemaGenerator.generateForMethodInput(method))
                                 .build())
                         .toolMethod(method)
                         .toolObject(addressTools)

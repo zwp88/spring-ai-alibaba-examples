@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +42,7 @@ public class BookingTools {
 	 * 并与具体业务实现类进行解耦
 	 * @return
 	 */
-	@Tool
+	@Bean
 	@Description("获取机票预定详细信息")
 	public Function<BookingDetailsRequest, BookingDetails> getBookingDetails() {
 		return request -> {
@@ -57,7 +56,7 @@ public class BookingTools {
 		};
 	}
 
-	@Tool
+	@Bean
 	@Description("修改机票预定日期")
 	public Function<ChangeBookingDatesRequest, String> changeBooking() {
 		return request -> {
@@ -67,7 +66,7 @@ public class BookingTools {
 		};
 	}
 
-	@Tool
+	@Bean
 	@Description("取消机票预定")
 	public Function<CancelBookingRequest, String> cancelBooking() {
 		return request -> {

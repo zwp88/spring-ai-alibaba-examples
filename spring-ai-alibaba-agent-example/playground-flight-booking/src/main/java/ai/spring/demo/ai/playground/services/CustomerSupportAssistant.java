@@ -73,7 +73,7 @@ public class CustomerSupportAssistant {
 
 						// logger
 						new SimpleLoggerAdvisor()
-				).defaultTools(
+				).defaultToolNames(
 						"getBookingDetails",
 						"changeBooking",
 						"cancelBooking"
