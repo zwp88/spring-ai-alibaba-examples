@@ -4,12 +4,6 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.alibaba.cloud.ai</groupId>
-		<artifactId>spring-ai-alibaba-examples</artifactId>
-		<version>${revision}</version>
-	</parent>
-
 	<artifactId>spring-ai-alibaba-playground</artifactId>
 	<version>${revision}</version>
 
@@ -17,6 +11,10 @@
 	<name>Spring AI Alibaba Playground</name>
 
 	<properties>
+		<spring-boot.version>3.4.0</spring-boot.version>
+		<spring-ai.version>1.0.0</spring-ai.version>
+		<spring-ai-alibaba.version>1.0.0.1</spring-ai-alibaba.version>
+
 		<!-- Node and npm -->
 		<node.version>v20.12.2</node.version>
 		<npm.version>10.9.2</npm.version>
@@ -218,6 +216,20 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
 				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.alibaba.cloud.ai</groupId>
+				<artifactId>spring-ai-alibaba-bom</artifactId>
+				<version>${spring-ai-alibaba.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

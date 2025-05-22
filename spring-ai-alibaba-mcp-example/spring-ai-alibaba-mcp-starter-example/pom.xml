@@ -36,9 +36,8 @@
 	<name>Spring AI Alibaba Starter MCP Examples</name>
 
 	<modules>
-		<module>server/starter-stdio-server</module>
-		<module>server/starter-stock-server</module>
-		<module>server/starter-webflux-server</module>
+		<module>server/mcp-stdio-server-example</module>
+		<module>server/mcp-starter-webflux-server</module>
 		<module>server/spring-ai-alibaba-nacos-mcp-example</module>
 		<module>server/nacos-dynamic-mcp-server-example</module>
 		<module>client/mcp-stdio-client-example</module>
