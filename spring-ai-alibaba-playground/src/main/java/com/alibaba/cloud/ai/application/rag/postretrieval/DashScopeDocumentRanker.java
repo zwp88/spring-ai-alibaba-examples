@@ -42,6 +42,7 @@ import org.springframework.util.StringUtils;
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
+//TODO spring-ai新版本已经不支持DocumentRanker
 public class DashScopeDocumentRanker implements DocumentRanker {
 
 	private static final Logger logger = LoggerFactory.getLogger(DashScopeDocumentRanker.class);
