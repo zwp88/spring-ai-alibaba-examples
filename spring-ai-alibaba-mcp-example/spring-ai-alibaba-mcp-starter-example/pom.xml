@@ -41,9 +41,9 @@
 		<module>server/starter-webflux-server</module>
 		<module>server/spring-ai-alibaba-nacos-mcp-example</module>
 		<module>server/nacos-dynamic-mcp-server-example</module>
-		<module>client/starter-default-client</module>
-		<module>client/starter-webflux-client</module>
-		<module>client/starter-streamable-client</module>
+		<module>client/mcp-stdio-client-example</module>
+		<module>client/mcp-stremable-client-example</module>
+		<module>client/mcp-webflux-client-example</module>
 		<module>client/nacos-mcp-client-example</module>
 	</modules>
 

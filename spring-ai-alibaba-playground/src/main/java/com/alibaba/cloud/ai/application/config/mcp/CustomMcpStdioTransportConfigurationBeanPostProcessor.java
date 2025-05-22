@@ -46,15 +46,15 @@ import static com.alibaba.cloud.ai.application.mcp.McpServerUtils.getMcpLibsAbsP
  */
 
 @Component
-public class McpStdioTransportConfigurationBeanPostProcessor implements BeanPostProcessor {
+public class CustomMcpStdioTransportConfigurationBeanPostProcessor implements BeanPostProcessor {
 
-	private static final Logger logger = LoggerFactory.getLogger(McpStdioTransportConfigurationBeanPostProcessor.class);
+	private static final Logger logger = LoggerFactory.getLogger(CustomMcpStdioTransportConfigurationBeanPostProcessor.class);
 
 	private final ObjectMapper objectMapper;
 
 	private final McpStdioClientProperties mcpStdioClientProperties;
 
-	public McpStdioTransportConfigurationBeanPostProcessor(
+	public CustomMcpStdioTransportConfigurationBeanPostProcessor(
 			ObjectMapper objectMapper,
 			McpStdioClientProperties mcpStdioClientProperties
 	) {
@@ -62,6 +62,7 @@ public class McpStdioTransportConfigurationBeanPostProcessor implements BeanPost
 		this.mcpStdioClientProperties = mcpStdioClientProperties;
 	}
 
+	@NotNull
 	@Override
 	public Object postProcessAfterInitialization(@NotNull Object bean, @NotNull String beanName) throws BeansException {
 
