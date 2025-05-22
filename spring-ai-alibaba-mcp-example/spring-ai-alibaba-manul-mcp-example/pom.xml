@@ -36,10 +36,10 @@
 	<name>Spring AI Alibaba MCP Examples</name>
 
 	<modules>
-		<module>filesystem</module>
-		<module>sqlite/chatbot</module>
-		<module>sqlite/simple</module>
-		<module>github</module>
+		<module>ai-mcp-github</module>
+		<module>ai-mcp-fileserver</module>
+		<module>sqlite/ai-mdp-sqlite</module>
+		<module>sqlite/ai-mdp-sqlite-chatbot</module>
 	</modules>
 
 	<build>

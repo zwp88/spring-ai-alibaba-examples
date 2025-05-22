@@ -41,10 +41,10 @@
 		<maven.compiler.target>17</maven.compiler.target>
 
 		<!-- Spring AI -->
-		<spring-ai.version>1.0.0-RC1</spring-ai.version>
+		<spring-ai.version>1.0.0</spring-ai.version>
 
 		<!-- Spring AI Alibaba -->
-		<spring-ai-alibaba.version>1.0.0-RC1.1</spring-ai-alibaba.version>
+		<spring-ai-alibaba.version>1.0.0.1</spring-ai-alibaba.version>
 
 		<!-- Spring Boot -->
 		<spring-boot.version>3.4.0</spring-boot.version>
