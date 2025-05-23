@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
@@ -78,7 +79,7 @@ public class CloudRagService implements RagService {
 
 		this.dashscopeApi = dashscopeApi;
 		this.chatClient = builder
-				.defaultAdvisors(new DocumentRetrievalAdvisor(retriever, retrievalSystemTemplate))
+				.defaultAdvisors(new DocumentRetrievalAdvisor(retriever, new SystemPromptTemplate(retrievalSystemTemplate)))
 				.build();
 	}
 

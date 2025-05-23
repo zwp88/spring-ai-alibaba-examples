@@ -134,7 +134,7 @@ Spring AI 提供了从离线数据加载、分析到向量化存储的抽象，�
 <dependency>
     <groupId>com.alibaba.ai</groupId>
     <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-    <version>1.0.0-RC1.1</version>
+    <version>1.0.0.1</version>
 </dependency>
 
 ```

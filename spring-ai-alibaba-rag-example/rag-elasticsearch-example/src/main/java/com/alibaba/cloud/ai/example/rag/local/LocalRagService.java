@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
@@ -118,7 +119,7 @@ public class LocalRagService implements RagService {
         // Step3 - Retrieve and llm generate
         String promptTemplate = getPromptTemplate(systemResource);
         ChatClient chatClient = ChatClient.builder(chatModel)
-                .defaultAdvisors(new RetrievalRerankAdvisor(vectorStore, rerankModel, searchRequest, promptTemplate, 0.1))
+                .defaultAdvisors(new RetrievalRerankAdvisor(vectorStore, rerankModel, searchRequest, new SystemPromptTemplate(promptTemplate), 0.1))
                 .build();
 
         return chatClient.prompt().user(message).stream().chatResponse();

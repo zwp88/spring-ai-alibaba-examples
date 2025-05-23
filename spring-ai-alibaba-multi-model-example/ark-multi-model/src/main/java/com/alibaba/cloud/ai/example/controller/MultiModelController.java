@@ -22,13 +22,12 @@ import org.apache.catalina.User;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.image.Image;
-import org.springframework.ai.model.Media;
+import org.springframework.ai.content.Media;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -36,6 +35,7 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +69,7 @@ public class MultiModelController {
                 // 实现 Chat Memory 的 Advisor
                 // 在使用 Chat Memory 时，需要指定对话 ID，以便 Spring AI 处理上下文。
                 .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(new InMemoryChatMemory())
+                        MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build()
                 )
                 // 实现 Logger 的 Advisor
                 .defaultAdvisors(
@@ -93,11 +93,12 @@ public class MultiModelController {
         List<Media> mediaList = List.of(
                 new Media(
                         MimeTypeUtils.IMAGE_PNG,
-                        new URI("https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg").toURL()
+						new URI("https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg").toURL()
+								.toURI()
                 )
         );
 
-        UserMessage message = new UserMessage(prompt, mediaList);
+        UserMessage message = UserMessage.builder().text(prompt).media(mediaList).build();
 
         ChatResponse response = openAiChatClient.prompt(
                 new Prompt(
@@ -114,12 +115,11 @@ public class MultiModelController {
             String prompt
     ) {
 
-        UserMessage message = new UserMessage(
-                prompt,
+        UserMessage message = UserMessage.builder().text(prompt).media(
                 new Media(
                         MimeTypeUtils.IMAGE_JPEG,
                         new ClassPathResource("multimodel/dog_and_girl.jpeg")
-                ));
+                )).build();
 
         List<ChatResponse> response = openAiChatClient.prompt(
                 new Prompt(
@@ -146,7 +146,7 @@ public class MultiModelController {
 
         List<Media> mediaList = FrameExtraHelper.createMediaList(10);
 
-        UserMessage message = new UserMessage(prompt, mediaList);
+        UserMessage message = UserMessage.builder().text(prompt).media(mediaList).build();
 
         ChatResponse response = openAiChatClient.prompt(
                 new Prompt(
