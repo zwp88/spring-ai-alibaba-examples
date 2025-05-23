@@ -10,7 +10,6 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>mcp-stremable-client-example</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>Spring AI - MCP STREAMABLE WEBFLUX Client EXAMPLE</name>
 
 
@@ -34,7 +33,6 @@
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 		
 	</dependencies>

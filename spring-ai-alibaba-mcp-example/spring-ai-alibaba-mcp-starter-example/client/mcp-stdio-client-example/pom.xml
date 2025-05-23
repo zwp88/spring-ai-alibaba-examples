@@ -10,7 +10,6 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>mcp-stdio-client-example</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>Spring AI - MCP STDIO Client EXAMPLE</name>
 
 

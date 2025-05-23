@@ -12,7 +12,7 @@
 
 	<groupId>com.example</groupId>
 	<artifactId>ai-mcp-fileserver</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Spring AI - Model Context Protocol - Fileserver</name>
 	<description>Simple AI Application using MCP client to chat with FileServer</description>
 
@@ -49,7 +49,6 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-mcp-client</artifactId>
-			<version>${spring.ai.version}</version>
 		</dependency>
 
 	</dependencies>
