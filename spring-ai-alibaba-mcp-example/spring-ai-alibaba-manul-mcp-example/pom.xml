@@ -27,8 +27,7 @@
 		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-
-	<version>${revision}</version>
+	
 	<artifactId>spring-ai-alibaba-manul-mcp-example</artifactId>
 	<packaging>pom</packaging>
 
@@ -38,8 +37,8 @@
 	<modules>
 		<module>ai-mcp-github</module>
 		<module>ai-mcp-fileserver</module>
-		<module>sqlite/ai-mdp-sqlite</module>
-		<module>sqlite/ai-mdp-sqlite-chatbot</module>
+		<module>sqlite/ai-mcp-sqlite</module>
+		<module>sqlite/ai-mcp-sqlite-chatbot</module>
 	</modules>
 
 	<build>
