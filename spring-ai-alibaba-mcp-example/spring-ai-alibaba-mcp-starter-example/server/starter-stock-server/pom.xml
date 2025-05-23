@@ -26,7 +26,6 @@
     </parent>
 
     <artifactId>starter-stock-server</artifactId>
-    <version>1.0.0</version>
 
     <name>Spring AI MCP Stock Server</name>
     <description>Sample Spring Boot application demonstrating MCP stock server usage</description>
