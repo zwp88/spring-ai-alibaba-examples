@@ -3,21 +3,17 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.5</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<groupId>com.alibaba.cloud.ai</groupId>
+		<artifactId>spring-ai-alibaba-observability-example</artifactId>
+		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>com.alibaba.cloud.ai</groupId>
 	<artifactId>observability-example</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>observability-example</name>
 	<description>Demo project for Spring AI Alibaba</description>
 
 	<properties>
 		<java.version>17</java.version>
-		<spring.ai.version>1.0.0</spring.ai.version>
-		<spring.ai.alibaba.version>1.0.0.1</spring.ai.alibaba.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -67,7 +63,6 @@
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-arms-observation</artifactId>
-			<version>${spring.ai.alibaba.version}</version>
 		</dependency>
 
 		<!--		<dependency>-->
@@ -82,27 +77,18 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.ai</groupId>
-				<artifactId>spring-ai-bom</artifactId>
-				<version>${spring.ai.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
+				<version>0.10.6</version>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.4.5</version>
 			</plugin>
 		</plugins>
 	</build>
