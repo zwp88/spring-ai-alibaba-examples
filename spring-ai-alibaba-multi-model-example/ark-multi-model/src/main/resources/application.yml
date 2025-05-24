@@ -13,7 +13,7 @@ spring:
         completions-path: /v3/chat/completions
 
 server:
-  port: 8080
+  port: 7878
 
 logging:
   level:
