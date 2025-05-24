@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package com.alibaba.cloud.ai.example.rag.knowledge;
+package com.alibaba.cloud.ai.example.rag.knowledge.service;
 
 import org.springframework.ai.chat.model.ChatResponse;
 import reactor.core.publisher.Flux;

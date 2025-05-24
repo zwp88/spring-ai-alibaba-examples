@@ -14,13 +14,15 @@
 * limitations under the License.
 */
 
-package com.alibaba.cloud.ai.example.rag.agent;
+package com.alibaba.cloud.ai.example.rag.agent.controller;
 
 import java.util.List;
 
 import com.alibaba.cloud.ai.dashscope.agent.DashScopeAgent;
 import com.alibaba.cloud.ai.dashscope.agent.DashScopeAgentOptions;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeAgentApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -30,9 +32,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Demo controller for integrating with Alibaba Cloud RAG service published on Bailian platform.
