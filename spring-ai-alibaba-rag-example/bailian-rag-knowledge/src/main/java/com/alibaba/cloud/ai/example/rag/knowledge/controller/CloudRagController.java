@@ -14,12 +14,14 @@
 * limitations under the License.
 */
 
-package com.alibaba.cloud.ai.example.rag.knowledge;
+package com.alibaba.cloud.ai.example.rag.knowledge.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.cloud.ai.example.rag.knowledge.service.RagService;
 import reactor.core.publisher.Flux;
 
 /**

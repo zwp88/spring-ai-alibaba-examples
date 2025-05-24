@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package com.alibaba.cloud.ai.example.rag.knowledge;
+package com.alibaba.cloud.ai.example.rag.knowledge.service;
 
 import com.alibaba.cloud.ai.advisor.DocumentRetrievalAdvisor;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
@@ -22,7 +22,6 @@ import com.alibaba.cloud.ai.dashscope.rag.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
@@ -38,7 +37,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**

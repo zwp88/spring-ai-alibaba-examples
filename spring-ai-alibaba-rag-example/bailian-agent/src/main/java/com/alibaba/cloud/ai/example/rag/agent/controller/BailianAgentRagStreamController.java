@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package com.alibaba.cloud.ai.example.rag.agent;
+package com.alibaba.cloud.ai.example.rag.agent.controller;
 
 import java.util.List;
 
@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
