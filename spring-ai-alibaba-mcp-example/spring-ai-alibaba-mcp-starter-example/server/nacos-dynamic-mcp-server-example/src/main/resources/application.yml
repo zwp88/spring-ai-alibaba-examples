@@ -15,15 +15,13 @@ spring:
     alibaba:
       mcp:
         nacos:
-          enabled: true
           server-addr: localhost:8848
+          namespace: public
           username: nacos
           password:
           dynamic:
             enabled: true
-            service-namespace: public
-            service-group: DEFAULT_GROUP
-            service-names: echo-server
+            server-names: echo-server
 
 server:
   port: 8090

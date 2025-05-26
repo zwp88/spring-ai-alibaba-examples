@@ -1,4 +1,4 @@
-本示例是MCP Server多节点注册在Nacos中，建立稳定性连接
+本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求Nacos版本在3.0.1及以上
 
 1. MCP Server多节点注册在Nacos中
 2. MCP Client建立1-N连接
@@ -43,14 +43,11 @@ spring:
           server-addr: 127.0.0.1:8848
           username: nacos
           password: nacos
-          registry:
-            service-namespace: 9ba5f1aa-b37d-493b-9057-72918a40ef35
-            service-group: mcp-server          
-
-        client:
-          sse:
-            connections:
-              server1: mcp-server-provider # MCP Server服务名称
+          namespace: 9ba5f1aa-b37d-493b-9057-72918a40ef35      
+          client:
+            sse:
+              connections:
+                server1: mcp-server-provider # MCP Server服务名称
     mcp:
       client:
         enabled: true

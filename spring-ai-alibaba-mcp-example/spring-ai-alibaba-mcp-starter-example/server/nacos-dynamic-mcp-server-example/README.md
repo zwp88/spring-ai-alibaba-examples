@@ -26,7 +26,7 @@
 
 ### 1. 启动 Nacos 服务
 
-请确保你已经本地或远程启动了 [Nacos 服务器]
+请确保你已经本地或远程启动了 [Nacos 服务器], 要求Nacos版本>=3.0.1
 
 ### 2. 配置 application.yml
 
@@ -48,12 +48,12 @@ spring:
     alibaba:
       mcp:
         nacos:
-          enabled: true
           server-addr:
-          service-namespace: public
-          service-group: DEFAULT_GROUP
+          namespace: public
           username:
           password:
+          dynamic:
+            server-names: echo-server
 
 server:
   port: 8081
