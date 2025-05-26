@@ -78,15 +78,16 @@ public class MoreModelChatClientController {
 				.content();
 	}
 
-	public Flux<String> stream(
-			@RequestParam("prompt") String prompt
-	) {
-
-		DashScopeApi dashScopeApi = new DashScopeApi("${AI_DASHSCOPE_API_KEY}");
-		ChatClient build = ChatClient.builder(
-				DashScopeChatModel.builder(dashScopeApi)
-						.build()
-		).build();
-	}
+//	public Flux<String> stream(
+//			@RequestParam("prompt") String prompt
+//	) {
+//
+//
+//		DashScopeApi dashScopeApi = DashScopeApi.builder().apiKey(System.getenv("${AI_DASHSCOPE_API_KEY}")).build();
+//		ChatClient build = ChatClient.builder(
+//				DashScopeChatModel.builder().dashScopeApi(dashScopeApi)
+//						.build()
+//		).build();
+//	}
 
 }
