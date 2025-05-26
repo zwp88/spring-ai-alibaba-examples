@@ -48,12 +48,12 @@ spring:
     alibaba:
       mcp:
         nacos:
-          enabled: true
           server-addr:
-          service-namespace: public
-          service-group: DEFAULT_GROUP
+          namespace: public
           username:
           password:
+          dynamic:
+            server-names: echo-server
 
 server:
   port: 8081

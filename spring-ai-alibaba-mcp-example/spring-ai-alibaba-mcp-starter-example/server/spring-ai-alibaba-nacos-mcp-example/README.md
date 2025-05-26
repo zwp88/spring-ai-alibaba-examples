@@ -27,7 +27,7 @@ MCP Server 注册到 Nacos 中，并通过注解式工具（Tool）提供服务�
 
 ### 1. 启动 Nacos 服务
 
-请确保你已经本地或远程启动了 [Nacos 服务器]
+请确保你已经本地或远程启动了 [Nacos 服务器],要求Nacos版本>3.0.1
 
 ### 2. 配置 application.yml
 
@@ -50,12 +50,12 @@ spring:
     alibaba:
       mcp:
         nacos:
-          enabled: true
           server-addr:                 # 替换为你的 Nacos 地址
-          service-namespace: public    # Nacos 命名空间 ID
-          service-group: DEFAULT_GROUP
+          namespace: public    # Nacos 命名空间 ID
           username:
           password:
+            registry:
+              enabled: true
 
 server:
   port: 8080
