@@ -43,7 +43,7 @@ public class Application {
 		return args -> {
 			// 构建ChatClient并注入MCP工具
 			var chatClient = chatClientBuilder
-					.defaultTools(tools)
+					.defaultToolCallbacks(tools)
 					.build();
 
 			// 定义用户输入
