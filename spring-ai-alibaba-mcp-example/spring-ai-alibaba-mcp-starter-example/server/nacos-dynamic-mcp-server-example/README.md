@@ -12,7 +12,7 @@
     <version>1.0.0.1</version>
 </dependency>
 
-        <!-- MCP Server (WebMVC) -->
+<!-- MCP Server (WebMVC) -->
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
     <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
@@ -57,8 +57,6 @@ spring:
 
 server:
   port: 8081
-
-
 ```
 
 ### 3. 启动应用

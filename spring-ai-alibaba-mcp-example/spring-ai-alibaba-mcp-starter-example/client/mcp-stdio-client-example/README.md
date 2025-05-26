@@ -51,15 +51,20 @@
 
 ### 编译运行
 
-1. 编译服务端：
+1. 编译 MCP 服务端：
+
    ```bash
-   cd spring-ai-alibaba-mcp-example/starter-example/server/starter-stdio-server
+   cd spring-ai-alibaba-mcp-example/spring-ai-alibaba-mcp-build-example/mcp-stdio-server-example
    mvn clean package
    ```
 
 2. 编译客户端：
+
+> 之后您需要在客户端的 resource 目录下的 mcp-servers-config.json 文件中配置 MCP Server 的**绝对路径**。
+> 之后，您可以通过 IDEA 或者第四步的 spring boot 命令启动 MCP Client 体验 MCP 能力。
+
    ```bash
-   cd spring-ai-alibaba-mcp-example/starter-example/client/starter-default-client
+   cd spring-ai-alibaba-mcp-example/spring-ai-alibaba-mcp-starter-example/client/mcp-stdio-client-example
    mvn clean package
    ```
 

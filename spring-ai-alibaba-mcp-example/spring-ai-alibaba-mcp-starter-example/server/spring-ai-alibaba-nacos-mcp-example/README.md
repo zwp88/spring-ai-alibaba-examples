@@ -12,8 +12,8 @@ MCP Server 注册到 Nacos 中，并通过注解式工具（Tool）提供服务�
     <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
     <version>1.0.0.1</version>
 </dependency>
-
-        <!-- MCP Server (WebMVC) -->
+        
+<!-- MCP Server (WebMVC) -->
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
     <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>

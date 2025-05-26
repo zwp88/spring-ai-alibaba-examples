@@ -37,3 +37,6 @@ target/
 
 **/node/**
 **/logs/**
+
+logs/
+**/.db/*

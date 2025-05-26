@@ -12,7 +12,6 @@
 	<artifactId>mcp-webflux-client-example</artifactId>
 	<name>Spring AI - MCP WEBFLUX Client EXAMPLE</name>
 
-
 	<dependencies>
 	
 		<dependency>
