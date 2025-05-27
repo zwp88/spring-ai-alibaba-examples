@@ -10,7 +10,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spring-ai-alibaba-nacos-mcp-example</artifactId>
+    <artifactId>nacos-mcp-registry-example</artifactId>
     <description>Spring AI Alibaba Register MCP Server To Nacos Example</description>
     <name>Spring AI Alibaba Register MCP Server To Nacos Example</name>
 

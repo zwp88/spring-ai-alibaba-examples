@@ -37,7 +37,7 @@
 
 	<modules>
 		<module>server/mcp-webflux-server-example</module>
-		<module>server/spring-ai-alibaba-nacos-mcp-example</module>
+		<module>server/nacos-mcp-registry-example</module>
 		<module>server/nacos-dynamic-mcp-server-example</module>
 
 		<module>client/mcp-stdio-client-example</module>
