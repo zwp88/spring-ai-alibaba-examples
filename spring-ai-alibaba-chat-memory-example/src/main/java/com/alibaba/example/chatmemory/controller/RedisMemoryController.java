@@ -24,7 +24,6 @@ import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 public class RedisMemoryController {
 
     private final ChatClient chatClient;
-    private final InMemoryChatMemoryRepository chatMemoryRepository = new InMemoryChatMemoryRepository();
     private final int MAX_MESSAGES = 100;
     private final MessageWindowChatMemory messageWindowChatMemory;
 
