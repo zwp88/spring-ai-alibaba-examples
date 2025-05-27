@@ -27,16 +27,27 @@
 在体验示例之前，确保代码中的 SQLite 和 Redis 数据库连接参数正确且数据库可以正常对外提供服务。
 
 在一轮问答中，您应该得看到这样的回复：
+参考[chat-memory.http](chat-memory.http)
 
 ```shell
+
+### 内存API
+GET http://localhost:8080/advisor/memory/in/call?query=请记住你是影子&conversation_id=yingzi
+### 信息
+GET http://localhost:8080/advisor/memory/in/messages?conversation_id=yingzi
+
 ### SQLite Memory API
-GET http://127.0.0.1:8080/chat-memory/sqlite?prompt="你好，我是小王"&chatId="100001"
+GET http://localhost:8080/advisor/memory/sqlite/call?query=你好，我的外号是影子，请记住呀&conversation_id=yingzi
+### 信息
+GET http://localhost:8080/advisor/memory/sqlite/messages?conversation_id=yingzi
 
-你好，小王！很高兴再次听到你的介绍。如果你有任何问题或需要帮助的地方，随时告诉我哦！😊 比如，你今天过得怎么样？或者有什么想聊的话题吗？
+### Mysql Memory API
+GET http://localhost:8080/advisor/memory/mysql/call?query=你好，我的外号是影子，请记住呀&conversation_id=yingzi
+### 信息
+http://localhost:8080/advisor/memory/mysql/messages?conversation_id=yingzi
 
-### 回答
-GET http://127.0.0.1:8080/chat-memory/sqlite?prompt="我是谁"&chatId="100001"
-
-你好！从我们的对话来看，你自称是“小王”。不过，......
-
+### Redis Memory API
+GET http://localhost:8080/advisor/memory/redis/call?query=你好，我的外号是影子，请记住呀&conversation_id=yingzi
+### 信息
+GET http://localhost:8080/advisor/memory/redis/messages?conversation_id=yingzi
 ```
