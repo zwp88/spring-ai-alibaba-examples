@@ -33,7 +33,7 @@
 ```yaml
 spring:
   application:
-    name: spring-ai-alibaba-nacos-dynamic-mcp-server-example
+    name: spring-ai-alibaba-mcp-nacos-dynamic-example
   ai:
     mcp:
       server:
