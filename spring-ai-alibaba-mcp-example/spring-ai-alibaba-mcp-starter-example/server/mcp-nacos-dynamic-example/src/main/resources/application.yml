@@ -6,11 +6,6 @@ spring:
       server:
         name: dynamic-mcp-server
         version: 1.0.0
-    dashscope:
-      api-key: ${AI_DASHSCOPE_API_KEY}
-      chat:
-        options:
-          model: qwen-max-latest
 
     alibaba:
       mcp:
