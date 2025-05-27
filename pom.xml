@@ -56,7 +56,6 @@
 	</properties>
 
 	<modules>
-		<module>spring-ai-alibaba-playground</module>
 		<module>spring-ai-alibaba-helloworld</module>
 		<module>spring-ai-alibaba-mcp-example</module>
 		<module>spring-ai-alibaba-rag-example</module>
