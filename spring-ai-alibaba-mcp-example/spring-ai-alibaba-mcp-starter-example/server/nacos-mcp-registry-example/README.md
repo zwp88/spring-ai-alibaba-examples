@@ -34,7 +34,7 @@ MCP Server 注册到 Nacos 中，并通过注解式工具（Tool）提供服务�
 ```yaml
 spring:
   application:
-    name: spring-ai-alibaba-nacos-mcp-example
+    name: nacos-mcp-registry-example
   ai:
     mcp:
       server:
