@@ -70,6 +70,8 @@ public class QWQChatClientController {
 				.defaultOptions(
 						DashScopeChatOptions.builder()
 								.withTopP(0.7)
+								// 设置enable_thinking 为 true，启用思考过程
+								.withEnableThinking(true)
 								.build()
 				)
 				.build();
