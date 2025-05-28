@@ -102,6 +102,13 @@
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-autoconfigure-mcp-client</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-openai</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
@@ -176,7 +183,6 @@
 			<artifactId>httpcore5</artifactId>
 			<version>5.3.1</version> <!-- 请检查最新版本 -->
 		</dependency>
-
 
 		<dependency>
 			<groupId>io.micrometer</groupId>
