@@ -85,7 +85,7 @@ public class SAAMcpService {
 		this.chatClient = ChatClient.builder(chatModel)
 				.defaultAdvisors(
 						simpleLoggerAdvisor
-				).defaultTools(tools)
+				).defaultToolCallbacks(tools)
 				.build();
 		this.tools = tools;
 		this.toolCallingManager = toolCallingManager;

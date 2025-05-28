@@ -36,14 +36,14 @@
 	<name>Spring AI Alibaba Starter MCP Examples</name>
 
 	<modules>
-		<module>server/mcp-stdio-server-example</module>
-		<module>server/mcp-starter-webflux-server</module>
-		<module>server/spring-ai-alibaba-nacos-mcp-example</module>
-		<module>server/nacos-dynamic-mcp-server-example</module>
+		<module>server/mcp-webflux-server-example</module>
+		<module>server/mcp-nacos-registry-example</module>
+		<module>server/mcp-nacos-dynamic-example</module>
+
 		<module>client/mcp-stdio-client-example</module>
-		<module>client/mcp-stremable-client-example</module>
+		<module>client/mcp-streamable-client-example</module>
 		<module>client/mcp-webflux-client-example</module>
-		<module>client/nacos-mcp-client-example</module>
+		<module>client/mcp-nacos-client-example</module>
 	</modules>
 
 	<dependencyManagement>

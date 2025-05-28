@@ -36,9 +36,10 @@
 	<name>Spring AI Alibaba MCP Examples</name>
 
 	<modules>
-		<module>spring-ai-alibaba-manul-mcp-example</module>
+		<module>spring-ai-alibaba-mcp-manual-example</module>
 		<module>spring-ai-alibaba-mcp-starter-example</module>
-    </modules>
+		<module>spring-ai-alibaba-mcp-build-example</module>
+	</modules>
 
 	<build>
 		<plugins>
