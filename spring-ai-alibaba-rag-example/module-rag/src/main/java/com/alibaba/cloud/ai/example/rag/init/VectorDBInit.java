@@ -15,7 +15,6 @@ import co.elastic.clients.elasticsearch._types.mapping.TextProperty;
 import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.elasticsearch.indices.IndexSettings;
-import com.alibaba.nacos.common.utils.StringUtils;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,7 @@ import org.springframework.ai.vectorstore.elasticsearch.autoconfigure.Elasticsea
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * @author yuluo
@@ -92,7 +92,7 @@ public class VectorDBInit {
 			String indexName = options.getIndexName();
 			Integer dimsLength = options.getDimensions();
 
-			if (StringUtils.isBlank(indexName)) {
+			if (!StringUtils.hasLength(indexName)) {
 				throw new IllegalArgumentException("Elastic search index name must be provided");
 			}
 
