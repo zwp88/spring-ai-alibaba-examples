@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.alibaba.cloud.ai</groupId>
+        <artifactId>spring-ai-alibaba-mcp-nacos-example</artifactId>
         <version>${revision}</version>
-        <artifactId>spring-ai-alibaba-mcp-starter-example</artifactId>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>mcp-nacos-dynamic-example</artifactId>
-    <description>Spring AI - MCP Nacos Dynamic Server Example</description>
-    <name>Spring AI - MCP Nacos Dynamic Server example</name>
+    <artifactId>mcp-nacos-registry-example</artifactId>
+    <description>Spring AI Alibaba Register MCP Server To Nacos Example</description>
+    <name>Spring AI Alibaba Register MCP Server To Nacos Example</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -21,17 +21,20 @@
     </properties>
 
     <dependencies>
+
+        <!-- Spring Boot Starter Web -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         
-        <!-- Dynamic Mcp Server -->
+        <!-- MCP Nacos 注册支持 -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
         </dependency>
-        
+
+        <!-- MCP Server WebMvc 支持（也可换成 WebFlux） -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
