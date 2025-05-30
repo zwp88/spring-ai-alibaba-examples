@@ -22,7 +22,7 @@ spring:
           client:
             sse:
               connections:
-                server1: mcp-server-provider
+                server1: mcp-server-provider::1.0.0
     mcp:
       client:
         enabled: true
