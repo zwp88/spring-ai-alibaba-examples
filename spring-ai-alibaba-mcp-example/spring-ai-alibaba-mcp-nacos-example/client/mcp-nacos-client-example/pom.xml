@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.alibaba.cloud.ai</groupId>
+        <artifactId>spring-ai-alibaba-mcp-nacos-example</artifactId>
         <version>${revision}</version>
-        <artifactId>spring-ai-alibaba-mcp-starter-example</artifactId>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
