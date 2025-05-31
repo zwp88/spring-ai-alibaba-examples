@@ -73,7 +73,9 @@
 		<module>spring-ai-alibaba-nacos-prompt-example</module>
 		<module>spring-ai-alibaba-observability-example</module>
 		<module>spring-ai-alibaba-more-platform-and-model-example</module>
-	</modules>
+        <module>spring-ai-alibaba-mcp-example/spring-ai-alibaba-mcp-starter-example/client/mcp-nacos2-client-example
+        </module>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>
