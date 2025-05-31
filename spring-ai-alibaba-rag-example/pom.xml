@@ -42,7 +42,8 @@
 		<module>rag-pgvector-example</module>
 		<module>module-rag</module>
         <module>spring-ai-alibaba-vector-databases-example</module>
-	</modules>
+        <module>rag-etl-pipeline-example</module>
+    </modules>
 
     <build>
         <plugins>
