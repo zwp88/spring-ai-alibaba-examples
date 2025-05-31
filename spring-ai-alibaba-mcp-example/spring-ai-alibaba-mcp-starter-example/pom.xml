@@ -44,7 +44,8 @@
 		<module>client/mcp-streamable-client-example</module>
 		<module>client/mcp-webflux-client-example</module>
 		<module>client/mcp-nacos-client-example</module>
-	</modules>
+        <module>server/mcp-nacos2-server-example</module>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>
