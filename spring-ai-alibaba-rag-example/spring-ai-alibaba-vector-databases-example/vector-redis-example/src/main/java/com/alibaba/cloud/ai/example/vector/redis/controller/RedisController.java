@@ -44,7 +44,6 @@ public class RedisController {
         redisVectorStore.add(documents);
     }
 
-    // todo 暂未生效
     @GetMapping("/search")
     public List<Document> search() {
         logger.info("start search data");
@@ -55,7 +54,6 @@ public class RedisController {
                 .build());
     }
 
-    // todo 暂未生效
     @GetMapping("delete-filter")
     public void searchFilter() {
         logger.info("start delete data with filter");
