@@ -1,8 +1,8 @@
 import React from "react";
-import { CopyOutlined } from "@ant-design/icons";
+import { CopyOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Button, Space, theme } from "antd";
 
-const MessageFooter = (props: { value: string }) => {
+const MessageFooter = (props: { value: string; onReload?: () => void }) => {
   const { token } = theme.useToken();
   return (
     <Space size={token.paddingXXS}>
@@ -15,6 +15,15 @@ const MessageFooter = (props: { value: string }) => {
         }}
         icon={<CopyOutlined />}
       />
+      {props.onReload && (
+        <Button
+          color="default"
+          variant="text"
+          size="small"
+          onClick={props.onReload}
+          icon={<ReloadOutlined />}
+        />
+      )}
     </Space>
   );
 };

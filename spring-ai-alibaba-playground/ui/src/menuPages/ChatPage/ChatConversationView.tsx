@@ -52,6 +52,8 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     updateCapability,
     appendAssistantMessage,
     processSendMessage,
+    deleteMessageAndAfter,
+    updateMessageContent,
   } = useConversationContext();
 
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数
@@ -242,6 +244,163 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     });
   };
 
+  // 处理重新生成消息（revert操作）
+  const handleReloadMessage = async (messageTimestamp: number) => {
+    if (!activeConversation || isLoading) return;
+
+    // 找到要重新生成的消息
+    const messageIndex = activeConversation.messages.findIndex(
+      (msg) => msg.timestamp === messageTimestamp
+    );
+
+    if (messageIndex === -1) return;
+
+    // 找到对应的用户消息（应该在assistant消息之前）
+    const userMessage = activeConversation.messages
+      .slice(0, messageIndex)
+      .reverse()
+      .find((msg) => msg.role === "user");
+
+    if (!userMessage) return;
+
+    // 删除当前assistant消息及其之后的所有消息（revert操作）
+    const remainingMessages = deleteMessageAndAfter(messageTimestamp);
+
+    // 直接重新生成回复，不创建新的用户消息
+    setIsLoading(true);
+
+    // 创建一个使用正确baseMessages的更新函数
+    const updateConversationMessagesWithBase = useThrottle(
+      (
+        messageContent: string,
+        role: "assistant",
+        isError: boolean = false,
+        userTimestamp: number,
+        userMessage: ChatUiMessage
+      ) => {
+        appendAssistantMessage(
+          messageContent,
+          role,
+          isError,
+          userTimestamp,
+          userMessage,
+          remainingMessages as ChatUiMessage[]
+        );
+      },
+      100
+    );
+
+    const sendRequest = async (
+      text: string,
+      userTimestamp: number,
+      userMessage: ChatUiMessage
+    ) => {
+      const params = {
+        chatId: activeConversation?.id,
+        model: currentModel?.value,
+        deepThink: aiCapabilities.deepThink,
+        onlineSearch: aiCapabilities.onlineSearch,
+      };
+      let thinkContentText = "";
+      let contentText = "";
+      let chunkBuffer: string[] = [];
+
+      const response = await getChat(
+        text,
+        (value) => {
+          const chunk = decoder.decode(value);
+          chunkBuffer.push(chunk);
+
+          const [thinkContent, content] = classifyChunk(chunk);
+          if (thinkContent) {
+            thinkContentText += thinkContent;
+          }
+          if (content) {
+            contentText += content;
+          }
+          const totalText = thinkContentText
+            ? `<think>${thinkContentText}</think> ${contentText}`
+            : contentText;
+
+          updateConversationMessagesWithBase(
+            totalText,
+            "assistant",
+            false,
+            userTimestamp,
+            userMessage
+          );
+
+          chunkBuffer = [];
+        },
+        params
+      );
+
+      if (!response.ok || !contentText) {
+        throw new Error("请求失败");
+      }
+
+      if (chunkBuffer.length > 0) {
+        const remainingChunk = chunkBuffer.join("");
+        const [thinkContent, content] = classifyChunk(remainingChunk);
+        if (thinkContent) {
+          thinkContentText += thinkContent;
+        }
+        if (content) {
+          contentText += content;
+        }
+      }
+
+      const finalText = thinkContentText
+        ? `<think>${thinkContentText}</think> ${contentText}`
+        : contentText;
+      updateConversationMessagesWithBase(
+        finalText,
+        "assistant",
+        false,
+        userTimestamp,
+        userMessage
+      );
+    };
+
+    try {
+      await sendRequest(
+        userMessage.content,
+        userMessage.timestamp,
+        userMessage as ChatUiMessage
+      );
+    } catch (error) {
+      console.error("重新生成消息错误:", error);
+      appendAssistantMessage(
+        "抱歉，重新生成回复时出现错误。",
+        "assistant",
+        true,
+        userMessage.timestamp,
+        userMessage as ChatUiMessage,
+        remainingMessages as ChatUiMessage[]
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 处理编辑消息
+  const handleEditMessage = async (messageTimestamp: number) => {
+    if (!activeConversation || isLoading) return;
+
+    // 找到要编辑的消息
+    const message = activeConversation.messages.find(
+      (msg) => msg.timestamp === messageTimestamp
+    );
+
+    if (!message || message.role !== "user") return;
+
+    // 删除当前消息及其之后的所有消息
+    deleteMessageAndAfter(messageTimestamp);
+
+    // 将消息内容填入输入框
+    setInputContent(message.content);
+  };
+
   // 处理文件上传变化
   // const handleFileChange = (info: any) => {
   //   if (
@@ -323,6 +482,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
                   key={message.id}
                   content={message.text}
                   timestamp={message.timestamp}
+                  onEdit={() => handleEditMessage(message.timestamp)}
                 />
               ) : (
                 <ResponseBubble
@@ -330,6 +490,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
                   content={message.text}
                   timestamp={message.timestamp}
                   isError={message.isError}
+                  onReload={() => handleReloadMessage(message.timestamp)}
                 />
               )
             )

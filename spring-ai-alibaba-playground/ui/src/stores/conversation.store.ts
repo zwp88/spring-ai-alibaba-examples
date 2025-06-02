@@ -384,35 +384,69 @@ export const useConversationContext = () => {
    * @param isError - 是否为错误消息
    * @param userTimestamp - 用户消息的时间戳
    * @param userMessage - 用户消息对象
+   * @param baseMessages - 可选的基础消息列表，用于避免状态更新延迟问题
    */
   const appendAssistantMessage = <T extends BaseMessage>(
     messageContent: string,
     role: "assistant",
     isError: boolean = false,
     userTimestamp: number,
-    userMessage: T
+    userMessage: T,
+    baseMessages?: T[]
   ) => {
     if (!activeConversation) return;
 
-    const assistantTimestamp = Date.now();
-    const assistantMessage = {
-      role,
-      content: messageContent,
-      timestamp: assistantTimestamp,
-      isError,
-    } as T;
+    // 使用传入的baseMessages或当前的activeConversation.messages
+    const currentMessages = baseMessages || activeConversation.messages;
 
-    const existingUserMessage = activeConversation.messages.find(
+    const existingUserMessage = currentMessages.find(
       (msg) => msg.timestamp === userTimestamp && msg.role === "user"
     );
 
-    const baseMessages = existingUserMessage
-      ? activeConversation.messages
-      : [...activeConversation.messages, userMessage];
+    const messagesWithUser = existingUserMessage
+      ? currentMessages
+      : [...currentMessages, userMessage];
 
-    const finalMessages = baseMessages
-      .filter((msg) => !(msg as BaseMessage).isLoading)
-      .concat([assistantMessage]);
+    // 查找用户消息的索引
+    const userMessageIndex = messagesWithUser.findIndex(
+      (msg) => msg.timestamp === userTimestamp && msg.role === "user"
+    );
+
+    if (userMessageIndex === -1) {
+      console.error("找不到对应的用户消息");
+      return;
+    }
+
+    // 查找该用户消息之后的第一个assistant消息
+    const existingAssistantIndex = messagesWithUser.findIndex(
+      (msg, index) => index > userMessageIndex && msg.role === "assistant"
+    );
+
+    let finalMessages: T[];
+
+    if (existingAssistantIndex !== -1) {
+      // 更新现有的assistant消息
+      finalMessages = messagesWithUser
+        .map((msg, index) =>
+          index === existingAssistantIndex
+            ? ({ ...msg, content: messageContent, isError } as T)
+            : msg
+        )
+        .filter((msg) => !(msg as BaseMessage).isLoading) as T[];
+    } else {
+      // 创建新的assistant消息
+      const assistantTimestamp = Date.now();
+      const assistantMessage = {
+        role,
+        content: messageContent,
+        timestamp: assistantTimestamp,
+        isError,
+      } as T;
+
+      finalMessages = messagesWithUser
+        .filter((msg) => !(msg as BaseMessage).isLoading)
+        .concat([assistantMessage]) as T[];
+    }
 
     if (isError) {
       console.log("更新错误后的消息列表:", finalMessages);
@@ -420,7 +454,7 @@ export const useConversationContext = () => {
 
     updateActiveConversation({
       ...activeConversation,
-      messages: finalMessages as T[],
+      messages: finalMessages,
     });
   };
 
@@ -480,6 +514,47 @@ export const useConversationContext = () => {
     }
   };
 
+  /**
+   * 删除指定时间戳的消息及其之后的所有消息
+   * @param messageTimestamp - 要删除的消息时间戳
+   * @returns 删除后的消息列表
+   */
+  const deleteMessageAndAfter = (messageTimestamp: number) => {
+    if (!activeConversation) return [];
+
+    const updatedMessages = activeConversation.messages.filter(
+      (msg) => msg.timestamp < messageTimestamp
+    );
+
+    updateActiveConversation({
+      ...activeConversation,
+      messages: updatedMessages,
+    });
+
+    return updatedMessages;
+  };
+
+  /**
+   * 更新指定消息的内容
+   * @param messageTimestamp - 要更新的消息时间戳
+   * @param newContent - 新的消息内容
+   */
+  const updateMessageContent = (
+    messageTimestamp: number,
+    newContent: string
+  ) => {
+    if (!activeConversation) return;
+
+    const updatedMessages = activeConversation.messages.map((msg) =>
+      msg.timestamp === messageTimestamp ? { ...msg, content: newContent } : msg
+    );
+
+    updateActiveConversation({
+      ...activeConversation,
+      messages: updatedMessages,
+    });
+  };
+
   return {
     conversations,
     activeConversation,
@@ -496,5 +571,7 @@ export const useConversationContext = () => {
     updateConversationTitle,
     appendAssistantMessage,
     processSendMessage,
+    deleteMessageAndAfter,
+    updateMessageContent,
   };
 };
