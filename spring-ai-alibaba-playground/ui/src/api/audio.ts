@@ -1,4 +1,4 @@
-import { BASE_URL } from "../constant";
+import { BASE_URL } from "../const";
 import { Result } from "./base";
 
 // 生成语音接口

@@ -11,6 +11,7 @@ interface ResponseBubbleProps {
   timestamp: number;
   isError?: boolean;
   footer?: () => React.ReactNode;
+  onReload?: () => void;
 }
 
 const ResponseBubble: React.FC<ResponseBubbleProps> = ({
@@ -18,6 +19,7 @@ const ResponseBubble: React.FC<ResponseBubbleProps> = ({
   timestamp,
   isError = false,
   footer = null,
+  onReload,
 }) => {
   const { styles } = useStyle();
   const messageId = `${timestamp}`;
@@ -25,6 +27,10 @@ const ResponseBubble: React.FC<ResponseBubbleProps> = ({
   const markdownRenderConfig = useMemo(
     () => getMarkdownRenderConfig(styles),
     [styles]
+  );
+
+  const defaultFooter = () => (
+    <MessageFooter value={content} onReload={onReload} />
   );
 
   return (
@@ -42,7 +48,7 @@ const ResponseBubble: React.FC<ResponseBubbleProps> = ({
       <div className={styles.messageTime}>
         {new Date(timestamp).toLocaleString()}
       </div>
-      {!isError && (footer?.() ?? <MessageFooter value={content} />)}
+      {!isError && (footer?.() ?? defaultFooter())}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { BASE_URL } from "../constant";
+import { BASE_URL } from "../const";
 
 export const getChat = async (
   message: string,
@@ -20,30 +20,30 @@ export const getChat = async (
     formData.append("image", image);
     res = (await fetch(BASE_URL + "/image2text", {
       method: "POST",
-      body: formData
+      body: formData,
     })) as any;
   } else if (onlineSearch) {
     res = (await fetch(BASE_URL + "/search?query=" + message, {
       method: "GET",
       headers: {
-        chatId: chatId ? chatId : ""
-      }
+        chatId: chatId ? chatId : "",
+      },
     })) as any;
   } else if (deepThink) {
     res = (await fetch(BASE_URL + "/deep-thinking/chat?prompt=" + message, {
       method: "GET",
       headers: {
         model: model ? model : "",
-        chatId: chatId ? chatId : ""
-      }
+        chatId: chatId ? chatId : "",
+      },
     })) as any;
   } else {
     res = (await fetch(BASE_URL + "/search?prompt=" + message, {
       method: "GET",
       headers: {
         model: model ? model : "",
-        chatId: chatId ? chatId : ""
-      }
+        chatId: chatId ? chatId : "",
+      },
     })) as any;
   }
 
