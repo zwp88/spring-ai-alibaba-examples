@@ -39,6 +39,7 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
     appendAssistantMessage,
     deleteMessageAndAfter,
     updateMessageContent,
+    updateActiveConversation,
   } = useConversationContext();
 
   const isFirstLoad = useRef(true);
@@ -268,22 +269,25 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
 
     if (!message || message.role !== "user") return;
 
-    // 删除当前消息及其之后的所有消息
-    const remainingMessages = deleteMessageAndAfter(messageTimestamp);
+    // 删除当前消息之后的所有消息（保留用户消息本身）
+    const remainingMessages = activeConversation.messages.filter(
+      (msg) => msg.timestamp <= messageTimestamp
+    );
 
-    // 创建更新后的用户消息
-    const updatedUserMessage: RagUiMessage = {
-      ...message,
-      content: newContent,
-    } as RagUiMessage;
+    // 更新用户消息内容
+    const updatedMessages = remainingMessages.map((msg) =>
+      msg.timestamp === messageTimestamp
+        ? ({ ...msg, content: newContent } as RagUiMessage)
+        : msg
+    ) as RagUiMessage[];
 
-    // 将更新后的用户消息添加到remainingMessages中
-    const messagesWithUpdatedUser = [
-      ...remainingMessages,
-      updatedUserMessage,
-    ] as RagUiMessage[];
+    // 立即更新会话状态
+    updateActiveConversation({
+      ...activeConversation,
+      messages: updatedMessages,
+    });
 
-    // 直接重新生成回复，不创建新的用户消息
+    // 直接重新生成回复
     setIsLoading(true);
 
     // 创建一个使用正确baseMessages的更新函数
@@ -300,9 +304,15 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
         isError,
         userTimestamp,
         userMessage,
-        messagesWithUpdatedUser
+        updatedMessages
       );
     };
+
+    // 创建更新后的用户消息
+    const updatedUserMessage: RagUiMessage = {
+      ...message,
+      content: newContent,
+    } as RagUiMessage;
 
     const sendRequest = async (
       text: string,
@@ -341,7 +351,7 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
         true,
         message.timestamp,
         updatedUserMessage,
-        messagesWithUpdatedUser
+        updatedMessages
       );
     } finally {
       setIsLoading(false);

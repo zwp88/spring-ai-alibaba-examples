@@ -22,7 +22,12 @@ const RequestBubble: React.FC<RequestBubbleProps> = ({
   const { token } = theme.useToken();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(content);
+  const [displayContent, setDisplayContent] = useState(content);
   const textAreaRef = useRef<any>(null);
+
+  useEffect(() => {
+    setDisplayContent(content);
+  }, [content]);
 
   useEffect(() => {
     if (isEditing && textAreaRef.current) {
@@ -39,12 +44,13 @@ const RequestBubble: React.FC<RequestBubbleProps> = ({
 
   const handleEditClick = () => {
     setIsEditing(true);
-    setEditContent(content);
+    setEditContent(displayContent);
     onEdit?.();
   };
 
   const handleConfirm = () => {
-    if (editContent.trim() && editContent !== content) {
+    if (editContent.trim() && editContent !== displayContent) {
+      setDisplayContent(editContent.trim());
       onEditConfirm?.(editContent.trim());
     }
     setIsEditing(false);
@@ -52,7 +58,7 @@ const RequestBubble: React.FC<RequestBubbleProps> = ({
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditContent(content);
+    setEditContent(displayContent);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -101,7 +107,7 @@ const RequestBubble: React.FC<RequestBubbleProps> = ({
         </div>
       ) : (
         <>
-          <div className={styles.messageText}>{content}</div>
+          <div className={styles.messageText}>{displayContent}</div>
           <div className={styles.messageTime}>
             {new Date(timestamp).toLocaleString()}
           </div>

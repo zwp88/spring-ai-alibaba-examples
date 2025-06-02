@@ -399,6 +399,7 @@ export const useConversationContext = () => {
     // 使用传入的baseMessages或当前的activeConversation.messages
     const currentMessages = baseMessages || activeConversation.messages;
 
+    // 确保用户消息存在
     const existingUserMessage = currentMessages.find(
       (msg) => msg.timestamp === userTimestamp && msg.role === "user"
     );

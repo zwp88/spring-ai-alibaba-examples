@@ -54,6 +54,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     processSendMessage,
     deleteMessageAndAfter,
     updateMessageContent,
+    updateActiveConversation,
   } = useConversationContext();
 
   // 跟踪组件是否首次加载，用于处理URL中的prompt参数
@@ -397,22 +398,25 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
 
     if (!message || message.role !== "user") return;
 
-    // 删除当前消息及其之后的所有消息
-    const remainingMessages = deleteMessageAndAfter(messageTimestamp);
+    // 删除当前消息之后的所有消息（保留用户消息本身）
+    const remainingMessages = activeConversation.messages.filter(
+      (msg) => msg.timestamp <= messageTimestamp
+    );
 
-    // 创建更新后的用户消息
-    const updatedUserMessage: ChatUiMessage = {
-      ...message,
-      content: newContent,
-    } as ChatUiMessage;
+    // 更新用户消息内容
+    const updatedMessages = remainingMessages.map((msg) =>
+      msg.timestamp === messageTimestamp
+        ? ({ ...msg, content: newContent } as ChatUiMessage)
+        : msg
+    ) as ChatUiMessage[];
 
-    // 将更新后的用户消息添加到remainingMessages中
-    const messagesWithUpdatedUser = [
-      ...remainingMessages,
-      updatedUserMessage,
-    ] as ChatUiMessage[];
+    // 立即更新会话状态
+    updateActiveConversation({
+      ...activeConversation,
+      messages: updatedMessages,
+    });
 
-    // 直接重新生成回复，使用原始的用户消息时间戳
+    // 直接重新生成回复
     setIsLoading(true);
 
     // 创建一个使用正确baseMessages的更新函数
@@ -430,11 +434,17 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
           isError,
           userTimestamp,
           userMessage,
-          messagesWithUpdatedUser
+          updatedMessages
         );
       },
       100
     );
+
+    // 创建更新后的用户消息
+    const updatedUserMessage: ChatUiMessage = {
+      ...message,
+      content: newContent,
+    } as ChatUiMessage;
 
     const sendRequest = async (
       text: string,
@@ -518,7 +528,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
         true,
         message.timestamp,
         updatedUserMessage,
-        messagesWithUpdatedUser
+        updatedMessages
       );
     } finally {
       setIsLoading(false);
