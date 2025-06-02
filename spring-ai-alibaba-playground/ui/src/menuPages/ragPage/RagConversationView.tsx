@@ -82,7 +82,7 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
         processedPrompts.current.add(urlPrompt);
         console.log("从URL参数获取提示词:", urlPrompt);
 
-        const newUrl = window.location.pathname;
+        const newUrl = window.location.hash.split("?")[0];
         window.history.replaceState({}, document.title, newUrl);
 
         setTimeout(() => {

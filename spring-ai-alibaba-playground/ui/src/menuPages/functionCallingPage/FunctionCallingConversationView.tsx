@@ -104,7 +104,7 @@ const FunctionCallingConversationView = ({
         console.log("从URL参数获取提示词:", urlPrompt);
 
         // 清除URL中的prompt参数，防止刷新页面重复发送
-        const newUrl = window.location.pathname;
+        const newUrl = window.location.hash.split("?")[0];
         window.history.replaceState({}, document.title, newUrl);
 
         // 设置输入内容并自动发送

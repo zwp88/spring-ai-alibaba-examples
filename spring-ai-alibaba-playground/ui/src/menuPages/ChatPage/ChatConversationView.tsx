@@ -113,7 +113,7 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
         // 标记此prompt已处理，避免重复处理
         processedPrompts.current.add(urlPrompt);
         // 清除URL中的prompt参数，防止刷新页面重复发送
-        const newUrl = window.location.pathname;
+        const newUrl = window.location.hash.split("?")[0];
         window.history.replaceState({}, document.title, newUrl);
 
         const timeId = setTimeout(() => {
