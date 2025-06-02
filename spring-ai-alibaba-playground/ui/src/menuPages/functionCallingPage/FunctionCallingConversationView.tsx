@@ -274,7 +274,10 @@ const FunctionCallingConversationView = ({
   };
 
   // 处理编辑消息
-  const handleEditMessage = async (messageTimestamp: number) => {
+  const handleEditConfirm = async (
+    messageTimestamp: number,
+    newContent: string
+  ) => {
     if (!activeConversation || isLoading) return;
 
     // 找到要编辑的消息
@@ -285,10 +288,93 @@ const FunctionCallingConversationView = ({
     if (!message || message.role !== "user") return;
 
     // 删除当前消息及其之后的所有消息
-    deleteMessageAndAfter(messageTimestamp);
+    const remainingMessages = deleteMessageAndAfter(messageTimestamp);
 
-    // 将消息内容填入输入框
-    setInputContent(message.content);
+    // 创建更新后的用户消息
+    const updatedUserMessage: FunctionCallingUiMessage = {
+      ...message,
+      content: newContent,
+    } as FunctionCallingUiMessage;
+
+    // 将更新后的用户消息添加到remainingMessages中
+    const messagesWithUpdatedUser = [
+      ...remainingMessages,
+      updatedUserMessage,
+    ] as FunctionCallingUiMessage[];
+
+    // 直接重新生成回复，不创建新的用户消息
+    setIsLoading(true);
+
+    // 创建一个使用正确baseMessages的更新函数
+    const appendAssistantMessageWithBase = (
+      messageContent: string,
+      role: "assistant",
+      isError: boolean,
+      userTimestamp: number,
+      userMessage: FunctionCallingUiMessage
+    ) => {
+      appendAssistantMessage(
+        messageContent,
+        role,
+        isError,
+        userTimestamp,
+        userMessage,
+        messagesWithUpdatedUser
+      );
+    };
+
+    const sendRequest = async (
+      text: string,
+      userTimestamp: number,
+      userMessage: FunctionCallingUiMessage
+    ) => {
+      const result = await getToolCalling(text, conversationId);
+
+      let toolText = "";
+      // 如果是工具调用，可以先显示工具调用的中间状态
+      if (result.toolName) {
+        toolText = `调用工具: ${result.toolName}\n${result.toolParameters}`;
+        appendAssistantMessageWithBase(
+          toolText,
+          "assistant",
+          result.status !== "SUCCESS",
+          userTimestamp,
+          userMessage
+        );
+      }
+
+      // 显示最终结果
+      const responseText =
+        result.toolResult || result.toolResponse || "工具调用失败";
+
+      const totalText = toolText
+        ? `<tool>${toolText}</tool>\n${responseText}`
+        : responseText;
+
+      appendAssistantMessageWithBase(
+        totalText,
+        "assistant",
+        result.status !== "SUCCESS",
+        userTimestamp,
+        userMessage
+      );
+    };
+
+    try {
+      await sendRequest(newContent, message.timestamp, updatedUserMessage);
+    } catch (error) {
+      console.error("重新生成消息错误:", error);
+      appendAssistantMessage(
+        "抱歉，重新生成回复时出现错误。",
+        "assistant",
+        true,
+        message.timestamp,
+        updatedUserMessage,
+        messagesWithUpdatedUser
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -302,7 +388,7 @@ const FunctionCallingConversationView = ({
               value={inputContent}
               onChange={setInputContent}
               onSubmit={handleSendMessage}
-              placeholder="请输入您想查询的地区和日期，例如：北京今天的天气..."
+              placeholder="例如：北京今天的天气..."
               className={styles.sender}
               loading={isLoading}
             />
@@ -329,7 +415,9 @@ const FunctionCallingConversationView = ({
                       key={message.id}
                       content={message.text}
                       timestamp={message.timestamp}
-                      onEdit={() => handleEditMessage(message.timestamp)}
+                      onEditConfirm={(newContent) =>
+                        handleEditConfirm(message.timestamp, newContent)
+                      }
                     />
                   ) : (
                     <ResponseBubble

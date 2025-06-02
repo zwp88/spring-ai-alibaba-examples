@@ -255,7 +255,10 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
   };
 
   // 处理编辑消息
-  const handleEditMessage = async (messageTimestamp: number) => {
+  const handleEditConfirm = async (
+    messageTimestamp: number,
+    newContent: string
+  ) => {
     if (!activeConversation || isLoading) return;
 
     // 找到要编辑的消息
@@ -266,10 +269,83 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
     if (!message || message.role !== "user") return;
 
     // 删除当前消息及其之后的所有消息
-    deleteMessageAndAfter(messageTimestamp);
+    const remainingMessages = deleteMessageAndAfter(messageTimestamp);
 
-    // 将消息内容填入输入框
-    setInputContent(message.content);
+    // 创建更新后的用户消息
+    const updatedUserMessage: RagUiMessage = {
+      ...message,
+      content: newContent,
+    } as RagUiMessage;
+
+    // 将更新后的用户消息添加到remainingMessages中
+    const messagesWithUpdatedUser = [
+      ...remainingMessages,
+      updatedUserMessage,
+    ] as RagUiMessage[];
+
+    // 直接重新生成回复，不创建新的用户消息
+    setIsLoading(true);
+
+    // 创建一个使用正确baseMessages的更新函数
+    const updateConversationMessagesWithBase = (
+      messageContent: string,
+      role: "assistant",
+      isError: boolean = false,
+      userTimestamp: number,
+      userMessage: RagUiMessage
+    ) => {
+      appendAssistantMessage(
+        messageContent,
+        role,
+        isError,
+        userTimestamp,
+        userMessage,
+        messagesWithUpdatedUser
+      );
+    };
+
+    const sendRequest = async (
+      text: string,
+      userTimestamp: number,
+      userMessage: RagUiMessage
+    ) => {
+      let accumulatedText = "";
+      const response = await getRag(
+        text,
+        (value) => {
+          const chunk = new TextDecoder().decode(value);
+          accumulatedText += chunk;
+          updateConversationMessagesWithBase(
+            accumulatedText,
+            "assistant",
+            false,
+            userTimestamp,
+            userMessage
+          );
+        },
+        { chatId: conversationId }
+      );
+
+      if (!response.ok) {
+        throw new Error("RAG查询失败");
+      }
+    };
+
+    try {
+      await sendRequest(newContent, message.timestamp, updatedUserMessage);
+    } catch (error) {
+      console.error("重新生成消息错误:", error);
+      appendAssistantMessage(
+        "抱歉，重新生成回复时出现错误。",
+        "assistant",
+        true,
+        message.timestamp,
+        updatedUserMessage,
+        messagesWithUpdatedUser
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -308,7 +384,9 @@ const RagConversationView = ({ conversationId }: RagConversationViewProps) => {
                       key={message.id}
                       content={message.text}
                       timestamp={message.timestamp}
-                      onEdit={() => handleEditMessage(message.timestamp)}
+                      onEditConfirm={(newContent) =>
+                        handleEditConfirm(message.timestamp, newContent)
+                      }
                     />
                   ) : (
                     <ResponseBubble

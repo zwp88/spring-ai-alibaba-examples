@@ -384,7 +384,10 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
   };
 
   // 处理编辑消息
-  const handleEditMessage = async (messageTimestamp: number) => {
+  const handleEditConfirm = async (
+    messageTimestamp: number,
+    newContent: string
+  ) => {
     if (!activeConversation || isLoading) return;
 
     // 找到要编辑的消息
@@ -395,10 +398,131 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
     if (!message || message.role !== "user") return;
 
     // 删除当前消息及其之后的所有消息
-    deleteMessageAndAfter(messageTimestamp);
+    const remainingMessages = deleteMessageAndAfter(messageTimestamp);
 
-    // 将消息内容填入输入框
-    setInputContent(message.content);
+    // 创建更新后的用户消息
+    const updatedUserMessage: ChatUiMessage = {
+      ...message,
+      content: newContent,
+    } as ChatUiMessage;
+
+    // 将更新后的用户消息添加到remainingMessages中
+    const messagesWithUpdatedUser = [
+      ...remainingMessages,
+      updatedUserMessage,
+    ] as ChatUiMessage[];
+
+    // 直接重新生成回复，使用原始的用户消息时间戳
+    setIsLoading(true);
+
+    // 创建一个使用正确baseMessages的更新函数
+    const updateConversationMessagesWithBase = useThrottle(
+      (
+        messageContent: string,
+        role: "assistant",
+        isError: boolean = false,
+        userTimestamp: number,
+        userMessage: ChatUiMessage
+      ) => {
+        appendAssistantMessage(
+          messageContent,
+          role,
+          isError,
+          userTimestamp,
+          userMessage,
+          messagesWithUpdatedUser
+        );
+      },
+      100
+    );
+
+    const sendRequest = async (
+      text: string,
+      userTimestamp: number,
+      userMessage: ChatUiMessage
+    ) => {
+      const params = {
+        chatId: activeConversation?.id,
+        model: currentModel?.value,
+        deepThink: aiCapabilities.deepThink,
+        onlineSearch: aiCapabilities.onlineSearch,
+      };
+      let thinkContentText = "";
+      let contentText = "";
+      let chunkBuffer: string[] = [];
+
+      const response = await getChat(
+        text,
+        (value) => {
+          const chunk = decoder.decode(value);
+          chunkBuffer.push(chunk);
+
+          const [thinkContent, content] = classifyChunk(chunk);
+          if (thinkContent) {
+            thinkContentText += thinkContent;
+          }
+          if (content) {
+            contentText += content;
+          }
+          const totalText = thinkContentText
+            ? `<think>${thinkContentText}</think> ${contentText}`
+            : contentText;
+
+          updateConversationMessagesWithBase(
+            totalText,
+            "assistant",
+            false,
+            userTimestamp,
+            userMessage
+          );
+
+          chunkBuffer = [];
+        },
+        params
+      );
+
+      if (!response.ok || !contentText) {
+        throw new Error("请求失败");
+      }
+
+      if (chunkBuffer.length > 0) {
+        const remainingChunk = chunkBuffer.join("");
+        const [thinkContent, content] = classifyChunk(remainingChunk);
+        if (thinkContent) {
+          thinkContentText += thinkContent;
+        }
+        if (content) {
+          contentText += content;
+        }
+      }
+
+      const finalText = thinkContentText
+        ? `<think>${thinkContentText}</think> ${contentText}`
+        : contentText;
+      updateConversationMessagesWithBase(
+        finalText,
+        "assistant",
+        false,
+        userTimestamp,
+        userMessage
+      );
+    };
+
+    try {
+      await sendRequest(newContent, message.timestamp, updatedUserMessage);
+    } catch (error) {
+      console.error("重新生成消息错误:", error);
+      appendAssistantMessage(
+        "抱歉，重新生成回复时出现错误。",
+        "assistant",
+        true,
+        message.timestamp,
+        updatedUserMessage,
+        messagesWithUpdatedUser
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 处理文件上传变化
@@ -482,7 +606,9 @@ const ChatConversationView: React.FC<ChatConversationViewProps> = ({
                   key={message.id}
                   content={message.text}
                   timestamp={message.timestamp}
-                  onEdit={() => handleEditMessage(message.timestamp)}
+                  onEditConfirm={(newContent) =>
+                    handleEditConfirm(message.timestamp, newContent)
+                  }
                 />
               ) : (
                 <ResponseBubble
