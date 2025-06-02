@@ -13,7 +13,7 @@ import { mapStoredMessagesToUIMessages, scrollToBottom } from "../../utils";
 import ResponseBubble from "../components/ResponseBubble";
 import RequestBubble from "../components/RequestBubble";
 import { Message } from "../chatPage/types";
-import { useStyles } from "../ragPage/style";
+import { useStyles } from "./style";
 
 interface RagConversationViewProps {
   conversationId: string;
