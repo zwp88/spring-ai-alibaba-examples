@@ -17,22 +17,7 @@
  */
 package com.alibaba.cloud.ai.mcp.samples.client;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import io.modelcontextprotocol.client.McpClient;
-import io.modelcontextprotocol.client.McpSyncClient;
-import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
-import io.modelcontextprotocol.spec.McpClientTransport;
-import io.modelcontextprotocol.spec.McpSchema;
-import jakarta.annotation.PostConstruct;
-
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -56,46 +41,14 @@ public class Application {
 
 	private String userInput2 = "将 user 转为大写";
 
-
-	private McpSyncClient mcpClient;
-
-	@PostConstruct
-	public void init() {
-
-		McpClientTransport transport = HttpClientSseClientTransport.builder("http://localhost:8080/").build();
-		mcpClient = McpClient.sync(transport)
-				.requestTimeout(Duration.ofSeconds(20L))
-				.capabilities(McpSchema.ClientCapabilities.builder()
-						.roots(true)
-						.sampling()
-						.build())
-				.sampling()
-				.build();
-
-		mcpClient.initialize();
-	}
-
 	@Bean
 	public CommandLineRunner predefinedQuestions(ChatClient.Builder chatClientBuilder, ToolCallbackProvider tools,
-			ConfigurableApplicationContext context, List<McpSyncClient> mcpClients) {
-
-		String input = """
-				{
-				    "input": "user"
-				}
-				""";
+			ConfigurableApplicationContext context) {
 
 		return args -> {
 
-			for (McpSyncClient mcpClient : mcpClients) {
-				McpSchema.CallToolRequest req = new McpSchema.CallToolRequest("toUpperCase", input);
-				System.out.println(req);
-			}
-
 			var chatClient = chatClientBuilder
-					.defaultToolCallbacks(new SyncMcpToolCallbackProvider(mcpClients))
-					.defaultAdvisors(MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build())
-							.build())
+					.defaultToolCallbacks(tools)
 					.build();
 
 			System.out.println("\n>>> QUESTION: " + userInput1);
@@ -107,34 +60,4 @@ public class Application {
 			context.close();
 		};
 	}
-
-
-    class Handler implements Function<McpSchema.CreateMessageRequest, McpSchema.CreateMessageResult> {
-
-        @Override
-        public McpSchema.CreateMessageResult apply(McpSchema.CreateMessageRequest createMessageRequest) {
-
-            McpSchema.CreateMessageRequest request = new McpSchema.CreateMessageRequest(
-                    List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("hi"))),
-                    McpSchema.ModelPreferences.builder().build(),
-                    "hi",
-                    McpSchema.CreateMessageRequest.ContextInclusionStrategy.ALL_SERVERS,
-                    0.7,
-                    100,
-                    List.of(""),
-                    Map.of("test-key", "value")
-            );
-
-            return request.toBuilder()
-                    .messages(List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("hi"))))
-                    .modelPreferences(McpSchema.ModelPreferences.builder().build())
-                    .id("hi")
-                    .contextInclusionStrategy(McpSchema.CreateMessageRequest.ContextInclusionStrategy.ALL_SERVERS)
-                    .temperature(0.7)
-                    .maxTokens(100)
-                    .stopSequences(List.of(""))
-                    .metadata(Map.of("test-key", "value"))
-                    .build();
-        }
-    }
 }
