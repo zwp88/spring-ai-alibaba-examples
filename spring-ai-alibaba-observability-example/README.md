@@ -173,25 +173,25 @@ services:
 
 在下文中即可看到 chatClient 相关的信息：
 
-![image-20250604212605930](.\images\image-20250604212605930.png)
+![image-20250604212605930](./images/image-20250604212605930.png)
 
 #### ToolCalling
 
 指标介绍：https://docs.spring.io/spring-ai/reference/observability/index.html#_tool_calling
 
-![image-20250604212858047](.\images\image-20250604212858047.png)
+![image-20250604212858047](./images/image-20250604212858047.png)
 
 在下面的 tool 模块可以看到 tools 的入参和出参信息：
 
-![image-20250604213730393](.\images\image-20250604213730393.png)
+![image-20250604213730393](./images/image-20250604213730393.png)
 
 #### Embedding Client
 
 指标参考：https://docs.spring.io/spring-ai/reference/observability/index.html#_embeddingmodel
 
-![image-20250604213822311](.\images\image-20250604213822311.png)
+![image-20250604213822311](./images/image-20250604213822311.png)
 
-![image-20250604213913992](.\images\image-20250604213913992.png)
+![image-20250604213913992](./images/image-20250604213913992.png)
 
 ### 扩展 Spring AI 指标
 
