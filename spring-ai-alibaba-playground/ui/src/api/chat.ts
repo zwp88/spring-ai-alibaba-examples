@@ -30,6 +30,7 @@ export const getChat = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        model: model || "",
         chatId: chatId || "",
       },
       body: prompt,

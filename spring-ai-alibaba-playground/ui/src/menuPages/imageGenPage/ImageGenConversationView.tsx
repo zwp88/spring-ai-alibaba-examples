@@ -61,7 +61,7 @@ const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
         processedPrompts.current.add(urlPrompt);
 
         // 清除URL中的prompt参数，防止刷新页面重复发送
-        const newUrl = window.location.pathname;
+        const newUrl = window.location.hash.split("?")[0];
         window.history.replaceState({}, document.title, newUrl);
 
         // 延迟一点处理以确保组件完全加载

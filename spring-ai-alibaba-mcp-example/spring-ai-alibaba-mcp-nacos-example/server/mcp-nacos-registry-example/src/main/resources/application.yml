@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: spring-ai-alibaba-nacos-mcp-example
+  ai:
+    mcp:
+      server:
+        name: webmvc-mcp-server
+        version: 1.0.0
+        type: SYNC
+
+    alibaba:
+      mcp:
+        nacos:
+          server-addr:
+          namespace: public
+          username:
+          password:
+          registry:
+            enabled: true
+
+server:
+  port: 8080
