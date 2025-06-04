@@ -20,12 +20,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.client.RestClient;
 
 @SpringBootApplication
-public class Application  {
+public class AgentApplication  {
 
-	private static final Logger logger = LoggerFactory.getLogger(Application.class);
+	private static final Logger logger = LoggerFactory.getLogger(AgentApplication.class);
 
 	public static void main(String[] args) {
-		new SpringApplicationBuilder(Application.class).run(args);
+		new SpringApplicationBuilder(AgentApplication.class).run(args);
 	}
 
 	// In the real world, ingesting documents would often happen separately, on a CI

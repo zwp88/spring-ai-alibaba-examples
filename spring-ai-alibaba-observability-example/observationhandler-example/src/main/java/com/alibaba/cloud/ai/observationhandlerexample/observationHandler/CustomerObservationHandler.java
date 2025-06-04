@@ -28,12 +28,12 @@ public class CustomerObservationHandler implements ObservationHandler<ChatModelO
 
     @Override
     public void onStart(ChatModelObservationContext context) {
-        System.out.println("CustomerObservationHandler Star! ChatModelObservationContext: " + context.toString() );
+        System.out.println("exec CustomerObservationHandler onStart function! ChatModelObservationContext: " + context.toString() );
     }
 
     @Override
     public void onStop(ChatModelObservationContext context) {
-        System.out.println("CustomerObservationHandler onStop! ChatModelObservationContext: " + context.toString() );
+        System.out.println("exec CustomerObservationHandler onStop function! ChatModelObservationContext: " + context.toString() );
     }
 
     @Override

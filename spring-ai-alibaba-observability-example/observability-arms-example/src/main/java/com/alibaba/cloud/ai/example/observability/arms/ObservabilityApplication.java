@@ -16,19 +16,12 @@
 
 package com.alibaba.cloud.ai.example.observability.arms;
 
-import java.util.Map;
-
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.trace.Span;
 
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @SpringBootApplication
 public class ObservabilityApplication {
@@ -38,37 +31,10 @@ public class ObservabilityApplication {
     }
 
     @Bean
-    ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.build();
-    }
-
-    @Bean
     public OpenTelemetry openTelemetry() {
         // suppress the initialization of OpenTelemetry SDK in micrometer
         return GlobalOpenTelemetry.get();
     }
+
 }
 
-@Controller
-@ResponseBody
-class JokeController {
-
-    private final ChatClient chatClient;
-
-    JokeController(ChatClient chatClient) {
-        this.chatClient = chatClient;
-    }
-
-    @GetMapping("/joke")
-    Map<String, String> joke() {
-        var reply = chatClient
-                .prompt()
-                .user("""
-                        tell me a joke. be concise. don't send anything except the joke.
-                        """)
-                .call()
-                .content();
-        Span currentSpan = Span.current();
-        return Map.of("joke", reply, "traceId", currentSpan.getSpanContext().getTraceId());
-    }
-}

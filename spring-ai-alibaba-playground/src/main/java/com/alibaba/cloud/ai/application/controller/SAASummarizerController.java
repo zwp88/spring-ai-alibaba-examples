@@ -25,7 +25,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,8 +54,7 @@ public class SAASummarizerController {
 	public Flux<String> summary(
 			HttpServletResponse response,
 			@RequestParam(value = "file", required = false) MultipartFile file,
-			@RequestParam(value = "url", required = false) String url,
-			@RequestHeader(value = "chatId", required = false, defaultValue = "spring-ai-alibaba-docs-summary") String chatId
+			@RequestParam(value = "url", required = false) String url
 	) {
 
 		if (file == null && (url == null || url.isEmpty())) {
@@ -64,7 +62,7 @@ public class SAASummarizerController {
 		}
 
 		response.setCharacterEncoding("UTF-8");
-		return docsSummaryService.summary(file, url, chatId);
+		return docsSummaryService.summary(file, url);
 	}
 
 }
