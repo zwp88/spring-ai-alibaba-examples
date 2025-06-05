@@ -39,15 +39,17 @@ spring:
     alibaba:
       mcp:
         nacos:
-          enabled: true
+          namespace: 4ad3108b-4d44-43d0-9634-3c1ac4850c8c
           server-addr: 127.0.0.1:8848
           username: nacos
           password: nacos
-          namespace: 9ba5f1aa-b37d-493b-9057-72918a40ef35      
           client:
+            enabled: true
             sse:
               connections:
-                server1: mcp-server-provider # MCP Server服务名称
+                server1:
+                  service-name: webflux-mcp-server
+                  version: 1.0.0
     mcp:
       client:
         enabled: true
