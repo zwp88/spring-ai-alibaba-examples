@@ -34,13 +34,13 @@ spring:
     alibaba:
       mcp:
         nacos:
+          namespace: 9ba5f1aa-b37d-493b-9057-72918a40ef35
           enabled: true
           server-addr: 127.0.0.1:8848
           username: nacos
           password: nacos
           registry:
             enabled: true
-            service-namespace: 9ba5f1aa-b37d-493b-9057-72918a40ef35
             service-group: mcp-server
 ```
-这里需要注意配置service-namespace，若不配置则默认使用public
+这里需要注意配置namespace，若不配置则默认使用public
