@@ -32,25 +32,26 @@ spring:
         version: 1.0.0
         request-timeout: 30s
         type: ASYNC  # or ASYNC for reactive applications
-        nacos-enabled: true
 
     alibaba:
       mcp:
         nacos:
           enabled: true
           server-addr: 127.0.0.1:8848
+          namespace: 9ba5f1aa-b37d-493b-9057-72918a40ef35
           username: nacos
           password: nacos
-          registry:
-            service-namespace: 9ba5f1aa-b37d-493b-9057-72918a40ef35
-            service-group: mcp-server
 
         client:
+          enabled: true
           sse:
             connections:
-              server1: webflux-mcp-server
+              server1:
+                service-group:  mcp-server
+                service-name: webflux-mcp-server
+
 ```
 开启配置：
-- nacos-enabled: true
+- enabled: true
 
-这里需要注意配置service-namespace，若不配置则默认使用public
+这里需要注意配置namespace，若不配置则默认使用public
