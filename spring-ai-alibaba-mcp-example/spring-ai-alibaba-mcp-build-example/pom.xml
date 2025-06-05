@@ -17,7 +17,6 @@
 	<name>Spring AI Alibaba MCP Examples</name>
 
 	<modules>
-		<module>mcp-stdio-server-example</module>
 		<module>starter-stock-server</module>
 	</modules>
 

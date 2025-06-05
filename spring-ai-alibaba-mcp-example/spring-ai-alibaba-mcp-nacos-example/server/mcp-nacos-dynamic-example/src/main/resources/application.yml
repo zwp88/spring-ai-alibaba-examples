@@ -16,7 +16,7 @@ spring:
           password:
           dynamic:
             enabled: true
-            server-names: echo-server
+            service-names: echo-server
 
 server:
   port: 8090
