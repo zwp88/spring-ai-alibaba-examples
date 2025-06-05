@@ -17,8 +17,12 @@
 
 package com.alibaba.cloud.ai.application.advisor;
 
+import java.util.List;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
@@ -28,16 +32,12 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Objects;
-
 /**
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  * Incorporate DeepSeek-R1's reasoning content into the output
  */
 
-//TODO spring-ai新版本不支持AdvisedRequest&AdvisedResponse
 public class ReasoningContentAdvisor implements BaseAdvisor {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReasoningContentAdvisor.class);
@@ -68,9 +68,9 @@ public class ReasoningContentAdvisor implements BaseAdvisor {
 			return chatClientResponse;
 		}
 		
-		logger.debug(String.valueOf(resp.getResults().get(0).getOutput().getMetadata()));
+		logger.debug("Advisor metadata output: {}", resp.getResults().get(0).getOutput().getMetadata());
 		String reasoningContent = String.valueOf(resp.getResults().get(0).getOutput().getMetadata().get("reasoningContent"));
-		
+		logger.debug("Advisor reasoning content: {}", reasoningContent);
 		if (StringUtils.hasText(reasoningContent)) {
 			List<Generation> thinkGenerations = resp.getResults().stream()
 					.map(generation -> {

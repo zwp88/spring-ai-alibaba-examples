@@ -20,7 +20,7 @@ import { useStyle } from "./style";
 import { Space } from "antd";
 import React, { useEffect, useState } from "react";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   Navigate,
