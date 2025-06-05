@@ -11,7 +11,7 @@
 ### application.yml
 ```yml
 server:
-  port: 121100
+  port: 8080
 
 spring:
   application:
@@ -54,4 +54,4 @@ spring:
 开启配置：
 - enabled: true
 
-这里需要注意配置namespace，若不配置则默认使用public
+这里需要注意配置 namespace，若不配置则默认使用public

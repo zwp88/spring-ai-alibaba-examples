@@ -3,6 +3,10 @@
 本项目是一个基于 [spring-ai-alibaba-mcp-nacos](https://github.com/spring-projects/spring-ai-alibaba) 的简单示例，展示如何将
 MCP Server 注册到 Nacos 中，并通过注解式工具（Tool）提供服务。
 
+本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求版本如下：
+1. Nacos版本在3.0.1及以上
+2. spring ai alibaba的1.0.0.3-SNAPSHOT以上
+
 ## 🧩 主要依赖
 
 ```xml

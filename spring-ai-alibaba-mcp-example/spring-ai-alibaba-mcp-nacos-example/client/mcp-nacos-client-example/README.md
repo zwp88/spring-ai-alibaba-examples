@@ -1,5 +1,8 @@
-本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求Nacos版本在3.0.1及以上
+本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求版本如下：
+1. Nacos版本在3.0.1及以上
+2. spring ai alibaba的1.0.0.3-SNAPSHOT以上
 
+详细步骤
 1. MCP Server多节点注册在Nacos中
 2. MCP Client建立1-N连接
 3. 根据sync、async模式提供clints自动注入
