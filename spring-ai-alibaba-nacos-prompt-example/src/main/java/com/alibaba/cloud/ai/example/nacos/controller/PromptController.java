@@ -20,7 +20,9 @@ import java.util.Map;
 
 import com.alibaba.cloud.ai.prompt.ConfigurablePromptTemplate;
 import com.alibaba.cloud.ai.prompt.ConfigurablePromptTemplateFactory;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
+import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -54,9 +56,13 @@ public class PromptController {
     }
 
     @GetMapping("/books")
-    public String generateJoke(
-            @RequestParam(value = "author", required = false, defaultValue = "鲁迅") String authorName
+    public Flux<String> generateJoke(
+            @RequestParam(value = "author", required = false, defaultValue = "鲁迅") String authorName,
+            HttpServletResponse response
     ) {
+
+        // 防止输出乱码
+        response.setCharacterEncoding("UTF-8");
 
         // 使用 nacos 的 prompt tmpl 创建 prompt
         ConfigurablePromptTemplate template = promptTemplateFactory.create(
@@ -66,9 +72,8 @@ public class PromptController {
         Prompt prompt = template.create(Map.of("author", authorName));
         logger.info("最终构建的 prompt 为：{}", prompt.getContents());
 
-        // 使用 prompt 请求大模型
         return client.prompt(prompt)
-                .call()
+                .stream()
                 .content();
     }
 
