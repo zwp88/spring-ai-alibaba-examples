@@ -13,6 +13,10 @@
     <artifactId>mcp-nacos-client-example</artifactId>
     <name>Spring AI - NACOS MCP SSE Client EXAMPLE</name>
 
+    <properties>
+        <spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -26,18 +30,14 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-autoconfigure-mcp-client</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-nacos-mcp-client</artifactId>
+            <version>${spring-ai-alibaba.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
         </dependency>
 
     </dependencies>
