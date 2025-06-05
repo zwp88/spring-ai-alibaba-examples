@@ -22,9 +22,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.alibaba.cloud.ai.application.exception.SAAAppException;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.memory.ChatMemory;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -60,7 +60,9 @@ public class SAASummarizerService {
 	) {
 
 		this.chatClient = ChatClient.builder(chatModel)
-				.defaultSystem(
+				.defaultOptions(
+						DashScopeChatOptions.builder().withModel("deepseek-r1").build()
+				).defaultSystem(
 						docsSummaryPromptTemplate.getTemplate()
 				).defaultAdvisors(
 						messageChatMemoryAdvisor,
@@ -68,7 +70,10 @@ public class SAASummarizerService {
 				).build();
 	}
 
-	public Flux<String> summary(MultipartFile file, String url, String chatId) {
+	/**
+	 * Docs Summary not has chat memory.
+	 */
+	public Flux<String> summary(MultipartFile file, String url) {
 
 		String text = getText(url, file);
 		if (!StringUtils.hasText(text)) {
@@ -77,9 +82,7 @@ public class SAASummarizerService {
 
 		return chatClient.prompt()
 				.user("Summarize the document")
-				.advisors(memoryAdvisor -> memoryAdvisor
-						.param(ChatMemory.CONVERSATION_ID, chatId)
-				).user(text)
+				.user(text)
 				.stream().content();
 	}
 
