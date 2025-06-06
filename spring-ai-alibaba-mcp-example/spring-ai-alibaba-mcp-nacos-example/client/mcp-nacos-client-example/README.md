@@ -1,5 +1,8 @@
-本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求Nacos版本在3.0.1及以上
+本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求版本如下：
+1. Nacos版本在3.0.1及以上
+2. spring ai alibaba的1.0.0.3-SNAPSHOT以上
 
+详细步骤
 1. MCP Server多节点注册在Nacos中
 2. MCP Client建立1-N连接
 3. 根据sync、async模式提供clints自动注入
@@ -39,15 +42,17 @@ spring:
     alibaba:
       mcp:
         nacos:
-          enabled: true
+          namespace: 4ad3108b-4d44-43d0-9634-3c1ac4850c8c
           server-addr: 127.0.0.1:8848
           username: nacos
           password: nacos
-          namespace: 9ba5f1aa-b37d-493b-9057-72918a40ef35      
           client:
+            enabled: true
             sse:
               connections:
-                server1: mcp-server-provider # MCP Server服务名称
+                server1:
+                  service-name: webflux-mcp-server
+                  version: 1.0.0
     mcp:
       client:
         enabled: true

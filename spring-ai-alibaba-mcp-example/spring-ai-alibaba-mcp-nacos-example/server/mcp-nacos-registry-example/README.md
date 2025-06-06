@@ -3,21 +3,25 @@
 本项目是一个基于 [spring-ai-alibaba-mcp-nacos](https://github.com/spring-projects/spring-ai-alibaba) 的简单示例，展示如何将
 MCP Server 注册到 Nacos 中，并通过注解式工具（Tool）提供服务。
 
+本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求版本如下：
+1. Nacos版本在3.0.1及以上
+2. spring ai alibaba的1.0.0.3-SNAPSHOT以上
+
 ## 🧩 主要依赖
 
 ```xml
 <!-- MCP Nacos 注册 -->
 <dependency>
-    <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
-    <version>1.0.0.1</version>
+  <groupId>com.alibaba.cloud.ai</groupId>
+  <artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
+  <version>${spring-ai-alibaba.version}</version>
 </dependency>
         
 <!-- MCP Server (WebMVC) -->
 <dependency>
-    <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-    <version>1.0.0.1</version>
+  <groupId>org.springframework.ai</groupId>
+  <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+  <version>${spring-ai-alibaba.version}</version>
 </dependency>
 ```
 
@@ -50,12 +54,14 @@ spring:
     alibaba:
       mcp:
         nacos:
-          server-addr:                 # 替换为你的 Nacos 地址
-          namespace: public    # Nacos 命名空间 ID
-          username:
-          password:
-            registry:
-              enabled: true
+          namespace: 4ad3108b-4d44-43d0-9634-3c1ac4850c8c
+          server-addr: 127.0.0.1:8848
+          username: nacos
+          password: nacos
+          registry:
+            enabled: true
+            service-group: mcp-server
+            service-name: webflux-mcp-server
 
 server:
   port: 8080
@@ -75,13 +81,33 @@ mvn spring-boot:run
 ## 🔧 工具服务示例
 
 ```java
-
 @Service
-public class WeatherService {
+public class TimeService {
 
-  @Tool(description = "Get weather information by city name")
-  public String getWeather(String cityName) {
-    return "Sunny in " + cityName;
+  private static final Logger logger = LoggerFactory.getLogger(TimeService.class);
+
+  @Tool(description = "Get the time of a specified city.")
+  public String  getCityTimeMethod(@ToolParam(description = "Time zone id, such as Asia/Shanghai") String timeZoneId) {
+    logger.info("The current time zone is {}", timeZoneId);
+    return String.format("The current time zone is %s and the current time is " + "%s", timeZoneId,
+            getTimeByZoneId(timeZoneId));
+  }
+
+  private String getTimeByZoneId(String zoneId) {
+
+    // Get the time zone using ZoneId
+    ZoneId zid = ZoneId.of(zoneId);
+
+    // Get the current time in this time zone
+    ZonedDateTime zonedDateTime = ZonedDateTime.now(zid);
+
+    // Defining a formatter
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+
+    // Format ZonedDateTime as a string
+    String formattedDateTime = zonedDateTime.format(formatter);
+
+    return formattedDateTime;
   }
 }
 ```

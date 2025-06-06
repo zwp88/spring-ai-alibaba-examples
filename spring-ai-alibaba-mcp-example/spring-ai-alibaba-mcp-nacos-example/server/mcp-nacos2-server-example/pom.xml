@@ -22,6 +22,7 @@
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-nacos2-mcp-server</artifactId>
+            <version>${spring-ai-alibaba.version}</version>
         </dependency>
 
         <!-- MCP Server WebFlux 支持（也可换成 WebMvc） -->

@@ -40,7 +40,7 @@ public class NacosMcpSseClientApplication {
     }
 
     @Bean
-    public CommandLineRunner predefinedQuestions(ChatClient.Builder chatClientBuilder, @Qualifier("loadbalancedSyncMcpToolCallbacks") ToolCallbackProvider tools,
+    public CommandLineRunner predefinedQuestions(ChatClient.Builder chatClientBuilder, @Qualifier("loadbalancedMcpAsyncToolCallbacks") ToolCallbackProvider tools,
                                                  ConfigurableApplicationContext context) {
 
         return args -> {
