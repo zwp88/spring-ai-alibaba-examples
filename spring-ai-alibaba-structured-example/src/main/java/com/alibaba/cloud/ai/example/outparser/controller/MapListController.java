@@ -19,6 +19,7 @@ package com.alibaba.cloud.ai.example.outparser.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.ChatClientAttributes;
 import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.ai.converter.MapOutputConverter;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -52,51 +53,17 @@ public class MapListController {
 
     @GetMapping("/chatMap")
     public Map<String, Object> chatMap(@RequestParam(value = "query", defaultValue = "请为我描述下影子的特性") String query) {
-        String promptUserSpec = """
-                format: key为描述的东西，value为对应的值
-                outputExample: {format};
-                """;
-        String format = mapConverter.getFormat();
-        log.info("map format: {}",format);
-
-        String result = chatClient.prompt(query)
-                .user(u -> u.text(promptUserSpec)
-                        .param("format", format))
-                .call().content();
-        log.info("result: {}", result);
-        assert result != null;
-        Map<String, Object> convert = null;
-        try {
-            convert = mapConverter.convert(result);
-            log.info("反序列成功，convert: {}", convert);
-        } catch (Exception e) {
-            log.error("反序列化失败");
-        }
-        return convert;
+        return chatClient.prompt(query)
+                .advisors(
+                        a -> a.param(ChatClientAttributes.OUTPUT_FORMAT.getKey(), mapConverter.getFormat())
+                ).call().entity(mapConverter);
     }
 
     @GetMapping("/chatList")
     public List<String> chatList(@RequestParam(value = "query", defaultValue = "请为我描述下影子的特性") String query) {
-        String promptUserSpec = """
-                format: value为对应的值
-                outputExample: {format};
-                """;
-        String format = listConverter.getFormat();
-        log.info("list format: {}",format);
-
-        String result = chatClient.prompt(query)
-                .user(u -> u.text(promptUserSpec)
-                        .param("format", format))
-                .call().content();
-        log.info("result: {}", result);
-        assert result != null;
-        List<String> convert = null;
-        try {
-            convert = listConverter.convert(result);
-            log.info("反序列成功，convert: {}", convert);
-        } catch (Exception e) {
-            log.error("反序列化失败");
-        }
-        return convert;
+        return chatClient.prompt(query)
+                .advisors(
+                        a -> a.param(ChatClientAttributes.OUTPUT_FORMAT.getKey(), listConverter.getFormat())
+                ).call().entity(listConverter);
     }
 }
