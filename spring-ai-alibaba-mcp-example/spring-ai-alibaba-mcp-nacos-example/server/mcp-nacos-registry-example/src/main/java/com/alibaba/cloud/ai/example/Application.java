@@ -16,7 +16,8 @@
 
 package com.alibaba.cloud.ai.example;
 
-import com.alibaba.cloud.ai.example.service.WeatherService;
+import com.alibaba.cloud.ai.autoconfigure.mcp.server.NacosMcpGatewayAutoConfiguration;
+import com.alibaba.cloud.ai.example.service.TimeService;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.boot.SpringApplication;
@@ -28,7 +29,7 @@ import org.springframework.context.annotation.Bean;
  * @version 1.0
  * @since 2025/4/21 20:00
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = NacosMcpGatewayAutoConfiguration.class)
 public class Application {
 
     public static void main(String[] args) {
@@ -36,8 +37,8 @@ public class Application {
     }
 
     @Bean
-    public ToolCallbackProvider weatherTools(WeatherService weatherService) {
-        return MethodToolCallbackProvider.builder().toolObjects(weatherService).build();
+    public ToolCallbackProvider tools(TimeService timeService) {
+        return MethodToolCallbackProvider.builder().toolObjects(timeService).build();
     }
 
 }

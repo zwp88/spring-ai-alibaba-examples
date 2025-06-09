@@ -77,25 +77,9 @@ public class BeanController {
     }
 
     @GetMapping("/chat-format")
-    public String simpleChatFormat(@RequestParam(value = "query", defaultValue = "以影子为作者，写一篇200字左右的有关人工智能诗篇") String query) {
-        String promptUserSpec = """
-                format: 以纯文本输出 json，请不要包含任何多余的文字——包括 markdown 格式;
-                outputExample: {format};
-                """;
-        String result = chatClient.prompt(query)
-                .user(u -> u.text(promptUserSpec)
-                        .param("format", format))
-                .call().content();
-
-        log.info("result: {}", result);
-        assert result != null;
-        try {
-            BeanEntity convert = converter.convert(result);
-            log.info("反序列成功，convert: {}", convert);
-        } catch (Exception e) {
-            log.error("反序列化失败");
-        }
-        return result;
+    public BeanEntity simpleChatFormat(@RequestParam(value = "query", defaultValue = "以影子为作者，写一篇200字左右的有关人工智能诗篇") String query) {
+        return chatClient.prompt(query)
+                .call().entity(BeanEntity.class);
     }
 
     @GetMapping("/chat-model-format")
@@ -109,8 +93,8 @@ public class BeanController {
             .build();
 
         Prompt prompt = promptTemplate.create();
-
-        String result = chatModel.call(prompt).getResult().getOutput().getText();
+        String result = chatModel.call(prompt)
+                .getResult().getOutput().getText();
         log.info("result: {}", result);
         assert result != null;
         try {

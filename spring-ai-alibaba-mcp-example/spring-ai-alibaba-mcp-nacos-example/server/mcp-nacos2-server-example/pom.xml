@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.alibaba.cloud.ai</groupId>
+        <artifactId>spring-ai-alibaba-mcp-nacos-example</artifactId>
         <version>${revision}</version>
-        <artifactId>spring-ai-alibaba-mcp-starter-example</artifactId>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.alibaba.cloud.ai.mcp.client</groupId>
-    <artifactId>mcp-nacos2-client-example</artifactId>
+    <groupId>com.alibaba.cloud.ai.mcp.server</groupId>
+    <artifactId>mcp-nacos2-server-example</artifactId>
 
     <properties>
         <!-- Spring AI Alibaba -->
@@ -19,25 +19,16 @@
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+            <artifactId>spring-ai-alibaba-starter-nacos2-mcp-server</artifactId>
+            <version>${spring-ai-alibaba.version}</version>
         </dependency>
 
+        <!-- MCP Server WebFlux 支持（也可换成 WebMvc） -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-autoconfigure-model-chat-client</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter-nacos2-mcp-client</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
+            <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
         </dependency>
 
     </dependencies>

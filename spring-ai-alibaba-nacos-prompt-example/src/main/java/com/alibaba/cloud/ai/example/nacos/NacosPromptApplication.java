@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.example.service;
+package com.alibaba.cloud.ai.example.nacos;
 
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * @author yHong
- * @version 1.0
- * @since 2025/4/21 20:00
+ * @author : huangzhen
  */
-@Service
-public class WeatherService {
-    @Tool(description = "Get weather information by city name")
-    public String getWeather(String cityName) {
-        return "Sunny in " + cityName;
+
+@SpringBootApplication
+public class NacosPromptApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(NacosPromptApplication.class, args);
     }
 
 }
