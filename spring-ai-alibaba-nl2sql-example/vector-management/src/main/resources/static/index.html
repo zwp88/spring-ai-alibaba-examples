@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库 Schema 管控模块</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f9fc;
+            color: #333;
+        }
+        header {
+            background-color: #0078d4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #005a9e;
+        }
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            color: white;
+            border: none;
+            background-color: #005a9e;
+            transition: background-color 0.3s ease;
+        }
+        .tab:hover {
+            background-color: #00488c;
+        }
+        .tab.active {
+            background-color: #0078d4;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005a9e;
+        }
+        pre {
+            background-color: #eaeaea;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>数据库 Schema 管控模块</h1>
+    <p>提供 schema 初始化及业务逻辑管理功能</p>
+</header>
+<div class="tabs">
+    <button class="tab active" onclick="switchTab('evidence')">业务逻辑解释管控</button>
+    <button class="tab" onclick="switchTab('schema')">Schema 管控</button>
+</div>
+<main>
+    <!-- 业务逻辑解释管控 -->
+    <section id="evidence" class="tab-content active">
+        <h2>业务逻辑解释管控</h2>
+
+        <section class="section">
+            <h3>新增业务逻辑解释</h3>
+            <label for="evidence-content">内容:</label>
+            <textarea id="evidence-content" rows="4" placeholder="请输入业务逻辑解释"></textarea>
+            <label for="evidence-type">类型:</label>
+            <select id="evidence-type">
+                <option value="1">全局</option>
+                <option value="2">智能判断</option>
+            </select>
+            <button onclick="addEvidence()">新增业务逻辑</button>
+            <pre id="add-result"></pre>
+        </section>
+
+        <section class="section">
+            <h3>召回业务逻辑解释</h3>
+            <label for="search-query">查询关键词:</label>
+            <input type="text" id="search-query" placeholder="冬季">
+            <button onclick="searchEvidence()">搜索业务逻辑</button>
+            <pre id="search-result"></pre>
+        </section>
+
+        <section class="section">
+            <h3>删除业务逻辑解释</h3>
+            <label for="delete-id">ID:</label>
+            <input type="text" id="delete-id" placeholder="33280667-0aad-449d-b1ad-78cf140ff134">
+            <button onclick="deleteEvidence()">删除业务逻辑</button>
+            <pre id="delete-result"></pre>
+        </section>
+    </section>
+
+    <!-- Schema 管控 -->
+    <section id="schema" class="tab-content">
+        <h2>Schema 管控</h2>
+
+        <section class="section">
+            <h3>初始化当前数据库的 schema</h3>
+            <label for="db-url">数据库 URL:</label>
+            <input type="text" id="db-url" placeholder="jdbc:mysql://ip:port/database">
+            <label for="db-username">用户名:</label>
+            <input type="text" id="db-username" placeholder="username">
+            <label for="db-password">密码:</label>
+            <input type="password" id="db-password" placeholder="password">
+            <label for="dialect-type">数据库类型:</label>
+            <select id="dialect-type">
+                <option value="mysql">MySQL</option>
+                <option value="postgresql">PostgreSQL</option>
+            </select>
+            <label for="tables">表名 (逗号分隔):</label>
+            <input type="text" id="tables" placeholder="customers,orders">
+            <button onclick="initSchema()">初始化 Schema</button>
+            <pre id="init-result"></pre>
+        </section>
+    </section>
+</main>
+
+<script>
+    const apiUrl = "http://localhost:8061"; // 修改为后端服务地址
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    async function initSchema() {
+        const dbUrl = document.getElementById("db-url").value;
+        const username = document.getElementById("db-username").value;
+        const password = document.getElementById("db-password").value;
+        const dialectType = document.getElementById("dialect-type").value;
+        const tables = document.getElementById("tables").value.split(",").map(t => t.trim());
+
+        const response = await fetch(`${apiUrl}/init/schema`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                dbConfig: { url: dbUrl, username, password, connectionType: "jdbc", dialectType },
+                tables
+            })
+        });
+
+        const result = await response.json();
+        document.getElementById("init-result").textContent = JSON.stringify(result, null, 2);
+    }
+
+    async function addEvidence() {
+        const content = document.getElementById("evidence-content").value;
+        const type = parseInt(document.getElementById("evidence-type").value);
+
+        const response = await fetch(`${apiUrl}/add/evidence`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify([{ content, type }])
+        });
+
+        const result = await response.json();
+        document.getElementById("add-result").textContent = JSON.stringify(result, null, 2);
+    }
+
+    async function searchEvidence() {
+        const query = document.getElementById("search-query").value;
+
+        const response = await fetch(`${apiUrl}/search`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query, vectorType: "evidence", topK: 100 })
+        });
+
+        const result = await response.json();
+        document.getElementById("search-result").textContent = JSON.stringify(result, null, 2);
+    }
+
+    async function deleteEvidence() {
+        const id = document.getElementById("delete-id").value;
+
+        const response = await fetch(`${apiUrl}/delete`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id })
+        });
+
+        const result = await response.json();
+        document.getElementById("delete-result").textContent = JSON.stringify(result, null, 2);
+    }
+</script>
+</body>
+</html>
