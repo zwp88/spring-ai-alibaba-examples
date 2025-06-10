@@ -73,7 +73,8 @@
 		<module>spring-ai-alibaba-nacos-prompt-example</module>
 		<module>spring-ai-alibaba-observability-example</module>
 		<module>spring-ai-alibaba-more-platform-and-model-example</module>
-    </modules>
+		<module>spring-ai-alibaba-nl2sql-example</module>
+	</modules>
 
 	<dependencyManagement>
 		<dependencies>
