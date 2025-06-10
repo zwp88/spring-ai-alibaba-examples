@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sender } from "@ant-design/x";
-import CodeInfo from "./components/CodeInfo";
-import OutputResult from "./components/OutputResult";
-import { useConversationContext } from "../../stores/conversation.store";
-import { MenuPage } from "../../stores/functionMenu.store";
-import { useStyles } from "./style";
+import CodeInfo from "../CodeInfo";
+import OutputResult from "../OutputResult";
+import { useConversationContext } from "../../../../stores/conversation.store";
+import { MenuPage } from "../../../../stores/functionMenu.store";
+import { useStyles } from "../../style";
 
 const RagLandingView = () => {
   const { styles } = useStyles();
@@ -19,7 +19,7 @@ const RagLandingView = () => {
 
     setIsLoading(true);
     try {
-      const newConversation = createConversation(MenuPage.Rag, [], content);
+      const newConversation = createConversation(MenuPage.Rag, content);
       navigate(
         `/rag/${newConversation.id}?prompt=${encodeURIComponent(content)}`
       );

@@ -1,5 +1,5 @@
 import { GeneratedImage } from "../../stores/conversation.store";
-import { Message } from "../functionCallingPage/types";
+import { Message } from "../FunctionCallingPage/types";
 
 declare global {
   interface Window {

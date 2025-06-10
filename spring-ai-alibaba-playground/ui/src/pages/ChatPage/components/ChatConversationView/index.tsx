@@ -1,26 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
-import { useStyle } from "./style";
+import { useStyle } from "../../style";
 import {
   useConversationContext,
   BaseMessage,
-} from "../../stores/conversation.store";
-import BasePage from "../components/BasePage";
-import { getChat } from "../../api/chat";
+} from "../../../../stores/conversation.store";
+import BasePage from "../../../components/BasePage";
+import { getChat } from "../../../../api/chat";
 import { Button, theme } from "antd";
-import { actionButtonConfig } from "../../const";
+import { actionButtonConfig } from "../../../../const";
 import {
   decoder,
   mapStoredMessagesToUIMessages,
   scrollToBottom,
-} from "../../utils";
-import { useFunctionMenuStore } from "../../stores/functionMenu.store";
-import { useModelConfigContext } from "../../stores/modelConfig.store";
-import { AiCapabilities, ChatConversationViewProps, Message } from "./types";
-import ResponseBubble from "../components/ResponseBubble";
-import RequestBubble from "../components/RequestBubble";
-import { useThrottle } from "../../hooks/useThrottle";
+} from "../../../../utils";
+import { useFunctionMenuStore } from "../../../../stores/functionMenu.store";
+import { useModelConfigContext } from "../../../../stores/modelConfig.store";
+import {
+  AiCapabilities,
+  ChatConversationViewProps,
+  Message,
+} from "../../types";
+import ResponseBubble from "../../../components/ResponseBubble";
+import RequestBubble from "../../../components/RequestBubble";
+import { useThrottle } from "../../../../hooks/useThrottle";
 
 interface ChatUiMessage extends BaseMessage {
   role: "user" | "assistant";

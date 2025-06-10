@@ -26,10 +26,10 @@ import {
   Navigate,
 } from "react-router-dom";
 import { pageComponents } from "./const";
-import FunctionMenu from "./menuPages/components/FunctionMenu";
+import FunctionMenu from "./pages/components/FunctionMenu";
 import { useTheme } from "./hooks/useTheme";
 import { ThemeProvider } from "antd-style";
-import TipsModalComponent from "./menuPages/components/TipsModal";
+import TipsModalComponent from "./pages/components/TipsModal";
 
 // 定义深色主题和浅色主题的算法
 import darkAlgorithm from "antd/es/theme/themes/dark";

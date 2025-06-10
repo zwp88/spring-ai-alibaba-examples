@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import ImageGenLandingView from "./ImageGenLandingView";
-import ImageGenConversationView from "./ImageGenConversationView";
+import ImageGenLandingView from "./components/ImageGenLandingView";
+import ImageGenConversationView from "./components/ImageGenConversationView";
 import BasePage from "../components/BasePage";
 
 const ImageGenPage: React.FC = () => {

@@ -2,18 +2,18 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import { Card, message } from "antd";
-import { useStyles } from "./style";
-import GeneratedImage from "./components/GeneratedImage";
-import { useConversationContext } from "../../stores/conversation.store";
-import { getImage } from "../../api/image";
-import RequestBubble from "../components/RequestBubble";
-import ResponseBubble from "../components/ResponseBubble";
+import { useStyles } from "../../style";
+import GeneratedImage from "../GeneratedImage";
+import { useConversationContext } from "../../../../stores/conversation.store";
+import { getImage } from "../../../../api/image";
+import RequestBubble from "../../../components/RequestBubble";
+import ResponseBubble from "../../../components/ResponseBubble";
 import {
   ExtendedChatMessage,
   GeneratedImageType,
   ImageResponse,
-} from "./types";
-import { scrollToBottom } from "../../utils";
+} from "../../types";
+import { scrollToBottom } from "../../../../utils";
 
 const ImageGenConversationView: React.FC<{ conversationId: string }> = ({
   conversationId,

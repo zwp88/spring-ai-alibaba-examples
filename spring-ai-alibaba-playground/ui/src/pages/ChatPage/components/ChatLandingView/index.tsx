@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sender, Bubble } from "@ant-design/x";
-import { actionButtonConfig, PlaceholderNode } from "../../const";
-import { useStyle } from "./style";
+import { actionButtonConfig, PlaceholderNode } from "../../../../const";
+import { useStyle } from "../../style";
 import {
   MenuPage,
   useFunctionMenuStore,
-} from "../../stores/functionMenu.store";
-import { useConversationContext } from "../../stores/conversation.store";
-import BasePage from "../components/BasePage";
+} from "../../../../stores/functionMenu.store";
+import { useConversationContext } from "../../../../stores/conversation.store";
+import BasePage from "../../../components/BasePage";
 import { Button, theme } from "antd";
 
-const ChatLandingView: React.FC = () => {
+const ChatLandingView = () => {
   const { styles } = useStyle();
   const { token } = theme.useToken();
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const ChatLandingView: React.FC = () => {
 
     try {
       // 创建新对话，传递内容用于生成标题
-      const newConversation = createConversation(MenuPage.Chat, [], content);
+      const newConversation = createConversation(MenuPage.Chat, content);
 
       // 构建URL参数
       let params = new URLSearchParams();
