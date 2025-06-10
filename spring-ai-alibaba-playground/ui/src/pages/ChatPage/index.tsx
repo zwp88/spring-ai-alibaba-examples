@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import ChatLandingView from "./ChatLandingView";
-import ChatConversationView from "./ChatConversationView";
+import ChatLandingView from "./components/ChatLandingView";
+import ChatConversationView from "./components/ChatConversationView";
 
 const ChatPage: React.FC = () => {
   const { conversationId } = useParams<{ conversationId?: string }>();

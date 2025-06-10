@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import RagConversationView from "./RagConversationView";
-import RagLandingView from "./RagLandingView";
+import RagConversationView from "./components/RagConversationView";
+import RagLandingView from "./components/RagLandingView";
 
 const RagPage: React.FC = () => {
   const { conversationId } = useParams<{ conversationId?: string }>();

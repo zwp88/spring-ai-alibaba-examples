@@ -239,13 +239,13 @@ export const useConversationContext = () => {
   /**
    * 创建新的对话会话
    * @param type - 对话类型
-   * @param items - 初始消息项
+  //  * @param items - 初始消息项
    * @param content - 用户输入内容，可选，用于生成标题
    * @returns 新创建的对话会话对象
    */
   const createConversation = (
     type: MenuPage,
-    items: GetProp<typeof Bubble.List, "items">,
+    // items: GetProp<typeof Bubble.List, "items">,
     content?: string
   ) => {
     // UUID

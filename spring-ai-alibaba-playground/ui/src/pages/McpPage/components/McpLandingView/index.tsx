@@ -12,12 +12,12 @@ import {
   formatMcpServerListData,
   generateFormFields,
   name2iconMap,
-} from "./utils";
-import { McpServerFormatted, McpToolFormatted, FormField } from "./types";
-import { useStyles } from "./style";
+} from "../../utils";
+import { McpServerFormatted, McpToolFormatted, FormField } from "../../types";
+import { useStyles } from "../../style";
 import React, { useState, useEffect } from "react";
-import { getMcpList, runMcp } from "../../api/mcp";
-import CardTab from "../components/CardTab";
+import { getMcpList, runMcp } from "../../../../api/mcp";
+import CardTab from "../../../components/CardTab";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import json from "react-syntax-highlighter/dist/esm/languages/hljs/json";
 import { githubGist } from "react-syntax-highlighter/dist/esm/styles/hljs";

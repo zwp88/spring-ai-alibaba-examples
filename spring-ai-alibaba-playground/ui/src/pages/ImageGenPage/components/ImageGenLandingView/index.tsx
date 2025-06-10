@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sender } from "@ant-design/x";
 import Masonry from "react-masonry-css";
-import { useStyles } from "./style";
-import TemplateImage from "./components/templateImage";
-import BasePage from "../components/BasePage";
-import { useConversationContext } from "../../stores/conversation.store";
-import { MenuPage } from "../../stores/functionMenu.store";
-import AnimatedSection from "../components/AnimatedSection";
+import { useStyles } from "../../style";
+import TemplateImage from "../TemplateImage";
+import BasePage from "../../../components/BasePage";
+import { useConversationContext } from "../../../../stores/conversation.store";
+import { MenuPage } from "../../../../stores/functionMenu.store";
+import AnimatedSection from "../../../components/AnimatedSection";
 
 interface ImageItem {
   id: string;
@@ -54,7 +54,6 @@ const ImageGenLandingView: React.FC = () => {
     try {
       const newConversation = createConversation(
         MenuPage.ImageGen,
-        [],
         prompt.slice(0, 10)
       );
       navigate(

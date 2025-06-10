@@ -10,18 +10,18 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import React from "react";
-import DocSummaryPage from "./menuPages/docSummaryPage";
-import FunctionCallingPage from "./menuPages/functionCallingPage";
-import ImageGenPage from "./menuPages/ImageGenPage";
-import McpPage from "./menuPages/McpPage";
-import MultiModalPage from "./menuPages/MultiModalPage";
-import RagPage from "./menuPages/RagPage";
+import DocSummaryPage from "./pages/DocSummaryPage";
+import FunctionCallingPage from "./pages/FunctionCallingPage";
+import ImageGenPage from "./pages/ImageGenPage";
+import McpPage from "./pages/McpPage";
+import MultiModalPage from "./pages/MultiModalPage";
+import RagPage from "./pages/RagPage";
 import { Bubble, Prompts, Welcome } from "@ant-design/x";
-import { Space, GetProp, Tag, message, Typography, Image, Button } from "antd";
+import { Space, GetProp, Tag, Typography, Image } from "antd";
 import ReactMarkdown from "react-markdown";
-import ChatPage from "./menuPages/chatPage";
+import ChatPage from "./pages/ChatPage";
 import { MenuPage } from "./stores/functionMenu.store";
-import AnimatedSection from "./menuPages/components/AnimatedSection";
+import AnimatedSection from "./pages/components/AnimatedSection";
 
 export const BASE_URL = "/api/v1";
 export const DEFAULT_MODEL = "qwen-plus";
