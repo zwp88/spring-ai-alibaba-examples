@@ -62,7 +62,7 @@ spring:
         include-prompt: false
 
   datasource:
-    url: jdbc:sqlite::resource:db/saa.db
+    url: jdbc:sqlite:db/saa.db
     driver-class-name: org.sqlite.JDBC
 
   jpa:

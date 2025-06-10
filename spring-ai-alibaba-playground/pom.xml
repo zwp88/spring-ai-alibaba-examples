@@ -361,6 +361,24 @@
 							</resources>
 						</configuration>
 					</execution>
+
+					<!-- Add new execution to copy db directory -->
+					<execution>
+						<id>copy-db</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/db</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/db</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
