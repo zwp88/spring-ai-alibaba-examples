@@ -41,5 +41,3 @@ logs/
 *.wav
 *.jpg
 
-# ignore db files
-/src/main/resources/db/saa.db

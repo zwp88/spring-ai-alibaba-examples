@@ -17,14 +17,10 @@ RUN apt-get update && \
 
 # 从构建阶段复制构建好的jar
 COPY target/app.jar ./app.jar
+COPY target/mcp-libs ./mcp-libs
 
 # 创建日志目录
 RUN mkdir -p /app/logs
-
-# 复制所需的资源文件到镜像中
-COPY src/main/resources/mcp-libs /app/mcp-libs
-COPY src/main/resources/rag/markdown /app/rag/markdown
-COPY src/main/resources /app/src/main/resources
 
 # 日志目录仍然挂载为卷，便于查看日志
 VOLUME ["/app/logs"]

@@ -50,10 +50,10 @@ spring:
        tool-calling:
          baidu:
            translate:
-             ak: ${BAIDU_TRANSLATE_APP_ID}
-             sk: ${BAIDU_TRANSLATE_SECRET_KEY}
+             ak: ${BAIDU_TRANSLATE_APP_ID:input-your-baidu-app-id}
+             sk: ${BAIDU_TRANSLATE_SECRET_KEY:input-your-baidu-app-key}
            map:
-             ak: ${BAIDU_MAP_API_KEY}
+             ak: ${BAIDU_MAP_API_KEY:input-your-baidu-map-key}
 
     # openai api 接入通义模型
     openai:
@@ -77,7 +77,7 @@ spring:
         include-error-logging: true
 
   datasource:
-    url: jdbc:sqlite:src/main/resources/db/saa.db
+    url: jdbc:sqlite::resource:db/saa.db
     driver-class-name: org.sqlite.JDBC
 
   jpa:

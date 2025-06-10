@@ -34,9 +34,6 @@ docker build -t spring-ai-alibaba-playground . || { print_error "Docker构建失
 # 运行容器
 print_message "启动容器..."
 docker run -d -p 8080:8080 \
-  -v "$(pwd)/src/main/resources/mcp-libs:/app/mcp-libs" \
-  -v "$(pwd)/src/main/resources/rag/markdown:/app/rag/markdown" \
-  -v "$(pwd)/src/main/resources:/app/src/main/resources" \
   -v "$(pwd)/logs:/app/logs" \
   --name spring-ai-alibaba-playground \
   spring-ai-alibaba-playground
