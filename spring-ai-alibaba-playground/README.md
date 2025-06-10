@@ -11,7 +11,7 @@ mvn clean install -DskipTests
 
 Playground 作为一个 AI 智能体应用，依赖大模型等在线服务，需要通过环境变量指定访问凭证。具体 KEY 定义请参考 `application-dev.yml` 文件，以下是简单说明：
 
-  - [阿里云百炼 API-KEY](https://bailian.console.aliyun.com/?tab=model#/api-key)，大模型服务，示例 `export AI_DASHSCOPE_API_KEY=xxx`
+  - 【必须】[阿里云百炼 API-KEY](https://bailian.console.aliyun.com/?tab=model#/api-key)，大模型服务，示例 `export AI_DASHSCOPE_API_KEY=xxx`
   - 【可选】[百度翻译 appId 和 secretKey](https://api.fanyi.baidu.com/product/113)，使用 Tool Call 时使用，示例 `export BAIDU_TRANSLATE_APP_ID=xxx`、`export BAIDU_TRANSLATE_SECRET_KEY=xxx`
   - 【可选】[百度地图 api key](https://lbs.baidu.com/faq/api)，使用 Tool Call 必须，示例 `export BAIDU_MAP_API_KEY=xxx`
   - 【可选】[阿里云 IQS 服务 apikey](https://help.aliyun.com/document_detail/2870227.html?)，使用联网搜索必须，示例 `export IQS_SEARCH_API_KEY=xxx`
@@ -25,7 +25,7 @@ java -jar ./target/app.jar
 打开浏览器访问 `http://localhost:8080` 查看前端页面：
 
 <p align="center">
-    <img src="./docs/imgs/playground.png" alt="PlayGround" style="max-width: 949px; height: 537px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);" />
+    <img src="./images/playground.png" alt="PlayGround" style="max-width: 949px; height: 537px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);" />
 </p>
 
 ## 本地开发
@@ -56,7 +56,7 @@ Playground 访问大模型等在线服务，需要通过环境变量指定访问
   - 【可选】`阿里云 IQS 服务 apikey` 联网搜索使用
 
 **4. 运行 `SAAPlayGroundApplication`**
-项目启动之后，浏览器访问 http://localhost:8080 查看前端页面；
+项目启动之后，浏览器访问 `http://localhost:8080` 查看前端页面。
 
 ## 常见问题与解决方法
 1. 如果项目启动时出现数据库相关错误，需要手动在 resources 目录下的 db 创建 saa.db 文件；
