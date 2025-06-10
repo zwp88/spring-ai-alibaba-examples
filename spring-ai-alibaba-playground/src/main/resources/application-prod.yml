@@ -35,11 +35,11 @@ spring:
           translate:
             # 显式开启 Tool Bean 注入
             enabled: true
-            app-id: ${BAIDU_TRANSLATE_APP_ID}
-            secret-key: ${BAIDU_TRANSLATE_SECRET_KEY}
+            app-id: ${BAIDU_TRANSLATE_APP_ID:input-your-baidu-app-id}
+            secret-key: ${BAIDU_TRANSLATE_SECRET_KEY:input-your-baidu-app-id}
           map:
             enabled: true
-            api-key: ${BAIDU_MAP_API_KEY}
+            api-key: ${BAIDU_MAP_API_KEY:input-your-baidu-app-id}
 
     # openai api 接入通义模型
     openai:
@@ -62,7 +62,7 @@ spring:
         include-prompt: false
 
   datasource:
-    url: jdbc:sqlite:src/main/resources/db/user.db
+    url: jdbc:sqlite::resource:db/saa.db
     driver-class-name: org.sqlite.JDBC
 
   jpa:

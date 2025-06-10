@@ -343,6 +343,24 @@
 							</resources>
 						</configuration>
 					</execution>
+
+					<!-- Add new execution to copy mcp-lib directory -->
+					<execution>
+						<id>copy-mcp-lib</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/mcp-libs</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/mcp-libs</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
