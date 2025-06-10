@@ -1,4 +1,4 @@
-package com.alibaba.cloud.ai.example;
+package com.alibaba.cloud.ai.example.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
