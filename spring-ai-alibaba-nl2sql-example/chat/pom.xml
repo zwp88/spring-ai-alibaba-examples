@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-nl2sql</artifactId>
-            <version>1.0.0.1</version>
+            <version>${spring-ai-alibaba.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

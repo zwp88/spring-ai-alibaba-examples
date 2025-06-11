@@ -14,29 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.cloud.ai.example.request;
+package com.alibaba.cloud.ai.example.controller;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
-import java.io.Serializable;
+@Controller
+public class HomeController {
 
-public class DeleteRequest implements Serializable {
-    private String id;
-
-    public String getId() {
-        return id;
+    @GetMapping("/")
+    @PostMapping("/")
+    public String index() {
+        return "index";
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 
-    public String getVectorType() {
-        return vectorType;
-    }
-
-    public void setVectorType(String vectorType) {
-        this.vectorType = vectorType;
-    }
-
-    private String vectorType;
 }
