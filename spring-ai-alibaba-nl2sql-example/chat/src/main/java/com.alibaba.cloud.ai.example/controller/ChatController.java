@@ -52,7 +52,7 @@ public class ChatController {
         SchemaInitRequest schemaInitRequest = new SchemaInitRequest();
         schemaInitRequest.setDbConfig(dbConfig);
         // 这里设置你需要查询的表
-        schemaInitRequest.setTables(Arrays.asList("xhs_note"));
+        schemaInitRequest.setTables(Arrays.asList("tableName"));
         simpleVectorStoreService.schema(schemaInitRequest);
         return simpleNl2SqlService.nl2sql(input);
     }
