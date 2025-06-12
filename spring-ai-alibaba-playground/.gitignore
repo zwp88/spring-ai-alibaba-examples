@@ -41,3 +41,4 @@ logs/
 *.wav
 *.jpg
 
+db/saa.db
