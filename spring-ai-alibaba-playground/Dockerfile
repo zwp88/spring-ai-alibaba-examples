@@ -18,6 +18,7 @@ RUN apt-get update && \
 # 从构建阶段复制构建好的jar
 COPY target/app.jar ./app.jar
 COPY target/mcp-libs ./mcp-libs
+COPY target/db ./db
 
 # 创建日志目录
 RUN mkdir -p /app/logs
