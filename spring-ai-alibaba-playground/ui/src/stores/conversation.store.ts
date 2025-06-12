@@ -76,8 +76,9 @@ const blobToDataUrl = (blob: Blob): Promise<string> => {
 };
 
 /**
- * 处理会话数据用于存储
- * 主要处理图片数据，将blob转换为dataUrl
+ * 处理文件数据，将blob转换为dataUrl
+ * 起初是专为图片生成页面使用，后来在其他文件生成的时候也有用到
+ * TODO: 这里如果有时间的话，可以考虑将这个函数抽离出来，做成一个通用的/语义更好的函数
  * @param conversations - 要处理的会话列表
  * @returns 处理后可以存储的会话列表
  */
@@ -94,21 +95,40 @@ const prepareConversationsForStorage = async (
     for (const message of conversation.messages) {
       // 处理图片
       if (message.images) {
-        for (const image of message.images) {
-          // 如果有blob但没有dataUrl，转换并保存
-          if (image.blob && !image.dataUrl) {
+        for (let i = 0; i < message.images.length; i++) {
+          const image = message.images[i];
+          // 查找原始会话中对应的图片，因为 JSON.parse/stringify 会丢失 Blob 对象
+          const originalConversation = conversations.find(
+            (c) => c.id === conversation.id
+          );
+          const originalMessage = originalConversation?.messages.find(
+            (m) => m.timestamp === message.timestamp
+          );
+          const originalImage = originalMessage?.images?.[i];
+
+          // 如果原始图片有blob但没有dataUrl，转换并保存
+          if (
+            originalImage?.blob &&
+            originalImage.blob instanceof Blob &&
+            !originalImage.dataUrl
+          ) {
             try {
               // 为了避免异步问题，我们这里不等待转换完成
               // 只在下次保存时才会包含dataUrl
-              blobToDataUrl(image.blob).then((dataUrl) => {
-                image.dataUrl = dataUrl;
-              });
+              blobToDataUrl(originalImage.blob)
+                .then((dataUrl) => {
+                  // 更新原始对象的 dataUrl
+                  originalImage.dataUrl = dataUrl;
+                })
+                .catch((e) => {
+                  console.error("转换文件失败", e);
+                });
             } catch (e) {
-              console.error("Failed to convert blob to dataUrl:", e);
+              console.error("转换文件失败", e);
             }
           }
 
-          // 移除blob字段，不适合存储在localStorage
+          // 移除blob字段，太大了，不适合存储在localStorage
           delete image.blob;
         }
       }

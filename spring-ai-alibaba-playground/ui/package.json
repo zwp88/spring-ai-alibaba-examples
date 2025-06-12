@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run mv-bundler",
+    "mv-bundler": "mkdir -p ../src/main/resources/static && cp -r dist/* ../src/main/resources/static/",
     "lint": "eslint .",
     "preview": "vite preview",
     "start:backend": "cd .. && mvn spring-boot:run -Dspring-boot.run.profiles=dev -Dskip.npm",
