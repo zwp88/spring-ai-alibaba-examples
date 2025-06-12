@@ -61,11 +61,7 @@ mvn clean install -DskipTests
 java -jar ./target/app.jar
 ```
 
-打开浏览器访问 `http://localhost:8080` 查看前端页面：
-
-<p align="center">
-    <img src="./images/playground.png" alt="PlayGround" style="max-width: 949px; height: 537px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);" />
-</p>
+启动成功后，打开浏览器访问 `http://localhost:8080` 查看前端页面。
 
 ## 本地开发
 
