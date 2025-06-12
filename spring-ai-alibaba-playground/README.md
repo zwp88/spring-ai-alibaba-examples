@@ -8,7 +8,6 @@
 
 ```shell
 docker run -d -p 8080:8080 \
-  -v "$(pwd)/logs:/app/logs" \
   -e AI_DASHSCOPE_API_KEY=your_api_key \
   --name spring-ai-alibaba-playground \
   sca-registry.cn-hangzhou.cr.aliyuncs.com/spring-ai-alibaba/playground:1.0.0.2-x
