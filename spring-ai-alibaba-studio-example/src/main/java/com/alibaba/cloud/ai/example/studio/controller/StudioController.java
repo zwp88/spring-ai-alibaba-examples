@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.example.helloworld.controller;
+package com.alibaba.cloud.ai.example.studio.controller;
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,29 +23,26 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
-
 @RestController
-@RequestMapping("/helloworld")
-public class HelloworldController {
+@RequestMapping("/studio")
+public class StudioController {
 
 	private static final String DEFAULT_PROMPT = "你是一个博学的智能聊天助手，请根据用户提问回答！";
 
 	private final ChatClient dashScopeChatClient;
 
 	// 也可以使用如下的方式注入 ChatClient
-	 public HelloworldController(ChatClient.Builder chatClientBuilder) {
+	 public StudioController(ChatClient.Builder chatClientBuilder) {
 	  	this.dashScopeChatClient = chatClientBuilder
 				.defaultSystem(DEFAULT_PROMPT)
 				// TODO
