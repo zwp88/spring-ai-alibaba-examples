@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Steps, Typography, theme, Tabs, Button, Space } from "antd";
 import { EyeOutlined, LinkOutlined } from "@ant-design/icons";
-import { Card, Image } from "antd";
+import { Image } from "antd";
 import { useStyles } from "../../style";
 import { motion, AnimatePresence } from "framer-motion";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -501,7 +501,10 @@ const Documentation: React.FC = () => {
   return (
     <div className={styles.documentationContainer}>
       <Title level={4}>什么是 Tool Calling?</Title>
-      <Image src="https://docs.spring.io/spring-ai/reference/_images/tools/tool-calling-01.jpg" />
+      <Image
+        src="function-calling-basic-flow.jpg"
+        alt="the original image is from https://docs.spring.io/spring-ai/reference/_images/tools/tool-calling-01.jpg"
+      />
       <Paragraph>
         Spring AI 允许开发者注册自定义 Java 函数，以便 AI 模型能够通过生成 JSON
         来调用这些函数。 开发者只需实现相应的函数，并通过简单的 @Bean

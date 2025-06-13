@@ -16,7 +16,6 @@ import {
   InfoCircleOutlined,
   LinkOutlined,
   PaperClipOutlined,
-  FilePdfOutlined,
   FileTextOutlined,
   EyeOutlined,
   MessageOutlined,
@@ -138,7 +137,7 @@ const DocSummaryPage: React.FC = () => {
     }
 
     try {
-      const newConversation = createConversation(MenuPage.Chat, []);
+      const newConversation = createConversation(MenuPage.Chat);
       setCurrentId(newConversation.id);
       setLastUploadedFile(file);
       setLastUploadedLink("");
@@ -146,7 +145,7 @@ const DocSummaryPage: React.FC = () => {
       setIsProcessing(true);
       setResultContent("正在上传文件，请稍候...");
 
-      const result = await uploadFile(file, currentId);
+      const result = await uploadFile(file, newConversation.id);
       setIsProcessing(false);
       setIsSuccess(true);
       setResultContent(result);
@@ -186,7 +185,7 @@ const DocSummaryPage: React.FC = () => {
     }
 
     try {
-      const newConversation = createConversation(MenuPage.Chat, []);
+      const newConversation = createConversation(MenuPage.Chat);
       setCurrentId(newConversation.id);
       setLastUploadedFile(null);
       setLastUploadedLink(fileLink);
@@ -194,7 +193,7 @@ const DocSummaryPage: React.FC = () => {
       setIsProcessing(true);
       setResultContent("正在处理链接，请稍候...");
 
-      const result = await uploadUrl(fileLink, currentId);
+      const result = await uploadUrl(fileLink, newConversation.id);
       setIsProcessing(false);
       setIsSuccess(true);
       setResultContent(result);
@@ -236,7 +235,7 @@ const DocSummaryPage: React.FC = () => {
 
       // 使用文件名或链接作为对话标题
       const chatTitle = item.file?.name || item.link || "文档解析对话";
-      const newConversation = createConversation(MenuPage.Chat, [], chatTitle);
+      const newConversation = createConversation(MenuPage.Chat, chatTitle);
 
       navigate(`/chat/${newConversation.id}?${params.toString()}`);
     } catch (error) {
@@ -252,7 +251,7 @@ const DocSummaryPage: React.FC = () => {
     setIsProcessing(true);
     try {
       if (!currentId) {
-        const newConversation = createConversation(MenuPage.Chat, []);
+        const newConversation = createConversation(MenuPage.Chat);
         setCurrentId(newConversation.id);
       }
       setResultContent("正在重新生成，请稍候...");
