@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: spring-ai-alibaba-helloworld
+    name: spring-ai-alibaba-studio-example
 
   ai:
     dashscope:
