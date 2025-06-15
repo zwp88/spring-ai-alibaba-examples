@@ -51,8 +51,7 @@ public class ChatController {
     public String simpleNl2Sql(@RequestBody String input) throws Exception {
         SchemaInitRequest schemaInitRequest = new SchemaInitRequest();
         schemaInitRequest.setDbConfig(dbConfig);
-        // 这里设置你需要查询的表
-        schemaInitRequest.setTables(Arrays.asList("tableName"));
+        schemaInitRequest.setTables(Arrays.asList("categories","order_items","orders","products","users","product_categories"));
         simpleVectorStoreService.schema(schemaInitRequest);
         return simpleNl2SqlService.nl2sql(input);
     }
