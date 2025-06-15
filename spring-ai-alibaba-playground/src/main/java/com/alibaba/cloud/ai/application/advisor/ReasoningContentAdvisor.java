@@ -17,12 +17,8 @@
 
 package com.alibaba.cloud.ai.application.advisor;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
@@ -31,6 +27,9 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author yuluo
@@ -63,14 +62,15 @@ public class ReasoningContentAdvisor implements BaseAdvisor {
 	public ChatClientResponse after(final ChatClientResponse chatClientResponse, final AdvisorChain advisorChain) {
 		
 		ChatResponse resp = chatClientResponse.chatResponse();
+
 		if (Objects.isNull(resp)) {
-			
 			return chatClientResponse;
 		}
-		
-		logger.debug("Advisor metadata output: {}", resp.getResults().get(0).getOutput().getMetadata());
+
+		// 注释，避免冗长的日志打印
+		// logger.debug("Advisor metadata output: {}", resp.getResults().get(0).getOutput().getMetadata());
 		String reasoningContent = String.valueOf(resp.getResults().get(0).getOutput().getMetadata().get("reasoningContent"));
-		logger.debug("Advisor reasoning content: {}", reasoningContent);
+		// logger.debug("Advisor reasoning content: {}", reasoningContent);
 		if (StringUtils.hasText(reasoningContent)) {
 			List<Generation> thinkGenerations = resp.getResults().stream()
 					.map(generation -> {

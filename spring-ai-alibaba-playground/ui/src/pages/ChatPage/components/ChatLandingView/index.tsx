@@ -9,7 +9,7 @@ import {
 } from "../../../../stores/functionMenu.store";
 import { useConversationContext } from "../../../../stores/conversation.store";
 import BasePage from "../../../components/BasePage";
-import { Button, theme } from "antd";
+import { Button, theme, Tooltip } from "antd";
 
 const ChatLandingView = () => {
   const { styles } = useStyle();
@@ -23,6 +23,16 @@ const ChatLandingView = () => {
 
   const handlePromptClick = (info: { data: { description: string } }) => {
     setInputValue(info.data.description);
+  };
+
+  const [activeButton, setActiveButton] = useState(null);
+
+  const handleMouseEnter = (key) => {
+    setActiveButton(key);
+  };
+
+  const handleMouseLeave = () => {
+    setActiveButton(null);
   };
 
   const handleCreateConversation = (content: string) => {
@@ -76,35 +86,46 @@ const ChatLandingView = () => {
 
         {/* 底部发送区域 */}
         <div
-          className={`${styles.landingSender} ${
-            menuCollapsed ? styles.landingSenderCollapsed : ""
-          }`}
+          className={`${styles.landingSender} ${menuCollapsed ? styles.landingSenderCollapsed : ""
+            }`}
         >
           <div className={styles.actionButtons}>
             {actionButtonConfig.map((button) => {
-              const isActive =
-                aiCapabilities[button.key as keyof typeof aiCapabilities];
+              const isActive = aiCapabilities[button.key as keyof typeof aiCapabilities];
+
               return (
-                <Button
-                  key={button.key}
-                  type="text"
-                  icon={button.icon}
-                  style={{
-                    color: isActive ? "#fff" : button.baseColor,
-                    background: isActive
-                      ? button.activeColor
-                      : token.colorBgElevated,
-                    border: "2px solid #eee3",
-                  }}
-                  onClick={() => {
-                    toggleCapability(button.key as keyof typeof aiCapabilities);
-                  }}
+                <Tooltip
+                  key={button.key} // 使用 key 属性来帮助 React 识别组件
+                  title={button.tipTitle}
+                  color={isActive ? "#fff" : button.baseColor}
+                  open={activeButton === button.key}
                 >
-                  {button.label}
-                </Button>
+                  <div
+                    onMouseEnter={() => handleMouseEnter(button.key)}
+                    onMouseLeave={() => handleMouseLeave()}
+                  >
+                    <Button
+                      type="text" // 保留按钮类型
+                      icon={button.icon}
+                      style={{
+                        color: isActive ? "#fff" : button.baseColor,
+                        background: isActive ? button.activeColor : token.colorBgElevated,
+                        border: "2px solid #eee3",
+                      }}
+                      onClick={() => {
+                        toggleCapability(button.key as keyof typeof aiCapabilities);
+                        // 点击按钮之后，关闭 Tooltip 显示
+                        setActiveButton(null);
+                      }}
+                    >
+                      {button.label}
+                    </Button>
+                  </div>
+                </Tooltip>
               );
             })}
           </div>
+
           <Sender
             value={inputValue}
             onChange={(value: string) => setInputValue(value)}

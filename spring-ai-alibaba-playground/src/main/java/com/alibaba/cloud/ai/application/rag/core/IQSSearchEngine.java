@@ -17,13 +17,11 @@
 
 package com.alibaba.cloud.ai.application.rag.core;
 
-import java.util.Objects;
-import java.util.function.Consumer;
-
+import com.alibaba.cloud.ai.application.entity.IQSSearchResponse;
 import com.alibaba.cloud.ai.application.exception.SAAAppException;
 import com.alibaba.cloud.ai.application.rag.IQSSearchProperties;
-import com.alibaba.cloud.ai.application.entity.websearch.GenericSearchResult;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,7 +32,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
+
 /**
+ * <a href="https://help.aliyun.com/document_detail/2883041.html">通晓搜索</a>
+ *
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
@@ -43,20 +48,24 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties(IQSSearchProperties.class)
 public class IQSSearchEngine {
 
-	private final IQSSearchProperties iqsSearchProperties;
-
 	private final RestClient restClient;
 
-	private static final String BASE_URL = "https://cloud-iqs.aliyuncs.com/";
+	private final ObjectMapper objectMapper;
+
+	private final IQSSearchProperties iqsSearchProperties;
 
 	private static final String TIME_RANGE = "OneWeek";
 
+	private static final String BASE_URL = "https://cloud-iqs.aliyuncs.com/";
+
 	public IQSSearchEngine(
-			IQSSearchProperties iqsSearchProperties,
+			ObjectMapper objectMapper,
 			RestClient.Builder restClientBuilder,
+			IQSSearchProperties iqsSearchProperties,
 			ResponseErrorHandler responseErrorHandler
 	) {
 
+		this.objectMapper = new ObjectMapper();
 		this.iqsSearchProperties = iqsSearchProperties;
 		this.restClient = restClientBuilder.baseUrl(BASE_URL)
 				.defaultHeaders(getHeaders())
@@ -64,26 +73,35 @@ public class IQSSearchEngine {
 				.build();
 	}
 
-	public GenericSearchResult search(String query) {
+	public IQSSearchResponse search(String query) throws JsonProcessingException {
+
+		Map<String, Boolean> reqDataContents = new HashMap<>();
+		reqDataContents.put("mainText", true);
+		// IQS 目前得 md 文档效果不好，所以关闭.
+		reqDataContents.put("markdownText", false);
+		reqDataContents.put("rerankScore", true);
+		Map<String, Object> reqData = new HashMap<>();
+		reqData.put("query", query);
+		reqData.put("timeRange", TIME_RANGE);
+		reqData.put("engineType", "Generic");
+		reqData.put("contents", reqDataContents);
+		String jsonReqData = objectMapper.writeValueAsString(reqData);
 
 		// String encodeQ = URLEncoder.encode(query, StandardCharsets.UTF_8);
-		ResponseEntity<GenericSearchResult> resultResponseEntity = run(query);
-
-		return genericSearchResult(resultResponseEntity);
-	}
-
-	private ResponseEntity<GenericSearchResult> run(String query) {
-
-		return this.restClient.get()
+		ResponseEntity<IQSSearchResponse> response = this.restClient.post()
 				.uri(
-						"/search/genericSearch?query={query}&timeRange={timeRange}",
+						"/search/unified?query={query}&timeRange={timeRange}",
 						query,
 						TIME_RANGE
-				).retrieve()
-				.toEntity(GenericSearchResult.class);
+				).contentType(MediaType.APPLICATION_JSON)
+				.body(jsonReqData)
+				.retrieve()
+				.toEntity(IQSSearchResponse.class);
+
+		return genericSearchResult(response);
 	}
 
-	private GenericSearchResult genericSearchResult(ResponseEntity<GenericSearchResult> response) {
+	private IQSSearchResponse genericSearchResult(ResponseEntity<IQSSearchResponse> response) {
 
 		if ((Objects.equals(response.getStatusCode(), HttpStatus.OK)) && Objects.nonNull(response.getBody())) {
 			return response.getBody();

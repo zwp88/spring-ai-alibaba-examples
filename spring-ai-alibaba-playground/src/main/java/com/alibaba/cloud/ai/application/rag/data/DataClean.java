@@ -17,22 +17,13 @@
 
 package com.alibaba.cloud.ai.application.rag.data;
 
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import com.alibaba.cloud.ai.application.exception.SAAAppException;
-import com.alibaba.cloud.ai.application.entity.websearch.GenericSearchResult;
-import com.alibaba.cloud.ai.application.entity.websearch.ScorePageItem;
-
-import org.springframework.ai.content.Media;
+import com.alibaba.cloud.ai.application.entity.IQSSearchResponse;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MimeType;
+import org.springframework.util.StringUtils;
+
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * @author yuluo
@@ -44,38 +35,33 @@ import org.springframework.util.MimeType;
 @Component
 public class DataClean {
 
-	public List<Document> getData(GenericSearchResult respData) throws URISyntaxException {
+	private static final Map<Integer, String> WebLink_MAP = new HashMap<>();
+
+	public List<Document> getData(IQSSearchResponse respData) throws URISyntaxException {
 
 		List<Document> documents = new ArrayList<>();
-
 		Map<String, Object> metadata = getQueryMetadata(respData);
 
-		for (ScorePageItem pageItem : respData.getPageItems()) {
+		for (int i = 0; i < respData.pageItems().size(); i++) {
 
+			IQSSearchResponse.PageItem pageItem = respData.pageItems().get(i);
 			Map<String, Object> pageItemMetadata = getPageItemMetadata(pageItem);
-			Double score = getScore(pageItem);
-			String text = getText(pageItem);
 
-			if (Objects.equals("", text)) {
-
-				Media media = getMedia(pageItem);
-				Document document = new Document.Builder()
-						.metadata(metadata)
-						.metadata(pageItemMetadata)
-						.media(media)
-						.score(score)
-						.build();
-
-				documents.add(document);
-				break;
+			if (!StringUtils.hasText(pageItem.mainText()) || pageItem.mainText().length() < 10) {
+				// Skip items with main text that is too short
+				continue;
 			}
-
 			Document document = new Document.Builder()
 					.metadata(metadata)
 					.metadata(pageItemMetadata)
-					.text(text)
-					.score(score)
+					.text(pageItem.mainText())
+					.score(pageItem.rerankScore())
 					.build();
+
+			if (Objects.nonNull(pageItem.link())) {
+				int index = i;
+				WebLink_MAP.put(index + 1, pageItem.link());
+			}
 
 			documents.add(document);
 		}
@@ -83,88 +69,70 @@ public class DataClean {
 		return documents;
 	}
 
-	private Double getScore(ScorePageItem pageItem) {
+	public Map<Integer, String> getWebLink() {
 
-		return pageItem.getScore();
+		return WebLink_MAP;
 	}
 
-	private Map<String, Object> getQueryMetadata(GenericSearchResult respData) {
+	private Map<String, Object> getQueryMetadata(IQSSearchResponse respData) {
 
 		HashMap<String, Object> docsMetadata = new HashMap<>();
 
-		if (Objects.nonNull(respData.getQueryContext())) {
-			docsMetadata.put("query", respData.getQueryContext().getOriginalQuery().getQuery());
+		if (Objects.nonNull(respData.queryContext())) {
+			docsMetadata.put("query", respData.queryContext().originalQuery().query());
 
-			if (Objects.nonNull(respData.getQueryContext().getOriginalQuery().getTimeRange())) {
-				docsMetadata.put("timeRange", respData.getQueryContext().getOriginalQuery().getTimeRange());
+			if (Objects.nonNull(respData.queryContext().originalQuery().timeRange())) {
+				docsMetadata.put("timeRange", respData.queryContext().originalQuery().timeRange());
 			}
 
-			if (Objects.nonNull(respData.getQueryContext().getOriginalQuery().getTimeRange())) {
-				docsMetadata.put("filters", respData.getQueryContext().getOriginalQuery().getTimeRange());
+			if (Objects.nonNull(respData.queryContext().originalQuery().timeRange())) {
+				docsMetadata.put("filters", respData.queryContext().originalQuery().timeRange());
 			}
 		}
 
 		return docsMetadata;
 	}
 
-	private Map<String, Object> getPageItemMetadata(ScorePageItem pageItem) {
+	private Map<String, Object> getPageItemMetadata(IQSSearchResponse.PageItem pageItem) {
 
 		HashMap<String, Object> pageItemMetadata = new HashMap<>();
 
 		if (Objects.nonNull(pageItem)) {
 
-			if (Objects.nonNull(pageItem.getHostname())) {
-				pageItemMetadata.put("hostname", pageItem.getHostname());
+			if (Objects.nonNull(pageItem.hostname())) {
+				pageItemMetadata.put("hostname", pageItem.hostname());
 			}
 
-			if (Objects.nonNull(pageItem.getHtmlSnippet())) {
-				pageItemMetadata.put("htmlSnippet", pageItem.getHtmlSnippet());
+			if (Objects.nonNull(pageItem.title())) {
+				pageItemMetadata.put("title", pageItem.title());
 			}
 
-			if (Objects.nonNull(pageItem.getTitle())) {
-				pageItemMetadata.put("title", pageItem.getTitle());
+			if (Objects.nonNull(pageItem.markdownText())) {
+				pageItemMetadata.put("markdownText", pageItem.markdownText());
 			}
 
-			if (Objects.nonNull(pageItem.getMarkdownText())) {
-				pageItemMetadata.put("markdownText", pageItem.getMarkdownText());
+			if (Objects.nonNull(pageItem.link())) {
+				pageItemMetadata.put("link", pageItem.link());
 			}
 
-			if (Objects.nonNull(pageItem.getLink())) {
-				pageItemMetadata.put("link", pageItem.getLink());
+			if (Objects.nonNull(pageItem.mainText())) {
+				pageItemMetadata.put("mainText", pageItem.mainText());
+			}
+
+			if (Objects.nonNull(pageItem.rerankScore())) {
+				pageItemMetadata.put("rerankScore", pageItem.rerankScore());
+			}
+
+			if (Objects.nonNull(pageItem.publishedTime())) {
+				pageItemMetadata.put("publishedTime", pageItem.publishedTime());
+			}
+
+			if (Objects.nonNull(pageItem.snippet())) {
+				pageItemMetadata.put("snippet", pageItem.snippet());
 			}
 		}
 
 		return pageItemMetadata;
-	}
-
-	private Media getMedia(ScorePageItem pageItem) throws URISyntaxException {
-
-		String mime = pageItem.getMime();
-		URL url;
-		try {
-			url = new URL(pageItem.getLink()).toURI().toURL();
-		}
-		catch (Exception e) {
-			throw new SAAAppException("Invalid URL: " + pageItem.getLink());
-		}
-		//TODO Media构造函数变更
-		return new Media(MimeType.valueOf(mime), url.toURI());
-	}
-
-	private String getText(ScorePageItem pageItem) {
-
-		if (Objects.nonNull(pageItem.getMainText())) {
-
-			String mainText = pageItem.getMainText();
-
-			mainText = mainText.replaceAll("<[^>]+>", "");
-			mainText = mainText.replaceAll("[\\n\\t\\r]+", " ");
-			mainText = mainText.replaceAll("[\\u200B-\\u200D\\uFEFF]", "");
-
-			return mainText.trim();
-		}
-
-		return "";
 	}
 
 	public List<Document> limitResults(List<Document> documents, int minResults) {

@@ -17,9 +17,11 @@
 
 package com.alibaba.cloud.ai.application.rag;
 
-import com.alibaba.cloud.ai.application.entity.websearch.GenericSearchResult;
+import com.alibaba.cloud.ai.application.entity.IQSSearchResponse;
+import com.alibaba.cloud.ai.application.exception.SAAAppException;
 import com.alibaba.cloud.ai.application.rag.core.IQSSearchEngine;
 import com.alibaba.cloud.ai.application.rag.data.DataClean;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,32 +34,27 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 /**
+ * spring-ai 从 0.8.0 版本开始不支持 DocumentRanker.
+ *
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
-//TOOD spring-ai新版本不支持DocumentRanker，对象缺失
 public class WebSearchRetriever implements DocumentRetriever {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebSearchRetriever.class);
-
-	private final IQSSearchEngine searchEngine;
 
 	private final int maxResults;
 
 	private final DataClean dataCleaner;
 
-//	private final DocumentRanker documentRanker;
-
-	private final boolean enableRanker;
+	private final IQSSearchEngine searchEngine;
 
 	private WebSearchRetriever(Builder builder) {
 
 		this.searchEngine = builder.searchEngine;
 		this.maxResults = builder.maxResults;
 		this.dataCleaner = builder.dataCleaner;
-//		this.documentRanker = builder.documentRanker;
-		this.enableRanker = builder.enableRanker;
 	}
 
 	@NotNull
@@ -67,16 +64,21 @@ public class WebSearchRetriever implements DocumentRetriever {
 	) {
 
 		// 搜索
-		GenericSearchResult searchResp = searchEngine.search(query.text());
+		IQSSearchResponse searchResp;
+		try {
+			searchResp = searchEngine.search(query.text());
+		} catch (JsonProcessingException e) {
+			throw new SAAAppException("json process error" + e.getMessage());
+		}
 
 		// 清洗数据
-        List<Document> cleanerData = null;
+        List<Document> cleanerData;
         try {
             cleanerData = dataCleaner.getData(searchResp);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        logger.debug("cleaner data: {}", cleanerData);
+        // logger.debug("cleaner data: {}", cleanerData);
 
 		// 返回结果
 		List<Document> documents = dataCleaner.limitResults(cleanerData, maxResults);
@@ -86,27 +88,7 @@ public class WebSearchRetriever implements DocumentRetriever {
 				documents.stream().map(Document::getId).toArray()
 		);
 
-		return enableRanker ? ranking(query, documents) : documents;
-	}
-
-	private List<Document> ranking(Query query, List<Document> documents) {
-
-		if (documents.size() == 1) {
-			// 只有一个时，不需要 rank
-			return documents;
-		}
-
-		try {
-
-//			List<Document> rankedDocuments = documentRanker.rank(query, documents);
-//			logger.debug("WebSearchRetriever#ranking() Ranked documents: {}", rankedDocuments.stream().map(Document::getId).toArray());
-//			return rankedDocuments;
-			return documents;
-		} catch (Exception e) {
-			// 降级返回原始结果
-			logger.error("ranking error", e);
-			return documents;
-		}
+		return documents;
 	}
 
 	public static WebSearchRetriever.Builder builder() {
@@ -121,11 +103,6 @@ public class WebSearchRetriever implements DocumentRetriever {
 		private int maxResults;
 
 		private DataClean dataCleaner;
-
-//		private DocumentRanker documentRanker;
-
-		// 默认开启 ranking
-		private Boolean enableRanker = true;
 
 		public WebSearchRetriever.Builder searchEngine(IQSSearchEngine searchEngine) {
 
@@ -142,16 +119,6 @@ public class WebSearchRetriever implements DocumentRetriever {
 		public WebSearchRetriever.Builder maxResults(int maxResults) {
 
 			this.maxResults = maxResults;
-			return this;
-		}
-
-//		public WebSearchRetriever.Builder documentRanker(DocumentRanker documentRanker) {
-//			this.documentRanker = documentRanker;
-//			return this;
-//		}
-
-		public WebSearchRetriever.Builder enableRanker(Boolean enableRanker) {
-			this.enableRanker = enableRanker;
 			return this;
 		}
 

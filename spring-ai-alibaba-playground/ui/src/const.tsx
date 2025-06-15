@@ -49,6 +49,7 @@ export const actionButtonConfig = [
     bgColor: "#e6f4ff",
     activeColor: "#1677ff",
     description: "使用网络搜索获取最新信息",
+    tipTitle: "在线搜索默认模型为 DeepSeek-R1.",
   },
   {
     key: "deepThink",
@@ -59,6 +60,7 @@ export const actionButtonConfig = [
     bgColor: "#f9f0ff",
     activeColor: "#722ed1",
     description: "深度分析问题并给出详细回答",
+    tipTitle: "深度思考模型可以任意选择，各个模型输出效果有差异.",
   },
 ];
 

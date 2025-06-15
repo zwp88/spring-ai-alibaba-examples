@@ -17,6 +17,14 @@
 
 package com.alibaba.cloud.ai.application.tools;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.ai.chat.model.ToolContext;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -24,21 +32,12 @@ import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
-import com.fasterxml.jackson.annotation.JsonClassDescription;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.springframework.ai.chat.model.ToolContext;
-
 /**
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
-public class BaiduMapTools implements BiFunction<BaiduMapTools.Request, ToolContext, BaiduMapTools.BaiduMapToolResponse> {
+public class BaiduMapTools implements BiFunction<BaiduMapTools.BaiduMapToolRequest, ToolContext, BaiduMapTools.BaiduMapToolResponse> {
 
 	private final String ak;
 
@@ -51,12 +50,12 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.Request, ToolCont
 	}
 
 	@Override
-	public BaiduMapToolResponse apply(BaiduMapTools.Request baiduMapToolRequest, ToolContext toolContext) {
+	public BaiduMapToolResponse apply(BaiduMapTools.BaiduMapToolRequest baiduMapToolRequest, ToolContext toolContext) {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		try {
 			ObjectNode jsonObject = objectMapper.createObjectNode();
-			String addressCityCodeResponse = getAddressCityCode(baiduMapToolRequest.address);
+			String addressCityCodeResponse = getAddressCityCode(baiduMapToolRequest.input.address);
 			JsonNode cityCodeJson = objectMapper.readTree(addressCityCodeResponse);
 			JsonNode districtsArray = cityCodeJson.path("districts");
 
@@ -71,7 +70,7 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.Request, ToolCont
 					}
 				}
 
-				String facilityJsonStr = getFacilityInformation(baiduMapToolRequest.address, baiduMapToolRequest.facilityType);
+				String facilityJsonStr = getFacilityInformation(baiduMapToolRequest.input.address, baiduMapToolRequest.input.facilityType);
 				JsonNode facilityJson = objectMapper.readTree(facilityJsonStr);
 				JsonNode resultsArray = facilityJson.path("results");
 
@@ -106,12 +105,12 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.Request, ToolCont
 		String path = String.format("/weather/v1/?ak=%s&district_id=%s&data_type=%s", ak, cityCode, "all");
 		HttpRequest httpRequest = this.createGetRequest(path);
 		CompletableFuture<HttpResponse<String>> responseFuture = this.httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
-		HttpResponse<String> response = (HttpResponse) responseFuture.join();
+		HttpResponse<String> response = responseFuture.join();
 		if (response.statusCode() != 200) {
 			throw new RuntimeException("Failed to get weather information");
 		}
 		else {
-			return (String) response.body();
+			return response.body();
 		}
 	}
 
@@ -124,7 +123,7 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.Request, ToolCont
 			throw new RuntimeException("Failed to get facility information");
 		}
 		else {
-			return (String) response.body();
+			return response.body();
 		}
 	}
 
@@ -133,12 +132,12 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.Request, ToolCont
 		return HttpRequest.newBuilder().uri(uri).GET().build();
 	}
 
-	// 模型的构造参数为：{"address": "杭州", "facilityType": "银行"} 因此这里不需要 Request 包装。
-	// public record BaiduMapToolRequest(@JsonProperty("Request") BaiduMapTools.Request input) {
-	// 	public BaiduMapToolRequest(BaiduMapTools.Request input) {
-	// 		this.input = input;
-	// 	}
-	// }
+	// 模型的构造参数为：{"Request": {"address": "杭州西溪园区", "facilityType": "科技园区"}}
+	public record BaiduMapToolRequest(@JsonProperty("Request") BaiduMapTools.Request input) {
+		public BaiduMapToolRequest(BaiduMapTools.Request input) {
+			this.input = input;
+		}
+	}
 
 	public record BaiduMapToolResponse(@JsonProperty("Response") BaiduMapTools.Response output) {
 		public BaiduMapToolResponse(BaiduMapTools.Response output) {
@@ -162,8 +161,10 @@ public class BaiduMapTools implements BiFunction<BaiduMapTools.Request, ToolCont
 			return this.address;
 		}
 
+		// {"Request": {"address": "杭州西溪园区", "facilityType": ""}}
+		// 可能 facilityType 为空
 		@JsonProperty(
-				required = true,
+				required = false,
 				value = "facilityType"
 		)
 		@JsonPropertyDescription("The type of facility (e.g., bank, airport, restaurant)")
