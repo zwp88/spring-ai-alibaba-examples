@@ -17,47 +17,82 @@
 
 package com.alibaba.cloud.ai.application.config;
 
-import org.apache.hc.client5.http.classic.HttpClient;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.util.Timeout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.client.RestClient;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 /**
- * Resolve the request timeout issue, need import org.apache.httpcomponents.client5:httplcient5 dependency.
+ * Spring AI Issue:
+ * - https://github.com/spring-projects/spring-ai/pull/365
+ * - https://github.com/spring-projects/spring-ai/issues/354#issuecomment-1965697951
+ *
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
-
  */
 
 @Configuration
 public class RestConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(RestConfiguration.class);
+    /**
+     * 在项目中引入 org.apache.httpcomponents.client5.httpclient5，可以像如下方式配置超时时间。
+     *
+     *    @Bean
+     *    public RestClient.Builder createRestClient() {
+     *
+     *         log.info("Initializing RestClient with custom timeout configuration");
+     *
+     * 		RequestConfig requestConfig = RequestConfig.custom()
+     * 				.setConnectTimeout(Timeout.of(10, TimeUnit.MINUTES))
+     * 				.setResponseTimeout(Timeout.of(10, TimeUnit.MINUTES))
+     * 				.setConnectionRequestTimeout(Timeout.of(10, TimeUnit.MINUTES))
+     * 				.build();
+     *
+     * 		HttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
+     *
+     * 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+     *
+     * 		return RestClient.builder().requestFactory(requestFactory);
+     *    }
+     */
 
-	@Bean
-	public RestClient.Builder createRestClient() {
+    /**
+     * 如果使用基于 netty 的 ReactorClientHttpConnector，可以使用如下配置：
+     * <p>
+     * https://projectreactor.io/docs/netty/release/reference/index.html#response-timeout
+     * https://docs.spring.io/spring-framework/reference/web/webflux-webclient/client-builder.html#webflux-client-builder-reactor-timeout
+     */
+    @Bean
+    public RestClientCustomizer restClientCustomizer() {
+        return restClientBuilder -> restClientBuilder
+                .requestFactory(
+                        ClientHttpRequestFactoryBuilder.reactor().withCustomizer(
+                                factory -> {
+                                    factory.setConnectTimeout(Duration.of(10, ChronoUnit.MINUTES));
+                                    factory.setReadTimeout(Duration.of(10, ChronoUnit.MINUTES));
+                                }
+                        ).build()
+                );
+    }
 
-        log.info("Initializing RestClient with custom timeout configuration");
+    /**
+     * 如果设置 WebClient，需要在 build 模型 api 时设置，底层仍然使用 netty 的 ReactorClientHttpConnector。
+     */
+    @Bean
+    public WebClient.Builder webClientBuilder() {
 
-		RequestConfig requestConfig = RequestConfig.custom()
-				.setConnectTimeout(Timeout.of(10, TimeUnit.MINUTES))
-				.setResponseTimeout(Timeout.of(10, TimeUnit.MINUTES))
-				.setConnectionRequestTimeout(Timeout.of(10, TimeUnit.MINUTES))
-				.build();
-
-		HttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
-
-		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-
-		return RestClient.builder().requestFactory(requestFactory);
-	}
+        return WebClient.builder()
+                .clientConnector(
+                        new ReactorClientHttpConnector(
+                                HttpClient.create().responseTimeout(Duration.of(600, ChronoUnit.SECONDS))
+                        )
+                );
+    }
 
 }
