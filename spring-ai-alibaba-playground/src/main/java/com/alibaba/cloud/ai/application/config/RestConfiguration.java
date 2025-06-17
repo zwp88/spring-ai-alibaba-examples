@@ -33,6 +33,8 @@ import java.time.temporal.ChronoUnit;
  * - https://github.com/spring-projects/spring-ai/pull/365
  * - https://github.com/spring-projects/spring-ai/issues/354#issuecomment-1965697951
  *
+ * 设置效果：https://github.com/springaialibaba/spring-ai-alibaba-examples/pull/276
+ *
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
@@ -82,7 +84,16 @@ public class RestConfiguration {
     }
 
     /**
-     * 如果设置 WebClient，需要在 build 模型 api 时设置，底层仍然使用 netty 的 ReactorClientHttpConnector。
+     * 如果设置 WebClient 响应超时时间，其底层仍然使用 netty 的 ReactorClientHttpConnector 时
+     * 1. 在 build 模型 api 时设置，例如：
+     *  WebClient.Builder webClientBuilder = WebClient.builder()
+     *         .clientConnector(new ReactorClientHttpConnector(
+     *                 HttpClient.create().responseTimeout(Duration.of(60, ChronoUnit.SECONDS))));
+     *
+     *   OllamaApi ollamaApi = OllamaApi.builder()
+     *         .webClientBuilder(webClientBuilder)
+     *         .build();
+     * 2. 按照如下写法，将其作为配置 bean 注入
      */
     @Bean
     public WebClient.Builder webClientBuilder() {
