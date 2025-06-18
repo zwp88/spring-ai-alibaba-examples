@@ -62,7 +62,6 @@
 		<module>spring-ai-alibaba-chat-example</module>
 		<module>spring-ai-alibaba-audio-example</module>
 		<module>spring-ai-alibaba-agent-example</module>
-		<module>spring-ai-alibaba-graph-example</module>
 		<module>spring-ai-alibaba-image-example</module>
 		<module>spring-ai-alibaba-prompt-example</module>
 		<module>spring-ai-alibaba-usecase-example</module>
@@ -75,6 +74,7 @@
 		<module>spring-ai-alibaba-more-platform-and-model-example</module>
 		<module>spring-ai-alibaba-nl2sql-example</module>
 		<module>spring-ai-alibaba-studio-example</module>
+		<module>spring-ai-alibaba-graph-example</module>
 	</modules>
 
 	<dependencyManagement>
