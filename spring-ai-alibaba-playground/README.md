@@ -20,6 +20,7 @@ docker run -d -p 8080:8080 \
 </p>
 
 #### 开启更多组件
+
 Playground 作为一个 AI 智能体应用，依赖大模型等在线服务，需要通过环境变量指定访问凭证。如果要开启 Playground 全部能力，需要通过环境变量指定访问凭证：
 
   - 【必须】[阿里云百炼 API-KEY](https://bailian.console.aliyun.com/?tab=model#/api-key)，大模型服务，示例 `export AI_DASHSCOPE_API_KEY=xxx`
@@ -48,9 +49,13 @@ docker run -d -p 8080:8080 \
 ### 下载源码构建运行
 
 **1. 项目打包**
+
 ```shell
 mvn clean install -DskipTests
 ```
+
+> PS: 项目中的前端资源默认放在了 resource/static 目录下，在执行 mvn clean package 时，默认跳过了前端资源打包。如果在启动项目时前端资源加载错误或者二次开发了前端时。
+> 需要将 pom 中的 <npm.build.skip> 改为 false，然后重新执行 `mvn clean package` 或者执行 `mvn clean package -Dnpm.build.skip=false`。
 
 **2. 配置环境变量**
 
@@ -96,7 +101,7 @@ Playground 作为 `spring-ai-alibaba-examples` 仓库子项目，有以下两种
 项目启动之后，浏览器访问 `http://localhost:8080` 查看前端页面。
 
 ## 常见问题与解决方法
+
 1. 如果项目启动时出现数据库相关错误，需要手动在 resources 目录下的 db 创建 saa.db 文件；
 2. 如果访问接口时，报 9411 端口相关错误，这是 zipkin 服务未启动原因，不影响接口调用；
 3. swagger 接口：http://localhost:8080/doc.html；
-
