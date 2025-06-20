@@ -314,7 +314,7 @@
         setLoading(true);
 
         try {
-            const apiUrl = vectorType === 'analyticDb' ? 'http://localhost:8066/chat' : 'http://localhost:8066/simpleChat';
+            const apiUrl = vectorType === 'analyticDb' ? 'http://localhost:8065/chat' : 'http://localhost:8065/simpleChat';
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
