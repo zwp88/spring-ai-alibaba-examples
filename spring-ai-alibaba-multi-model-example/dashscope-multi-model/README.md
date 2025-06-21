@@ -16,15 +16,15 @@
 </dependency>
 
 <dependency>
-<groupId>com.alibaba.cloud.ai</groupId>
-<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-<version>${spring-ai-alibaba.version}</version>
+	<groupId>com.alibaba.cloud.ai</groupId>
+	<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+	<version>${spring-ai-alibaba.version}</version>
 </dependency>
 
 <dependency>
-<groupId>org.bytedeco</groupId>
-<artifactId>javacv-platform</artifactId>
-<version>1.5.9</version>
+	<groupId>org.bytedeco</groupId>
+	<artifactId>javacv-platform</artifactId>
+	<version>1.5.9</version>
 </dependency>
 ```
 
