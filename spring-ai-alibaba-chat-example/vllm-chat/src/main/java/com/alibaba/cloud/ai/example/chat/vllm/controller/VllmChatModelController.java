@@ -32,7 +32,7 @@ import reactor.core.publisher.Flux;
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 @RestController
-@RequestMapping("/openai/chat-model")
+@RequestMapping("/vllm/chat-model")
 public class VllmChatModelController {
 
     private static final String DEFAULT_PROMPT = "你好，介绍下你自己吧。";
@@ -79,7 +79,7 @@ public class VllmChatModelController {
 
         OpenAiChatOptions customOptions = OpenAiChatOptions.builder()
                 .topP(0.7)
-                .model("gpt-4o")
+                .model("111")
                 .maxTokens(1000)
                 .temperature(0.8)
                 .build();
