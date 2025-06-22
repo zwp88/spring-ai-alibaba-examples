@@ -19,8 +19,9 @@
 
     <parent>
         <groupId>com.alibaba.cloud.ai</groupId>
-        <artifactId>spring-ai-alibaba</artifactId>
-        <version>1.0.0.2</version>
+        <artifactId>spring-ai-alibaba-graph-example</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>multiagent-openmanus</artifactId>
