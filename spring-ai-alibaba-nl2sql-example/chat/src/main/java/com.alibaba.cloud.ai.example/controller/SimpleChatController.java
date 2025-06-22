@@ -17,7 +17,6 @@ package com.alibaba.cloud.ai.example.controller;
 
 import com.alibaba.cloud.ai.dbconnector.DbConfig;
 import com.alibaba.cloud.ai.request.SchemaInitRequest;
-import com.alibaba.cloud.ai.service.analytic.AnalyticNl2SqlService;
 import com.alibaba.cloud.ai.service.simple.SimpleNl2SqlService;
 import com.alibaba.cloud.ai.service.simple.SimpleVectorStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Arrays;
 
 @RestController
-public class ChatController {
+public class SimpleChatController {
 
-    @Autowired
-    private AnalyticNl2SqlService nl2SqlService;
 
     @Autowired
     private SimpleNl2SqlService simpleNl2SqlService;
@@ -42,11 +39,6 @@ public class ChatController {
     @Autowired
     private DbConfig dbConfig;
 
-    @PostMapping("/chat")
-    public String nl2Sql(@RequestBody String input) throws Exception {
-        return nl2SqlService.nl2sql(input);
-    }
-
     @PostMapping("/simpleChat")
     public String simpleNl2Sql(@RequestBody String input) throws Exception {
         SchemaInitRequest schemaInitRequest = new SchemaInitRequest();
@@ -56,4 +48,3 @@ public class ChatController {
         return simpleNl2SqlService.nl2sql(input);
     }
 }
-
