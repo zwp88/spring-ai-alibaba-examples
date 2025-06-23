@@ -14,3 +14,9 @@ GET http://127.0.0.1:10000/model/stream/chat
 
 ### Chat Model Custom Options Chat
 GET http://127.0.0.1:10000/model/custom/chat
+
+### Chat Model Custom Http Headers
+GET http://127.0.0.1:10000/model/custom/http-headers
+
+### Chat Model DashScope Web Search
+GET http://127.0.0.1:10000/model/dashscope/web-search
