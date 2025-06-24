@@ -44,9 +44,9 @@ import static com.alibaba.cloud.ai.constant.Constant.RESULT;
  */
 @RestController
 @RequestMapping("nl2sql")
-public class Nl2sqlController {
+public class Nl2sqlForGraphController {
 
-	private static final Logger logger = LoggerFactory.getLogger(Nl2sqlController.class);
+	private static final Logger logger = LoggerFactory.getLogger(Nl2sqlForGraphController.class);
 
 	private final CompiledGraph compiledGraph;
 
@@ -57,7 +57,7 @@ public class Nl2sqlController {
 	private DbConfig dbConfig;
 
 	@Autowired
-	public Nl2sqlController(@Qualifier("nl2sqlGraph") StateGraph stateGraph) throws GraphStateException {
+	public Nl2sqlForGraphController(@Qualifier("nl2sqlGraph") StateGraph stateGraph) throws GraphStateException {
 		this.compiledGraph = stateGraph.compile();
 		this.compiledGraph.setMaxIterations(100);
 	}
