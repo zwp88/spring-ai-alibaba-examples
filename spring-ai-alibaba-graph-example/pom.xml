@@ -40,6 +40,8 @@
 		<module>workflow-writing-assistant</module>
 		<module>multiagent-openmanus</module>
 		<module>stream-node</module>
+		<module>mcp-node</module>
+		<module>human-node</module>
 	</modules>
 
 	<build>
