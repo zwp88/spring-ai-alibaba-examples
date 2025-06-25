@@ -17,6 +17,7 @@
 package com.alibaba.example.controller;
 
 import com.alibaba.cloud.ai.graph.CompiledGraph;
+import com.alibaba.cloud.ai.graph.exception.GraphRunnerException;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class GraphController {
 
 	@PostMapping("/invoke")
 	public ResponseEntity<Map<String, Object>> invoke(@RequestBody Map<String, Object> inputs)
-			throws GraphStateException {
+            throws GraphStateException, GraphRunnerException {
 
 		// invoke graph
 		var resultFuture = graph.invoke(inputs);
