@@ -39,6 +39,7 @@
 		<module>workflow-review-classifier</module>
 		<module>workflow-writing-assistant</module>
 		<module>multiagent-openmanus</module>
+		<module>stream-node</module>
 	</modules>
 
 	<build>
