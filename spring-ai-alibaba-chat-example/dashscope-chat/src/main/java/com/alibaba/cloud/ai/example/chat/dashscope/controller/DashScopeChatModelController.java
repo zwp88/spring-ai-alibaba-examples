@@ -80,6 +80,25 @@ public class DashScopeChatModelController {
 		return stream.map(resp -> resp.getResult().getOutput().getText());
 	}
 
+	/**
+	 * 演示如何获取 LLM 得 token 信息
+	 */
+	@GetMapping("/tokens")
+	public Map<String, Object> tokens(HttpServletResponse response) {
+
+		ChatResponse chatResponse = dashScopeChatModel.call(new Prompt(DEFAULT_PROMPT, DashScopeChatOptions
+				.builder()
+				.withModel(DashScopeApi.ChatModel.QWEN_PLUS.getValue())
+				.build()));
+
+		Map<String, Object> res = new HashMap<>();
+		res.put("output", chatResponse.getResult().getOutput().getText());
+		res.put("output_token", chatResponse.getMetadata().getUsage().getCompletionTokens());
+		res.put("input_token", chatResponse.getMetadata().getUsage().getPromptTokens());
+		res.put("total_token", chatResponse.getMetadata().getUsage().getTotalTokens());
+
+		return res;
+	}
 
 	/**
 	 * 使用编程方式自定义 LLMs ChatOptions 参数， {@link com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions}
