@@ -24,6 +24,7 @@ import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.alibaba.cloud.ai.graph.RunnableConfig;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.checkpoint.config.SaverConfig;
+import com.alibaba.cloud.ai.graph.exception.GraphRunnerException;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,7 +56,7 @@ public class ParallelController {
 	}
 
 	@GetMapping
-	public Map<String, Object> analyze(@RequestParam("text") String text) {
+	public Map<String, Object> analyze(@RequestParam("text") String text) throws GraphRunnerException {
 		return engine.invoke(Map.of("inputText", text)).get().data();
 	}
 
@@ -63,17 +64,21 @@ public class ParallelController {
 	public Flux<Map<String, Object>> analyzeStream(@RequestParam("text") String text) {
 		RunnableConfig cfg = RunnableConfig.builder().streamMode(CompiledGraph.StreamMode.SNAPSHOTS).build();
 		return Flux.create(sink -> {
-			engine.stream(Map.of("inputText", text), cfg)
-				.forEachAsync(node -> sink.next(node.state().data()))
-				.whenComplete((v, e) -> {
-					if (e != null) {
-						sink.error(e);
-					}
-					else {
-						sink.complete();
-					}
-				});
-		});
+            try {
+                engine.stream(Map.of("inputText", text), cfg)
+                    .forEachAsync(node -> sink.next(node.state().data()))
+                    .whenComplete((v, e) -> {
+                        if (e != null) {
+                            sink.error(e);
+                        }
+                        else {
+                            sink.complete();
+                        }
+                    });
+            } catch (GraphRunnerException e) {
+                throw new RuntimeException(e);
+            }
+        });
 	}
 
 }

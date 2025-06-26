@@ -25,12 +25,12 @@
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
     <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-    <version>1.0.0.1</version>
+    <version>${spring-ai-alibaba.version}</version>
 </dependency>
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
     <artifactId>spring-ai-alibaba-graph-core</artifactId>
-    <version>1.0.0.1</version>
+    <version>${spring-ai-alibaba-graph-core.version}</version>
 </dependency>
 ```
 
