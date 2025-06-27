@@ -42,6 +42,7 @@
 		<module>stream-node</module>
 		<module>mcp-node</module>
 		<module>human-node</module>
+		<module>parallel-node</module>
 	</modules>
 
 	<build>
