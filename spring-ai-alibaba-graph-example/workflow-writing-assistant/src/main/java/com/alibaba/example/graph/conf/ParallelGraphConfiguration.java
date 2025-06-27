@@ -18,7 +18,11 @@
 
 package com.alibaba.example.graph.conf;
 
-import com.alibaba.cloud.ai.graph.*;
+import com.alibaba.cloud.ai.graph.GraphRepresentation;
+import com.alibaba.cloud.ai.graph.KeyStrategy;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.OverAllState;
+import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
@@ -29,6 +33,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,15 +53,15 @@ public class ParallelGraphConfiguration {
 	public StateGraph parallelGraph(ChatModel chatModel) throws GraphStateException {
 		ChatClient client = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
 		// 状态工厂注册字段与策略
-		OverAllStateFactory factory = () -> {
-			OverAllState s = new OverAllState();
-			s.registerKeyAndStrategy("inputText", new ReplaceStrategy());
-			s.registerKeyAndStrategy("sentiment", new ReplaceStrategy());
-			s.registerKeyAndStrategy("keywords", new ReplaceStrategy());
-			s.registerKeyAndStrategy("analysis", new ReplaceStrategy());
-			return s;
+		KeyStrategyFactory keyStrategyFactory = () -> {
+			HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+			keyStrategyHashMap.put("inputText", new ReplaceStrategy());
+			keyStrategyHashMap.put("sentiment", new ReplaceStrategy());
+			keyStrategyHashMap.put("keywords", new ReplaceStrategy());
+			keyStrategyHashMap.put("analysis", new ReplaceStrategy());
+			return keyStrategyHashMap;
 		};
-		StateGraph graph = new StateGraph("ParallelDemo", factory.create())
+		StateGraph graph = new StateGraph("ParallelDemo", keyStrategyFactory)
 			// 注册节点
 			.addNode("start", node_async(new InputNode()))
 			.addNode("sentiment", node_async(new SentimentAnalysisNode(client, "inputText")))

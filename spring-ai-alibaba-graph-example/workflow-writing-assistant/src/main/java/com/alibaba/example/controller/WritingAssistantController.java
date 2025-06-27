@@ -20,6 +20,7 @@ package com.alibaba.example.controller;
 
 import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.alibaba.cloud.ai.graph.StateGraph;
+import com.alibaba.cloud.ai.graph.exception.GraphRunnerException;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,7 +49,7 @@ public class WritingAssistantController {
 	 * 调用写作助手流程图 示例请求：GET /write?text=今天我去了西湖，天气特别好，感觉特别开心
 	 */
 	@GetMapping
-	public Map<String, Object> write(@RequestParam("text") String inputText) {
+	public Map<String, Object> write(@RequestParam("text") String inputText) throws GraphRunnerException {
 		var resultFuture = compiledGraph.invoke(Map.of("original_text", inputText));
 		var result = resultFuture.get();
 		return result.data();

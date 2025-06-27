@@ -18,20 +18,24 @@
 
 package com.alibaba.example.graph.conf;
 
-import com.alibaba.cloud.ai.graph.*;
+import com.alibaba.cloud.ai.graph.GraphRepresentation;
+import com.alibaba.cloud.ai.graph.KeyStrategy;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.OverAllState;
+import com.alibaba.cloud.ai.graph.StateGraph;
+import com.alibaba.cloud.ai.graph.action.EdgeAction;
+import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
-import com.alibaba.example.graph.dispatcher.FeedbackDispatcher;
-import com.alibaba.example.graph.node.RewordingNode;
-import com.alibaba.example.graph.node.SummarizerNode;
-import com.alibaba.example.graph.node.SummaryFeedbackClassifierNode;
-import com.alibaba.example.graph.node.TitleGeneratorNode;
 import org.springframework.ai.chat.model.ChatModel;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
@@ -52,17 +56,18 @@ public class WritingAssistantAutoconfiguration {
 
 		ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
 
-		OverAllStateFactory stateFactory = () -> {
-			OverAllState state = new OverAllState();
-			state.registerKeyAndStrategy("original_text", new ReplaceStrategy());
-			state.registerKeyAndStrategy("summary", new ReplaceStrategy());
-			state.registerKeyAndStrategy("summary_feedback", new ReplaceStrategy());
-			state.registerKeyAndStrategy("reworded", new ReplaceStrategy());
-			state.registerKeyAndStrategy("title", new ReplaceStrategy());
-			return state;
+		KeyStrategyFactory keyStrategyFactory = () -> {
+			HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+
+			keyStrategyHashMap.put("original_text", new ReplaceStrategy());
+			keyStrategyHashMap.put("summary", new ReplaceStrategy());
+			keyStrategyHashMap.put("summary_feedback", new ReplaceStrategy());
+			keyStrategyHashMap.put("reworded", new ReplaceStrategy());
+			keyStrategyHashMap.put("title", new ReplaceStrategy());
+			return keyStrategyHashMap;
 		};
 
-		StateGraph graph = new StateGraph("Writing Assistant with Feedback Loop", stateFactory.create())
+		StateGraph graph = new StateGraph(keyStrategyFactory)
 			.addNode("summarizer", node_async(new SummarizerNode(chatClient)))
 			.addNode("feedback_classifier", node_async(new SummaryFeedbackClassifierNode(chatClient, "summary")))
 			.addNode("reworder", node_async(new RewordingNode(chatClient)))
@@ -84,5 +89,126 @@ public class WritingAssistantAutoconfiguration {
 
 		return graph;
 	}
+
+	static class SummarizerNode implements NodeAction {
+
+		private final ChatClient chatClient;
+
+		public SummarizerNode(ChatClient chatClient) {
+			this.chatClient = chatClient;
+		}
+
+		@Override
+		public Map<String, Object> apply(OverAllState state) {
+			String text = (String) state.value("original_text").orElse("");
+			String prompt = "请对以下中文文本进行简洁明了的摘要：\n\n" + text;
+
+			ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
+			String summary = response.getResult().getOutput().getText();
+
+			Map<String, Object> result = new HashMap<>();
+			result.put("summary", summary);
+			return result;
+		}
+
+	}
+
+	static class SummaryFeedbackClassifierNode implements NodeAction {
+
+		private final ChatClient chatClient;
+
+		private final String inputKey;
+
+		public SummaryFeedbackClassifierNode(ChatClient chatClient, String inputKey) {
+			this.chatClient = chatClient;
+			this.inputKey = inputKey;
+		}
+
+		@Override
+		public Map<String, Object> apply(OverAllState state) {
+			String summary = (String) state.value(inputKey).orElse("");
+			if (!StringUtils.hasText(summary)) {
+				throw new IllegalArgumentException("summary is empty in state");
+			}
+
+			String prompt = """
+				以下是一个自动生成的中文摘要。请你判断它是否让用户满意。如果满意，请返回 "positive"，否则返回 "negative"：
+
+				摘要内容：
+				%s
+				""".formatted(summary);
+
+			ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
+			String output = response.getResult().getOutput().getText();
+
+			String classification = output.toLowerCase().contains("positive") ? "positive" : "negative";
+
+			Map<String, Object> updated = new HashMap<>();
+			updated.put("summary_feedback", classification);
+
+			return updated;
+		}
+
+	}
+
+	static class RewordingNode implements NodeAction {
+
+		private final ChatClient chatClient;
+
+		public RewordingNode(ChatClient chatClient) {
+			this.chatClient = chatClient;
+		}
+
+		@Override
+		public Map<String, Object> apply(OverAllState state) {
+			String summary = (String) state.value("summary").orElse("");
+			String prompt = "请将以下摘要用更优美、生动的语言改写，同时保持信息不变：\n\n" + summary;
+
+			ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
+			String reworded = response.getResult().getOutput().getText();
+
+			Map<String, Object> result = new HashMap<>();
+			result.put("reworded", reworded);
+			return result;
+		}
+
+	}
+
+	static class TitleGeneratorNode implements NodeAction {
+
+		private final ChatClient chatClient;
+
+		public TitleGeneratorNode(ChatClient chatClient) {
+			this.chatClient = chatClient;
+		}
+
+		@Override
+		public Map<String, Object> apply(OverAllState state) {
+			String content = (String) state.value("reworded").orElse("");
+			String prompt = "请为以下内容生成一个简洁有吸引力的中文标题：\n\n" + content;
+
+			ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
+			String title = response.getResult().getOutput().getText();
+
+			Map<String, Object> result = new HashMap<>();
+			result.put("title", title);
+			return result;
+		}
+
+	}
+
+	static class FeedbackDispatcher implements EdgeAction {
+
+		@Override
+		public String apply(OverAllState state) {
+			String feedback = (String) state.value("summary_feedback").orElse("");
+			if (feedback.contains("positive")) {
+				return "positive";
+			}
+			return "negative";
+		}
+
+	}
+
 
 }
