@@ -43,6 +43,7 @@
         <module>mcp-node</module>
         <module>human-node</module>
         <module>usecase-field-classifier</module>
+        <module>product-analysis-graph</module>
     </modules>
 
     <build>
