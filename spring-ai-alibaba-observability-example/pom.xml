@@ -39,6 +39,7 @@
 		<module>observability-example</module>
 		<module>observability-arms-example</module>
 		<module>observationhandler-example</module>
+		<module>observability-langfuse-example</module>
 	</modules>
 
 	<build>
