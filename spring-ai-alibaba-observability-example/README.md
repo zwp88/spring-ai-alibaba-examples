@@ -230,15 +230,14 @@ spring:
   application:
     name: observationhandler-example
 
-server:
-  port: 8080
-
   ai:
     dashscope:
       api-key: ${AI_DASHSCOPE_API_KEY}
       observations:
         log-completion: true
         log-prompt: true
+server:
+  port: 8080
 
 management:
   tracing:
