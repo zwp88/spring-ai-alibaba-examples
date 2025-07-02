@@ -21,6 +21,8 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.observationhandlerexample.observationHandler.CustomerObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
 
+
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,19 +36,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/custom/observation/chat")
 public class ChatModelController {
 
-	@GetMapping
-	public String chat(@RequestParam(defaultValue = "hi") String message) {
+    private final DashScopeChatModel dashScopeChatModel;
 
-		ObservationRegistry registry = ObservationRegistry.create();
-		registry.observationConfig().observationHandler(new CustomerObservationHandler());
+    public ChatModelController(Environment environment, ObservationRegistry observationRegistry) {
+        observationRegistry.observationConfig().observationHandler(new CustomerObservationHandler()) ;
+        String dashscopeApiKey = environment.getProperty("spring.ai.dashscope.api-key");
+        this.dashScopeChatModel = DashScopeChatModel.builder()
+                .dashScopeApi(DashScopeApi.builder().apiKey(dashscopeApiKey).build())
+                .observationRegistry(observationRegistry)
+                .build();
+    }
 
-		// Need to set the API key in the environment variable "AI_DASHSCOPE_API_KEY"
-		// Spring Boot Autoconfiguration is injected use ChatClient.
-		return DashScopeChatModel.builder()
-				.dashScopeApi(DashScopeApi.builder().apiKey(System.getenv("AI_DASHSCOPE_API_KEY")).build())
-				.observationRegistry(registry)
-				.build()
-				.call(message);
-	}
+
+    @GetMapping
+    public String chat(@RequestParam(name = "message", defaultValue = "hi") String message) {
+        return dashScopeChatModel.call(message);
+    }
 
 }

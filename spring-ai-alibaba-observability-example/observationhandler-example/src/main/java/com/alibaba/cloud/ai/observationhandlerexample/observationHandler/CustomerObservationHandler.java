@@ -16,6 +16,7 @@
 
 package com.alibaba.cloud.ai.observationhandlerexample.observationHandler;
 
+import io.micrometer.common.KeyValue;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
 import org.springframework.ai.chat.observation.ChatModelObservationContext;
@@ -28,6 +29,17 @@ public class CustomerObservationHandler implements ObservationHandler<ChatModelO
 
     @Override
     public void onStart(ChatModelObservationContext context) {
+        context.addLowCardinalityKeyValue(new KeyValue() {
+            @Override
+            public String getKey() {
+                return "test lowcardinality Key";
+            }
+
+            @Override
+            public String getValue() {
+                return "test lowcardinality value";
+            }
+        });
         System.out.println("exec CustomerObservationHandler onStart function! ChatModelObservationContext: " + context.toString() );
     }
 
@@ -38,6 +50,6 @@ public class CustomerObservationHandler implements ObservationHandler<ChatModelO
 
     @Override
     public boolean supportsContext(Observation.Context context) {
-        return true;
+        return context instanceof ChatModelObservationContext;
     }
 }
