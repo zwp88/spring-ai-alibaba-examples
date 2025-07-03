@@ -53,6 +53,7 @@ spring:
       api-key: sk  #DashScope 平台的 API Key，用于调用 Qwen 等模型。获取方式：登录 DashScope 控制台 → 查看或创建 API Key。
     vectorstore:
       analytic:
+        enabled: true # 开启 AnalyticDB 向量数据库存储功能
         collectName: chatbi #向量集合名称，即你要写入数据的“collection”名，例如 chatbi
         regionId: cn-hangzhou #实例所在的区域 ID，比如 cn-hangzhou（杭州）、cn-beijing（北京）等。
         dbInstanceId: gp-bp11vjucxhw757v9p #AnalyticDB PostgreSQL 实例 ID，例如 gp-bp11vjucxhw757v9p
@@ -73,6 +74,8 @@ chatbi:
     dialecttype: mysql #数据库类型，可选：postgresql、mysql
     schema: #postgresql类型所需要的schema名称
 ```
+
+> 更多配置说明参考 : [Spring AI Alibaba NL2SQL文档](https://github.com/alibaba/spring-ai-alibaba/blob/main/spring-ai-alibaba-nl2sql/spring-ai-alibaba-nl2sql-chat/README.md)。
 
 ### 💻 构建项目
 
