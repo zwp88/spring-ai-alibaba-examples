@@ -127,6 +127,9 @@ management:
     sampling:
       # trace 采样信息，记录每个请求
       probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
 ```
 
 #### Controller
@@ -169,29 +172,39 @@ services:
 
 #### ChatClient
 
-指标介绍：https://docs.spring.io/spring-ai/reference/observability/index.html#_chat_client
 
-在下文中即可看到 chatClient 相关的信息：
 
-![image-20250604212605930](./images/image-20250604212605930.png)
+登录 zipkin 的控制台，默认情况为 http://localhost:9411/zipkin/ ,点击对应的 trace，可以看到 chatClient 相关的信息：
+
+详细指标介绍请参考 https://docs.spring.io/spring-ai/reference/observability/index.html#_chat_client
+
+![image-chatclient-1](./images/observe-1.png)
+
 
 #### ToolCalling
 
-指标介绍：https://docs.spring.io/spring-ai/reference/observability/index.html#_tool_calling
+在 zipkin 的控制台查看 ToolCalling 对应的信息。
 
-![image-20250604212858047](./images/image-20250604212858047.png)
+![image-tool-calling-1](./images/observe-2.png)
+
+![image-tool-calling-2](./images/observe-3.png)
+
 
 在下面的 tool 模块可以看到 tools 的入参和出参信息：
 
-![image-20250604213730393](./images/image-20250604213730393.png)
+![image-chatclient-2](./images/observe-4.png)
+
+详细指标介绍请参考 ：https://docs.spring.io/spring-ai/reference/observability/index.html#_tool_calling
 
 #### Embedding Client
 
-指标参考：https://docs.spring.io/spring-ai/reference/observability/index.html#_embeddingmodel
+在 zipkin 的控制台查看 ToolCalling 对应的信息。
 
-![image-20250604213822311](./images/image-20250604213822311.png)
+![image-embedding-1](./images/observe-5.png)
 
-![image-20250604213913992](./images/image-20250604213913992.png)
+![image-embedding-2](./images/observe-6.png)
+
+详细指标介绍请参考 ：https://docs.spring.io/spring-ai/reference/observability/index.html#_embeddingmodel
 
 ### 扩展 Spring AI 指标
 
@@ -199,7 +212,7 @@ Spring AI 提供了 `ObservationHandler<ChatModelObservationContext>` 机制来�
 
 #### pom
 
-pom 中只需引入对应的 starter 即可。
+pom 中只需引入 spring-ai-alibaba-starter-dashscope ，此 starter 会间接引入相关的依赖。
 
 ```xml
 <dependencies>
@@ -216,6 +229,23 @@ pom 中只需引入对应的 starter 即可。
 spring:
   application:
     name: observationhandler-example
+
+  ai:
+    dashscope:
+      api-key: ${AI_DASHSCOPE_API_KEY}
+      observations:
+        log-completion: true
+        log-prompt: true
+server:
+  port: 8080
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
 ```
 
 #### CustomerObservationHandler
@@ -227,6 +257,17 @@ public class CustomerObservationHandler implements ObservationHandler<ChatModelO
 
     @Override
     public void onStart(ChatModelObservationContext context) {
+        context.addLowCardinalityKeyValue(new KeyValue() {
+            @Override
+            public String getKey() {
+                return "test lowcardinality Key";
+            }
+
+            @Override
+            public String getValue() {
+                return "test lowcardinality value";
+            }
+        });
         System.out.println("exec CustomerObservationHandler onStart function! ChatModelObservationContext: " + context.toString() );
     }
 
@@ -237,7 +278,7 @@ public class CustomerObservationHandler implements ObservationHandler<ChatModelO
 
     @Override
     public boolean supportsContext(Observation.Context context) {
-        return true;
+        return context instanceof ChatModelObservationContext;
     }
 }
 ```
@@ -249,19 +290,20 @@ public class CustomerObservationHandler implements ObservationHandler<ChatModelO
 @RequestMapping("/custom/observation/chat")
 public class ChatModelController {
 
+    private final DashScopeChatModel dashScopeChatModel;
+
+    public ChatModelController(Environment environment, ObservationRegistry observationRegistry) {
+        observationRegistry.observationConfig().observationHandler(new CustomerObservationHandler()) ;
+        String dashscopeApiKey = environment.getProperty("spring.ai.dashscope.api-key");
+        this.dashScopeChatModel = DashScopeChatModel.builder()
+                .dashScopeApi(DashScopeApi.builder().apiKey(dashscopeApiKey).build())
+                .observationRegistry(observationRegistry)
+                .build();
+    }
+
     @GetMapping
-    public String chat(@RequestParam(defaultValue = "hi") String message) {
-
-       ObservationRegistry registry = ObservationRegistry.create();
-       registry.observationConfig().observationHandler(new CustomerObservationHandler());
-
-       // Need to set the API key in the environment variable "AI_DASHSCOPE_API_KEY"
-       // Spring Boot Autoconfiguration is injected use ChatClient.
-       return DashScopeChatModel.builder()
-             .dashScopeApi(DashScopeApi.builder().apiKey(System.getenv("AI_DASHSCOPE_API_KEY")).build())
-             .observationRegistry(registry)
-             .build()
-             .call(message);
+    public String chat(@RequestParam(name = "message", defaultValue = "hi") String message) {
+        return dashScopeChatModel.call(message);
     }
 
 }
@@ -270,10 +312,13 @@ public class ChatModelController {
 当在请求 chat 接口时，会执行 custom handler 中的代码语句：
 
 ```text
-exec CustomerObservationHandler onStart function! ChatModelObservationContext: name='gen_ai.client.operation', contextualName='null', error='null', lowCardinalityKeyValues=[gen_ai.operation.name='chat', gen_ai.request.model='qwen-plus', gen_ai.response.model='none', gen_ai.system='dashscope'], highCardinalityKeyValues=[gen_ai.request.temperature='0.7'], map=[], parentObservation=null
-
-exec CustomerObservationHandler onStop function! ChatModelObservationContext: name='gen_ai.client.operation', contextualName='chat qwen-plus', error='null', lowCardinalityKeyValues=[gen_ai.operation.name='chat', gen_ai.request.model='qwen-plus', gen_ai.response.model='none', gen_ai.system='dashscope'], highCardinalityKeyValues=[gen_ai.request.temperature='0.7', gen_ai.response.finish_reasons='["STOP"]', gen_ai.response.id='9582b50a-4056-9b7e-b2ca-e52368406b5e', gen_ai.usage.input_tokens='9', gen_ai.usage.output_tokens='7', gen_ai.usage.total_tokens='16'], map=[], parentObservation=null
+exec CustomerObservationHandler onStart function! ChatModelObservationContext: name='gen_ai.client.operation', contextualName='null', error='null', lowCardinalityKeyValues=[gen_ai.operation.name='chat', gen_ai.request.model='qwen-plus', gen_ai.response.model='none', gen_ai.system='dashscope', test lowcardinality Key='test lowcardinality value'], highCardinalityKeyValues=[gen_ai.request.temperature='0.7'], map=[class io.micrometer.core.instrument.LongTaskTimer$Sample='SampleImpl{duration(seconds)=2.89375E-4, duration(nanos)=289375.0, startTimeNanos=621932481108208}', class io.micrometer.core.instrument.Timer$Sample='io.micrometer.core.instrument.Timer$Sample@706f58e8', class io.micrometer.tracing.handler.TracingObservationHandler$TracingContext='TracingContext{span=68637ed074cc4d5e69f88f66edded268/720ea72f9e2fe0e9}'], parentObservation={name=http.server.requests(null), error=null, context=name='http.server.requests', contextualName='null', error='null', lowCardinalityKeyValues=[exception='none', method='GET', outcome='SUCCESS', status='200', uri='UNKNOWN'], highCardinalityKeyValues=[http.url='/custom/observation/chat'], map=[class io.micrometer.core.instrument.LongTaskTimer$Sample='SampleImpl{duration(seconds)=0.066068208, duration(nanos)=6.6068208E7, startTimeNanos=621932415435375}', class io.micrometer.core.instrument.Timer$Sample='io.micrometer.core.instrument.Timer$Sample@bd86d13', class io.micrometer.tracing.handler.TracingObservationHandler$TracingContext='TracingContext{span=68637ed074cc4d5e69f88f66edded268/69f88f66edded268}'], parentObservation=null}
+exec CustomerObservationHandler onStop function! ChatModelObservationContext: name='gen_ai.client.operation', contextualName='chat qwen-plus', error='null', lowCardinalityKeyValues=[gen_ai.operation.name='chat', gen_ai.request.model='qwen-plus', gen_ai.response.model='none', gen_ai.system='dashscope', test lowcardinality Key='test lowcardinality value'], highCardinalityKeyValues=[gen_ai.request.temperature='0.7', gen_ai.response.finish_reasons='["STOP"]', gen_ai.response.id='ea672ad9-83cb-9254-985a-6035c5281129', gen_ai.usage.input_tokens='14', gen_ai.usage.output_tokens='8', gen_ai.usage.total_tokens='22'], map=[class io.micrometer.core.instrument.LongTaskTimer$Sample='SampleImpl{duration(seconds)=0.907360583, duration(nanos)=9.07360583E8, startTimeNanos=621932481108208}', class io.micrometer.core.instrument.Timer$Sample='io.micrometer.core.instrument.Timer$Sample@706f58e8', class io.micrometer.tracing.handler.TracingObservationHandler$TracingContext='TracingContext{span=68637ed074cc4d5e69f88f66edded268/720ea72f9e2fe0e9}'], parentObservation={name=http.server.requests(null), error=null, context=name='http.server.requests', contextualName='null', error='null', lowCardinalityKeyValues=[exception='none', method='GET', outcome='SUCCESS', status='200', uri='UNKNOWN'], highCardinalityKeyValues=[http.url='/custom/observation/chat'], map=[class io.micrometer.core.instrument.LongTaskTimer$Sample='SampleImpl{duration(seconds)=0.973095208, duration(nanos)=9.73095208E8, startTimeNanos=621932415435375}', class io.micrometer.core.instrument.Timer$Sample='io.micrometer.core.instrument.Timer$Sample@bd86d13', class io.micrometer.tracing.handler.TracingObservationHandler$TracingContext='TracingContext{span=68637ed074cc4d5e69f88f66edded268/69f88f66edded268}'], parentObservation=null}
 ```
+
+同时我们登录 zipkin 的控制台，也能在 trace 里面找到自定义的 lowCardinalityKeyValues 信息。
+
+![image-custom-handler](./images/observe-7.png)
 
 ## 参考文档
 

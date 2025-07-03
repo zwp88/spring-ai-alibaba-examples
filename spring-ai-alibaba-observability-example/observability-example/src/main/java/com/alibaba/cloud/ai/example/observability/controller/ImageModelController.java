@@ -15,7 +15,6 @@
  */
 package com.alibaba.cloud.ai.example.observability.controller;
 
-import com.alibaba.cloud.ai.dashscope.image.DashScopeImageOptions;
 import org.springframework.ai.image.*;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
