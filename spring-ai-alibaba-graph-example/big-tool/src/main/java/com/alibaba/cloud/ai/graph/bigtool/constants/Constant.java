@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.example.graph;
+package com.alibaba.cloud.ai.graph.bigtool.constants;
 
+public class Constant {
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+	public static final String INPUT_KEY = "input";
 
-@SpringBootApplication
-@ComponentScan(basePackages = { "com.alibaba.cloud.ai" })
-public class GraphApplication {
+	public static final String HIT_TOOL = "hit_tool";
 
-	public static void main(String[] args) {
+	public static final String SOLUTION = "solution";
 
-		SpringApplication.run(GraphApplication.class, args);
-	}
+	public static final String TOOL_LIST = "tool_list";
+
+	public static final String METHOD_PARAMETER_TYPES = "parameter_types";
+
+	public static final String METHOD_NAME = "method_name";
 
 }

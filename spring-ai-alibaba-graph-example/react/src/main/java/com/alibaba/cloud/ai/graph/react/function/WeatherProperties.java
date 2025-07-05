@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.example.graph;
+package com.alibaba.cloud.ai.graph.react.function;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+@ConfigurationProperties(prefix = "spring.ai.alibaba.toolcalling.weather")
+public class WeatherProperties {
 
-@SpringBootApplication
-@ComponentScan(basePackages = { "com.alibaba.cloud.ai" })
-public class GraphApplication {
+	private String apiKey;
 
-	public static void main(String[] args) {
+	public String getApiKey() {
+		return apiKey;
+	}
 
-		SpringApplication.run(GraphApplication.class, args);
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
 }

@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.example.graph;
+package com.alibaba.cloud.ai.graph.react.function;
 
+import cn.hutool.extra.pinyin.PinyinUtil;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+public class WeatherUtils {
 
-@SpringBootApplication
-@ComponentScan(basePackages = { "com.alibaba.cloud.ai" })
-public class GraphApplication {
+	public static String preprocessLocation(String location) {
+		if (containsChinese(location)) {
+			return PinyinUtil.getPinyin(location, "");
+		}
+		return location;
+	}
 
-	public static void main(String[] args) {
-
-		SpringApplication.run(GraphApplication.class, args);
+	public static boolean containsChinese(String str) {
+		return str.matches(".*[\u4e00-\u9fa5].*");
 	}
 
 }
