@@ -45,6 +45,7 @@
         <module>usecase-field-classifier</module>
         <module>product-analysis-graph</module>
         <module>parallel-node</module>
+        <module>graph-observability-langfuse</module>
     </modules>
 
     <build>
