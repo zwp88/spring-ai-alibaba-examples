@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
-@ConfigurationProperties("spring.iqs.search")
+@ConfigurationProperties("spring.ai.alibaba.playground.iqs.search")
 public class IQSSearchProperties {
 
 	private String apiKey;

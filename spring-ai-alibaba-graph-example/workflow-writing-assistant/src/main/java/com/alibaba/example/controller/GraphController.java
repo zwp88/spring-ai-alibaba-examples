@@ -36,7 +36,7 @@ public class GraphController {
 
 	@PostMapping("/invoke")
 	public ResponseEntity<Map<String, Object>> invoke(@RequestBody Map<String, Object> inputs)
-            throws GraphStateException, GraphRunnerException {
+			throws GraphStateException, GraphRunnerException {
 
 		// invoke graph
 		var resultFuture = graph.invoke(inputs);
