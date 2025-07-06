@@ -1,18 +1,18 @@
-# STT(speech to text) API
+# Aduio Transcription API
 
 ### STT(speech to text) API
-GET http://127.0.0.1:10009/ai/stt
+GET http://127.0.0.1:10009/ai/transcription
 
 ### STT(speech to text) stream API
-GET http://127.0.0.1:10009/ai/stt/stream
+GET http://127.0.0.1:10009/ai/transcription/stream
 
 ### STT(speech to text) async API
-GET http://127.0.0.1:10009/ai/stt/async
+GET http://127.0.0.1:10009/ai/transcription/async
 
-# TTS(text to speech) API
+# Audio Speech API
 
 ### TTS(text to speech) API
-GET http://127.0.0.1:10009/ai/tts
+GET http://127.0.0.1:10009/ai/speech
 
 ### TTS(text to speech) stream API
-GET http://127.0.0.1:10009/ai/tts/stream
+GET http://127.0.0.1:10009/ai/speech/stream
