@@ -44,9 +44,20 @@ spring:
       client:
         toolcallback:
           enabled: true
-    # 需要配置相关 tools 的信息
+
     alibaba:
      playground:
+
+       # IQS 数据搜索服务配置
+       iqs:
+         search:
+           api-key: ${IQS_SEARCH_API_KEY}
+
+       # 百炼知识库
+       bailian:
+         index-name: "saa-playground"
+
+       # 需要配置相关 tools 的信息
        tool-calling:
          baidu:
            translate:
@@ -91,9 +102,6 @@ spring:
       hibernate:
         boot:
           allow_jdbc_metadata_access: false
-  iqs:
-    search:
-      api-key: ${IQS_SEARCH_API_KEY}
 
 # enabled debug log out.
 logging:

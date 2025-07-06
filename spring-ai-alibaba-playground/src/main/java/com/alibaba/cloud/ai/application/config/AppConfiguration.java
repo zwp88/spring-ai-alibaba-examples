@@ -17,8 +17,7 @@
 
 package com.alibaba.cloud.ai.application.config;
 
-//import com.alibaba.cloud.ai.memory.jdbc.SQLiteChatMemory;
-
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.memory.jdbc.SQLiteChatMemoryRepository;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -39,7 +38,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Configuration
 public class AppConfiguration {
 
-	//TODO SQLiteChatMemory待验证
+	private static final String AI_DASHSCOPE_API_KEY_PREFIX = "AI_DASHSCOPE_API_KEY";
+
 	@Bean
 	public ChatMemory SQLiteChatMemory(JdbcTemplate jdbcTemplate) {
 		return MessageWindowChatMemory.builder()
@@ -48,16 +48,6 @@ public class AppConfiguration {
 						.build())
 				.build();
 	}
-
-//	@Bean
-//	public ChatMemory SQLiteChatMemory() {
-//
-//		return new SQLiteChatMemory(
-//				null,
-//				null,
-//				"jdbc:sqlite:src/main/resources/db/saa.db"
-//		);
-//	}
 
 	@Bean
 	public SimpleLoggerAdvisor simpleLoggerAdvisor() {
@@ -76,6 +66,17 @@ public class AppConfiguration {
 	public ToolCallingManager toolCallingManager() {
 
 		return ToolCallingManager.builder().build();
+	}
+
+	/**
+	 * For bailian call use.
+	 */
+	@Bean
+	public DashScopeApi dashScopeApi() {
+
+		return DashScopeApi.builder()
+				.apiKey(System.getenv(AI_DASHSCOPE_API_KEY_PREFIX))
+				.build();
 	}
 
 }
