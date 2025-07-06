@@ -15,26 +15,19 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.application.modulerag;
+package com.alibaba.cloud.ai.application.service;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import reactor.core.publisher.Flux;
 
 /**
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
+ *
+ * SAA Playground RAG Service interface.
  */
 
-@ConfigurationProperties("spring.ai.alibaba.playground.iqs.search")
-public class IQSSearchProperties {
+public interface ISAARAGService {
 
-	private String apiKey;
-
-	public String getApiKey() {
-		return this.apiKey;
-	}
-
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
+    Flux<String> ragChat(String chatId, String prompt);
 
 }

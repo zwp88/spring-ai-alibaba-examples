@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-public class SAARAGService {
+public class SAARAGService4VectorStore implements ISAARAGService {
 
 	private final ChatClient client;
 
@@ -45,13 +45,14 @@ public class SAARAGService {
 
 	private String vectorStoreType;
 
-	public SAARAGService(
+	public SAARAGService4VectorStore(
 			VectorStoreDelegate vectorStoreDelegate,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
 			MessageChatMemoryAdvisor messageChatMemoryAdvisor,
 			@Qualifier("dashscopeChatModel") ChatModel chatModel,
 			@Qualifier("systemPromptTemplate") PromptTemplate systemPromptTemplate
 	) {
+
 		this.vectorStoreType = System.getenv("VECTOR_STORE_TYPE");
 		this.vectorStoreDelegate = vectorStoreDelegate;
 		this.client = ChatClient.builder(chatModel)
@@ -75,7 +76,7 @@ public class SAARAGService {
 								.searchRequest(
 										SearchRequest.builder()
 												// TODO all documents retrieved from ADB are under 0.1
-//												.similarityThreshold(0.6d)
+											    // .similarityThreshold(0.6d)
 												.topK(6)
 												.build()
 								)
