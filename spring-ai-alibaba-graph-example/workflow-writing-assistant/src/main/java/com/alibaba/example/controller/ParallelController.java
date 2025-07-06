@@ -64,21 +64,22 @@ public class ParallelController {
 	public Flux<Map<String, Object>> analyzeStream(@RequestParam("text") String text) {
 		RunnableConfig cfg = RunnableConfig.builder().streamMode(CompiledGraph.StreamMode.SNAPSHOTS).build();
 		return Flux.create(sink -> {
-            try {
-                engine.stream(Map.of("inputText", text), cfg)
-                    .forEachAsync(node -> sink.next(node.state().data()))
-                    .whenComplete((v, e) -> {
-                        if (e != null) {
-                            sink.error(e);
-                        }
-                        else {
-                            sink.complete();
-                        }
-                    });
-            } catch (GraphRunnerException e) {
-                throw new RuntimeException(e);
-            }
-        });
+			try {
+				engine.stream(Map.of("inputText", text), cfg)
+					.forEachAsync(node -> sink.next(node.state().data()))
+					.whenComplete((v, e) -> {
+						if (e != null) {
+							sink.error(e);
+						}
+						else {
+							sink.complete();
+						}
+					});
+			}
+			catch (GraphRunnerException e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 }
