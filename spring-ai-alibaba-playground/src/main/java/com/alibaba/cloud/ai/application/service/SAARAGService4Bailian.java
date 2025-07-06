@@ -42,6 +42,8 @@ public class SAARAGService4Bailian implements ISAARAGService {
 
     private final ChatClient client;
 
+    private final DashScopeApi dashscopeApi;
+
     @Value("${spring.ai.alibaba.playground.bailian.index-name:default-index}")
     private String indexName;
 
@@ -53,21 +55,13 @@ public class SAARAGService4Bailian implements ISAARAGService {
             @Qualifier("systemPromptTemplate") PromptTemplate systemPromptTemplate
     ) {
 
+        this.dashscopeApi = dashscopeApi;
         this.client = ChatClient.builder(chatModel)
                 .defaultSystem(
                         systemPromptTemplate.getTemplate()
                 ).defaultAdvisors(
                         messageChatMemoryAdvisor,
                         simpleLoggerAdvisor
-                ).defaultAdvisors(
-                        new DocumentRetrievalAdvisor(
-                                new DashScopeDocumentRetriever(
-                                        dashscopeApi,
-                                        DashScopeDocumentRetrieverOptions.builder()
-                                                .withIndexName(indexName)
-                                                .build()
-                                )
-                        )
                 ).build();
     }
 
@@ -78,6 +72,15 @@ public class SAARAGService4Bailian implements ISAARAGService {
                 .user(prompt)
                 .advisors(memoryAdvisor -> memoryAdvisor
                         .param(ChatMemory.CONVERSATION_ID, chatId)
+                ).advisors(
+                        new DocumentRetrievalAdvisor(
+                                new DashScopeDocumentRetriever(
+                                        dashscopeApi,
+                                        DashScopeDocumentRetrieverOptions.builder()
+                                                .withIndexName(indexName)
+                                                .build()
+                                )
+                        )
                 ).stream()
                 .content();
     }

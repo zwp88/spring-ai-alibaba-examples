@@ -21,6 +21,7 @@ import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,12 +29,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SimpleVectorStoreConfiguration {
 
+	@Value("${spring.ai.alibaba.playground.bailian.enable:false}")
+	private Boolean enable;
+
 	@Bean
 	CommandLineRunner ingestTermOfServiceToVectorStore(VectorStoreDelegate vectorStoreDelegate) {
 		return args -> {
-			String type = System.getenv("VECTOR_STORE_TYPE");
-			VectorStoreInitializer initializer = new VectorStoreInitializer();
-			initializer.init(vectorStoreDelegate.getVectorStore(type));
+			// 百炼知识库和向量存储初始化
+			// 如果未启用百炼知识库，则默认用向量存储服务
+			if (!enable) {
+				String type = System.getenv("VECTOR_STORE_TYPE");
+				VectorStoreInitializer initializer = new VectorStoreInitializer();
+				initializer.init(vectorStoreDelegate.getVectorStore(type));
+			}
 		};
 	}
 

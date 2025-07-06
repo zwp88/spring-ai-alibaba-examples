@@ -55,6 +55,7 @@ spring:
 
        # 百炼知识库
        bailian:
+         enable: true
          index-name: "saa-playground"
 
        # 需要配置相关 tools 的信息
