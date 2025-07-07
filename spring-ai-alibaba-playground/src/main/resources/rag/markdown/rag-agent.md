@@ -29,7 +29,7 @@ description: "使用 Spring AI Alibaba 框架将本地 Spring Boot 应用接入�
 ```xml
 <dependency>
 	<groupId>com.alibaba.cloud.ai</groupId>
-	<artifactId>spring-ai-alibaba-starter</artifactId>
+	<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 	<version>${spring-ai-alibaba.version}</version>
 </dependency>
 ```

@@ -89,7 +89,7 @@ Spring AI 为 VectorStore 提供了 Spring Boot 的自动配置。要启用此�
 ```xml
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-starter</artifactId>
+    <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
     <version>${version}</version>
 </dependency>
 ```
