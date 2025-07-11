@@ -124,7 +124,7 @@ Spring AI 为 DashScope Embedding Model提供了 Spring Boot 的自动配置。�
 ```xml
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-starter</artifactId>
+    <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 </dependency>
 ```
 或者添加到您的Gradle`build.gradle`文件中：
