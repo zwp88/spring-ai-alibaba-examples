@@ -30,6 +30,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnClass(GetCurrentTimeByTimeZoneIdService.class)
 public class ToolCallAutoConfiguration {
+    @Bean
+    public GetCurrentTimeByTimeZoneIdService getCurrentTimeByTimeZoneIdService() {
+        return new GetCurrentTimeByTimeZoneIdService();
+    }
 
     @Bean
     public TimeTools timeTools(GetCurrentTimeByTimeZoneIdService service) {
