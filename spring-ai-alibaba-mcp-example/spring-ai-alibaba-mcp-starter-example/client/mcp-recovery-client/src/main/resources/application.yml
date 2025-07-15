@@ -5,9 +5,8 @@ spring:
   application:
     name: mcp-recovery-client
   ai:
-    openai:
+    dashscope:
       api-key: ${DASHSCOPE_API_KEY}
-      base-url: https://dashscope.aliyuncs.com/compatible-mode
       chat:
         options:
           model: qwen-max
