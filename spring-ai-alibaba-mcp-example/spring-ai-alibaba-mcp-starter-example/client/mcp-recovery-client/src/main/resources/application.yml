@@ -30,3 +30,14 @@ spring:
           delay: 5s
           stop: 10s
 
+
+## debug级别
+logging:
+  level:
+    com:
+      alibaba:
+        cloud:
+          ai:
+            autoconfigure:
+              mcp:
+                client: DEBUG
