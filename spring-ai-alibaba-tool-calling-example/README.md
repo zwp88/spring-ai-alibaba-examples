@@ -3,8 +3,10 @@
 Demonstrate four approaches to ToolCalling with four distinct examples here:
 - TimeController : Methods as Tools
 - AddressController : Methods as Tools - MethodToolCallback
-- BaiduTranslateController : Function as Tools - Function Name
+- BaiduTranslateController : Function as Tools - Function Name 
 - WeatherController : Function as Tools - FunctionCallBack
+
+If you want to build your own tools, you can refer to the implementation in the community module of the Spring AI Alibaba repository and use the currently stable version 1.0.0.2.
 
 More available tools can be found on [this documentation](https://java2ai.com/docs/1.0.0-M5.1/integrations/tools/). For mcp style tools please check [spring-ai-alibaba-mcp-example](../spring-ai-alibaba-mcp-example).
 
