@@ -18,10 +18,11 @@
 package com.alibaba.cloud.ai.application.controller;
 
 import com.alibaba.cloud.ai.application.annotation.UserIp;
-import com.alibaba.cloud.ai.application.service.SAARAGService;
+import com.alibaba.cloud.ai.application.service.ISAARAGService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Qualifier;
 import reactor.core.publisher.Flux;
 
 import org.springframework.validation.annotation.Validated;
@@ -41,9 +42,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class SAARAGController {
 
-	private final SAARAGService ragService;
+	private final ISAARAGService ragService;
 
-	public SAARAGController(SAARAGService ragService) {
+	public SAARAGController(@Qualifier("SAARAGService4Bailian") ISAARAGService ragService) {
 		this.ragService = ragService;
 	}
 

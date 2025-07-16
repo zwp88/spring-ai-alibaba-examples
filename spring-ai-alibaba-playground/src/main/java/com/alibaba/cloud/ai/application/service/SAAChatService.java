@@ -19,9 +19,14 @@ package com.alibaba.cloud.ai.application.service;
 
 import java.util.Objects;
 
+import com.alibaba.cloud.ai.advisor.DocumentRetrievalAdvisor;
 import com.alibaba.cloud.ai.application.advisor.ReasoningContentAdvisor;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
+import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetrieverOptions;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -33,6 +38,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,18 +53,26 @@ public class SAAChatService {
 
 	private final ChatClient chatClient;
 
+	private final DashScopeApi dashscopeApi;
+
+	@Value("${spring.ai.alibaba.playground.bailian.index-name:default-index}")
+	private String indexName;
+
 	private final PromptTemplate deepThinkPromptTemplate;
 
 	private final ReasoningContentAdvisor reasoningContentAdvisor;
 
+	private DocumentRetrievalAdvisor retrievalAdvisor;
+
 	public SAAChatService(
+			DashScopeApi dashscopeApi,
 			SimpleLoggerAdvisor simpleLoggerAdvisor,
 			MessageChatMemoryAdvisor messageChatMemoryAdvisor,
 			@Qualifier("dashscopeChatModel") ChatModel chatModel,
 			@Qualifier("systemPromptTemplate") PromptTemplate systemPromptTemplate,
 			@Qualifier("deepThinkPromptTemplate") PromptTemplate deepThinkPromptTemplate
 	) {
-
+		this.dashscopeApi = dashscopeApi;
 		this.chatClient = ChatClient.builder(chatModel)
 				.defaultSystem(
 					systemPromptTemplate.getTemplate()
@@ -69,6 +83,18 @@ public class SAAChatService {
 
 		this.deepThinkPromptTemplate = deepThinkPromptTemplate;
 		this.reasoningContentAdvisor = new ReasoningContentAdvisor(1);
+	}
+
+	@PostConstruct
+	public void init(){
+		this.retrievalAdvisor = new DocumentRetrievalAdvisor(
+				new DashScopeDocumentRetriever(
+						dashscopeApi,
+						DashScopeDocumentRetrieverOptions.builder()
+								.withIndexName(indexName)
+								.build()
+				)
+		);
 	}
 
 	public Flux<String> chat(String chatId, String model, String prompt) {
@@ -93,7 +119,9 @@ public class SAAChatService {
 				.user(prompt)
 				.advisors(memoryAdvisor -> memoryAdvisor
 						.param(ChatMemory.CONVERSATION_ID, chatId)
-				).stream()
+				)
+				.advisors(retrievalAdvisor)
+				.stream()
 				.content();
 	}
 
@@ -111,7 +139,9 @@ public class SAAChatService {
 				.user(prompt)
 				.advisors(memoryAdvisor -> memoryAdvisor
 						.param(ChatMemory.CONVERSATION_ID, chatId)
-				).stream()
+				)
+				.advisors(retrievalAdvisor)
+				.stream()
 				.content();
 	}
 }

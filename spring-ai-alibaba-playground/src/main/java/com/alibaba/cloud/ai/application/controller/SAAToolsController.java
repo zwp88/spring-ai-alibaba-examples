@@ -48,7 +48,6 @@ public class SAAToolsController {
 
 	/**
 	 * http://127.0.0.1:8080/api/v1/tool-call?prompt="使用百度翻译将隐私计算翻译为英文"
-	 *
 	 * 触发百度翻译：使用百度翻译将隐私计算翻译为英文
 	 * 触发百度地图：使用百度地图查找杭州市的银行 ATM 机信息 or 使用百度地图查找杭州的信息
 	 */

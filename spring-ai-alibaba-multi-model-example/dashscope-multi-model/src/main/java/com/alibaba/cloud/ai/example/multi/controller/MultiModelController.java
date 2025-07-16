@@ -34,6 +34,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.content.Media;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +58,9 @@ public class MultiModelController {
     private static final String DEFAULT_PROMPT = "这些是什么？";
     
     private static final String DEFAULT_VIDEO_PROMPT = "这是一组从视频中提取的图片帧，请描述此视频中的内容。";
-    
+
+    private static final String DEFAULT_AUDIO_PROMPT = "这是一个音频文件，请描述此音频中的内容。";
+
     private static final String DEFAULT_MODEL = "qwen-vl-max-latest";
     
     public MultiModelController(ChatModel chatModel) {
@@ -101,6 +104,26 @@ public class MultiModelController {
                 .call()
                 .chatResponse();
         
+        return response.getResult().getOutput().getText();
+    }
+
+    @GetMapping("/audio")
+    public String audio(
+            @RequestParam(value = "prompt", required = false, defaultValue = DEFAULT_AUDIO_PROMPT) String prompt) {
+
+        Media media = new Media(MediaType.parseMediaType("audio/mpeg"),
+                URI.create("https://dashscope.oss-cn-beijing.aliyuncs.com/audios/welcome.mp3"));;
+
+        UserMessage message =
+        UserMessage.builder().text(prompt).media(media).metadata(new HashMap<>()).build();
+        message.getMetadata().put(DashScopeApiConstants.MESSAGE_FORMAT, MessageFormat.AUDIO);
+
+        ChatResponse response = dashScopeChatClient
+                .prompt(new Prompt(message,
+                        DashScopeChatOptions.builder().withModel("qwen-audio-turbo-latest").withMultiModel(true).build()))
+                .call()
+                .chatResponse();
+
         return response.getResult().getOutput().getText();
     }
     

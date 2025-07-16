@@ -14,7 +14,22 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.example.audio.stt;
+package com.alibaba.cloud.ai.example.audio;
+
+import com.alibaba.cloud.ai.dashscope.api.DashScopeAudioTranscriptionApi;
+import com.alibaba.cloud.ai.dashscope.audio.DashScopeAudioTranscriptionOptions;
+import com.alibaba.cloud.ai.dashscope.audio.transcription.AudioTranscriptionModel;
+import com.alibaba.cloud.ai.dashscope.common.DashScopeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
+import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 import java.net.MalformedURLException;
 import java.util.Objects;
@@ -23,46 +38,28 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.alibaba.cloud.ai.dashscope.api.DashScopeAudioTranscriptionApi;
-import com.alibaba.cloud.ai.dashscope.audio.DashScopeAudioTranscriptionOptions;
-import com.alibaba.cloud.ai.dashscope.audio.transcription.AudioTranscriptionModel;
-import com.alibaba.cloud.ai.dashscope.common.DashScopeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Flux;
-
-import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
-import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 /**
+ * 语音转文本（语音合成）
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
 @RestController
-@RequestMapping("/ai/stt")
-public class STTController {
+@RequestMapping("/ai/transcription")
+public class AudioTranscriptionController {
 
 	private final AudioTranscriptionModel transcriptionModel;
 
-	private static final Logger log = LoggerFactory.getLogger(STTController.class);
+	private static final Logger log = LoggerFactory.getLogger(AudioTranscriptionController.class);
 
-	private static final String DEFAULT_MODEL_1 = "sensevoice-v1";
-
-	private static final String DEFAULT_MODEL_2 = "paraformer-realtime-v2";
-
-	private static final String DEFAULT_MODEL_3 = "paraformer-v2";
+	// 模型列表：https://help.aliyun.com/zh/model-studio/sambert-websocket-api
+	private static final String DEFAULT_MODEL = DashScopeAudioTranscriptionApi.AudioTranscriptionModel.PARAFORMER_REALTIME_V2.getValue();
 
 	private static final String AUDIO_RESOURCES_URL = "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/audio/paraformer/hello_world_female2.wav";
 
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-	public STTController(AudioTranscriptionModel transcriptionModel) {
+	public AudioTranscriptionController(AudioTranscriptionModel transcriptionModel) {
 
 		this.transcriptionModel = transcriptionModel;
 	}
@@ -74,7 +71,7 @@ public class STTController {
 				new AudioTranscriptionPrompt(
 						new UrlResource(AUDIO_RESOURCES_URL),
 						DashScopeAudioTranscriptionOptions.builder()
-								.withModel(DEFAULT_MODEL_1)
+								.withModel(DEFAULT_MODEL)
 								.build()
 				)
 		);
@@ -82,6 +79,9 @@ public class STTController {
 		return response.getResult().getOutput();
 	}
 
+	/**
+	 * 以 Audio Speech 的输出作为输入
+	 */
 	@GetMapping("/stream")
 	public String streamSTT() {
 
@@ -91,9 +91,9 @@ public class STTController {
 		Flux<AudioTranscriptionResponse> response = transcriptionModel
 				.stream(
 						new AudioTranscriptionPrompt(
-								new FileSystemResource("spring-ai-alibaba-audio-example/dashscope-audio/src/main/resources/gen/tts/output.mp3"),
+								new FileSystemResource("D:\\open_sources\\spring-ai-alibaba-examples\\spring-ai-alibaba-audio-example\\dashscope-audio\\src\\main\\resources\\gen\\tts\\output.mp3"),
 								DashScopeAudioTranscriptionOptions.builder()
-										.withModel(DEFAULT_MODEL_2)
+										.withModel(DEFAULT_MODEL)
 										.withSampleRate(16000)
 										.withFormat(DashScopeAudioTranscriptionOptions.AudioFormat.PCM)
 										.withDisfluencyRemovalEnabled(false)
@@ -127,7 +127,7 @@ public class STTController {
 					new AudioTranscriptionPrompt(
 							new UrlResource(AUDIO_RESOURCES_URL),
 							DashScopeAudioTranscriptionOptions.builder()
-									.withModel(DEFAULT_MODEL_3)
+									.withModel(DEFAULT_MODEL)
 									.build()
 					)
 			);

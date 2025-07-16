@@ -44,7 +44,8 @@
 		<spring-ai.version>1.0.0</spring-ai.version>
 
 		<!-- Spring AI Alibaba -->
-		<spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>
+		<!-- Install Spring AI Alibaba in your local. -->
+		<spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>
 
 		<!-- Spring Boot -->
 		<spring-boot.version>3.4.0</spring-boot.version>

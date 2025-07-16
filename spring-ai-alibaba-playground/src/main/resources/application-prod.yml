@@ -16,10 +16,25 @@
 #
 
 spring:
+
   ai:
+    # 向量数据库配置
+    vectorstore:
+      analytic:
+        enabled: false
+        dbInstanceId: gp-bp1238pvyz0g78u2m
+        regionId: cn-hangzhou
+        managerAccount: ${ADB_MANAGER_ACCOUNT}
+        managerAccountPassword: ${ADB_MANAGER_ACCOUNT_PASSWORD}
+        namespace: saa
+        namespacePassword: saa@2025
+        collectName: saa
+        access-key-id: ${ADB_ACCESS_KEY_ID}
+        access-key-secret: ${ADB_ACCESS_KEY_SECRET}
+
     dashscope:
       api-key: ${AI_DASHSCOPE_API_KEY}
-    # 自定义增强 mcp server config
+    # 使用自定义增强的 mcp server config 替换
     # mcp:
     #   client:
     #     stdio:
@@ -29,17 +44,27 @@ spring:
       client:
         toolcallback:
           enabled: true
+
     alibaba:
-      tool-calling:
-        baidu:
-          translate:
-            # 显式开启 Tool Bean 注入
-            enabled: true
-            app-id: ${BAIDU_TRANSLATE_APP_ID:input-your-baidu-app-id}
-            secret-key: ${BAIDU_TRANSLATE_SECRET_KEY:input-your-baidu-app-id}
-          map:
-            enabled: true
-            api-key: ${BAIDU_MAP_API_KEY:input-your-baidu-app-id}
+      playground:
+        # IQS 数据搜索服务配置
+        iqs:
+          search:
+            api-key: ${IQS_SEARCH_API_KEY}
+
+        # 百炼知识库
+        bailian:
+          enable: true
+          index-name: "saa-playground"
+
+        # 需要配置相关 tools 的信息
+        tool-calling:
+          baidu:
+            translate:
+              ak: ${BAIDU_TRANSLATE_APP_ID:input-your-baidu-app-id}
+              sk: ${BAIDU_TRANSLATE_SECRET_KEY:input-your-baidu-app-key}
+            map:
+              ak: ${BAIDU_MAP_API_KEY:input-your-baidu-map-key}
 
     # openai api 接入通义模型
     openai:
@@ -47,26 +72,14 @@ spring:
       api-key: ${AI_DASHSCOPE_API_KEY}
       chat:
         options:
-          model: qwen-max-latest
-
-    # 注意：观测数据可能存在敏感信息！
-    chat:
-      client:
-        observations:
-          # 记录调用输入
-          include-input: false
-      observations:
-        # 记录 LLMs 输出
-        include-completion: false
-        # 记录 prompt
-        include-prompt: false
+          model: qwen-max
 
   datasource:
     url: jdbc:sqlite:db/saa.db
     driver-class-name: org.sqlite.JDBC
 
   jpa:
-    show-sql: false
+    show-sql: true
     database-platform: org.hibernate.community.dialect.SQLiteDialect
 
     hibernate:
@@ -76,6 +89,3 @@ spring:
       hibernate:
         boot:
           allow_jdbc_metadata_access: false
-  iqs:
-    search:
-      api-key: ${IQS_SEARCH_API_KEY}
