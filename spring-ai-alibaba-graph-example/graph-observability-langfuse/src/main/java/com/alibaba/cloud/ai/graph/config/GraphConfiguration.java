@@ -28,14 +28,21 @@ import com.alibaba.cloud.ai.graph.node.SimpleSubGraph;
 import com.alibaba.cloud.ai.graph.node.StreamingChatNode;
 import com.alibaba.cloud.ai.graph.state.strategy.AppendStrategy;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestClient;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 import static com.alibaba.cloud.ai.graph.StateGraph.START;
@@ -43,170 +50,151 @@ import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 
 /**
  * Graph Configuration
- * 
- * Configures the observability graph with various node types and edge types:
- * - Start node: Initial processing
- * - Parallel nodes: Concurrent sentiment and topic analysis
- * - SubGraph node: Internal serial processing
- * - Streaming node: Real-time AI response streaming
- * - Summary node: Result aggregation
- * - End node: Final output formatting
- * 
+ *
+ * Configures the observability graph with various node types and edge types: - Start
+ * node: Initial processing - Parallel nodes: Concurrent sentiment and topic analysis -
+ * SubGraph node: Internal serial processing - Streaming node: Real-time AI response
+ * streaming - Summary node: Result aggregation - End node: Final output formatting
+ *
  * @author sixiyida
  */
 @Configuration
 public class GraphConfiguration {
 
-    /**
-     * Configure ChatClient with logging advisor
-     * 
-     * @param chatModel the chat model to use
-     * @return configured ChatClient
-     */
-    @Bean
-    public ChatClient chatClient(ChatModel chatModel) {
-        return ChatClient.builder(chatModel)
-            .defaultAdvisors(new SimpleLoggerAdvisor())
-            .build();
-    }
+	@Bean
+	public RestClient.Builder createRestClient() {
 
-    /**
-     * Configure the observability graph
-     * 
-     * @param chatClient the chat client for AI processing
-     * @return configured StateGraph
-     * @throws GraphStateException if graph configuration fails
-     */
-    @Bean
-    public StateGraph observabilityGraph(ChatClient chatClient) throws GraphStateException {
-        
-        // Start node - initial processing
-        ChatNode startNode = ChatNode.create(
-            "StartNode", 
-            "input", 
-            "start_output", 
-            chatClient, 
-            "Please perform initial processing on the input content:"
-        );
-        
-        // Parallel nodes - concurrent processing
-        ChatNode parallelNode1 = ChatNode.create(
-            "ParallelNode1", 
-            "start_output", 
-            "parallel_output1", 
-            chatClient, 
-            "Please perform sentiment analysis on the content:"
-        );
-        
-        ChatNode parallelNode2 = ChatNode.create(
-            "ParallelNode2", 
-            "start_output", 
-            "parallel_output2", 
-            chatClient, 
-            "Please perform topic analysis on the content:"
-        );
+		// 2. 创建 RequestConfig 并设置超时
+		RequestConfig requestConfig = RequestConfig.custom()
+			.setConnectTimeout(Timeout.of(10, TimeUnit.MINUTES)) // 设置连接超时
+			.setResponseTimeout(Timeout.of(10, TimeUnit.MINUTES))
+			.setConnectionRequestTimeout(Timeout.of(10, TimeUnit.MINUTES))
+			.build();
 
-        // Summary node - aggregates streaming output
-        ChatNode summaryNode = ChatNode.create(
-            "SummaryNode", 
-            "streaming_output", 
-            "summary_output", 
-            chatClient, 
-            "Please summarize the streaming analysis results:"
-        );
-        
-        // Streaming node - real-time AI response
-        StreamingChatNode streamingNode = StreamingChatNode.create(
-            "StreamingNode", 
-            "final_output", 
-            "streaming_output", 
-            chatClient, 
-            "Please perform detailed analysis on the subgraph results:"
-        );
-        
-        // End node - final output formatting
-        ChatNode endNode = ChatNode.create(
-            "EndNode", 
-            "summary_output", 
-            "end_output", 
-            chatClient, 
-            "Please format the final results for output:"
-        );
-        
-        // Create subgraph
-        SimpleSubGraph subGraph = new SimpleSubGraph(chatClient);
+		// 3. 创建 CloseableHttpClient 并应用配置
+		HttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
 
-        // Define key strategies for state management
-        KeyStrategyFactory keyStrategyFactory = () -> {
-            Map<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
-            keyStrategyHashMap.put("input", new ReplaceStrategy());
-            keyStrategyHashMap.put("start_output", new ReplaceStrategy());
-            keyStrategyHashMap.put("parallel_output1", new ReplaceStrategy());
-            keyStrategyHashMap.put("parallel_output2", new ReplaceStrategy());
-            keyStrategyHashMap.put("final_output", new ReplaceStrategy());
-            keyStrategyHashMap.put("streaming_output", new ReplaceStrategy());
-            keyStrategyHashMap.put("summary_output", new ReplaceStrategy());
-            keyStrategyHashMap.put("end_output", new ReplaceStrategy());
-            keyStrategyHashMap.put("logs", new AppendStrategy());
-            return keyStrategyHashMap;
-        };
+		// 4. 使用 HttpComponentsClientHttpRequestFactory 包装 HttpClient
+		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-        // Build the main graph
-        StateGraph graph = new StateGraph(keyStrategyFactory)
-        
-        // Add nodes
-        .addNode("start", node_async(startNode))
-        .addNode("parallel1", node_async(parallelNode1))
-        .addNode("parallel2", node_async(parallelNode2))
-        .addNode("subgraph", subGraph.subGraph())  // Add subgraph
-        .addNode("streaming", node_async(streamingNode))  // Add streaming node
-        .addNode("summary", node_async(summaryNode))
-        .addNode("end", node_async(endNode))
-        
-        // Serial edge: START -> start
-        .addEdge(START, "start")
-        
-        // Parallel edges: start -> parallel1 and parallel2 (concurrent execution)
-        .addEdge("start", "parallel1")
-        .addEdge("start", "parallel2")
-        
-        // Aggregation edges: both parallel nodes complete -> subgraph
-        .addEdge("parallel1", "subgraph")
-        .addEdge("parallel2", "subgraph")
-        
-        // Serial edges: subgraph -> streaming -> summary
-        .addEdge("subgraph", "streaming")
-        .addEdge("streaming", "summary")
-        
-        // Serial edge: summary -> end
-        .addEdge("summary", "end")
-        
-        // Serial edge: end -> END
-        .addEdge("end", END);
+		// 5. 创建 RestClient 并设置请求工厂
+		return RestClient.builder().requestFactory(requestFactory);
+	}
 
-        // Print graph structure
-        GraphRepresentation representation = graph.getGraph(
-            GraphRepresentation.Type.PLANTUML, 
-            "Observability Demo"
-        );
-        
-        System.out.println("\n=== Observability Demo Graph ===");
-        System.out.println(representation.content());
-        System.out.println("================================\n");
+	/**
+	 * Configure ChatClient with logging advisor
+	 * @param chatModel the chat model to use
+	 * @return configured ChatClient
+	 */
+	@Bean
+	public ChatClient chatClient(ChatModel chatModel) {
+		return ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
+	}
 
-        return graph;
-    }
+	/**
+	 * Configure the observability graph
+	 * @param chatClient the chat client for AI processing
+	 * @return configured StateGraph
+	 * @throws GraphStateException if graph configuration fails
+	 */
+	@Bean
+	public StateGraph observabilityGraph(ChatClient chatClient) throws GraphStateException {
 
-    /**
-     * Compile the graph with observability configuration
-     * 
-     * @param observabilityGraph the state graph to compile
-     * @param observationCompileConfig the compile configuration
-     * @return compiled graph
-     * @throws GraphStateException if compilation fails
-     */
-    @Bean
-    public CompiledGraph compiledGraph(StateGraph observabilityGraph, CompileConfig observationCompileConfig) throws GraphStateException {
-        return observabilityGraph.compile(observationCompileConfig);
-    }
-} 
+		// Start node - initial processing
+		ChatNode startNode = ChatNode.create("StartNode", "input", "start_output", chatClient,
+				"Please perform initial processing on the input content:");
+
+		// Parallel nodes - concurrent processing
+		ChatNode parallelNode1 = ChatNode.create("ParallelNode1", "start_output", "parallel_output1", chatClient,
+				"Please perform sentiment analysis on the content:");
+
+		ChatNode parallelNode2 = ChatNode.create("ParallelNode2", "start_output", "parallel_output2", chatClient,
+				"Please perform topic analysis on the content:");
+
+		// Summary node - aggregates streaming output
+		ChatNode summaryNode = ChatNode.create("SummaryNode", "streaming_output", "summary_output", chatClient,
+				"Please summarize the streaming analysis results:");
+
+		// Streaming node - real-time AI response
+		StreamingChatNode streamingNode = StreamingChatNode.create("StreamingNode", "final_output", "streaming_output",
+				chatClient, "Please perform detailed analysis on the subgraph results:");
+
+		// End node - final output formatting
+		ChatNode endNode = ChatNode.create("EndNode", "summary_output", "end_output", chatClient,
+				"Please format the final results for output:");
+
+		// Create subgraph
+		SimpleSubGraph subGraph = new SimpleSubGraph(chatClient);
+
+		// Define key strategies for state management
+		KeyStrategyFactory keyStrategyFactory = () -> {
+			Map<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+			keyStrategyHashMap.put("input", new ReplaceStrategy());
+			keyStrategyHashMap.put("start_output", new ReplaceStrategy());
+			keyStrategyHashMap.put("parallel_output1", new ReplaceStrategy());
+			keyStrategyHashMap.put("parallel_output2", new ReplaceStrategy());
+			keyStrategyHashMap.put("final_output", new ReplaceStrategy());
+			keyStrategyHashMap.put("streaming_output", new ReplaceStrategy());
+			keyStrategyHashMap.put("summary_output", new ReplaceStrategy());
+			keyStrategyHashMap.put("end_output", new ReplaceStrategy());
+			keyStrategyHashMap.put("logs", new AppendStrategy());
+			return keyStrategyHashMap;
+		};
+
+		// Build the main graph
+		StateGraph graph = new StateGraph(keyStrategyFactory)
+
+			// Add nodes
+			.addNode("start", node_async(startNode))
+			.addNode("parallel1", node_async(parallelNode1))
+			.addNode("parallel2", node_async(parallelNode2))
+			.addNode("subgraph", subGraph.subGraph()) // Add subgraph
+			.addNode("streaming", node_async(streamingNode)) // Add streaming node
+			.addNode("summary", node_async(summaryNode))
+			.addNode("end", node_async(endNode))
+
+			// Serial edge: START -> start
+			.addEdge(START, "start")
+
+			// Parallel edges: start -> parallel1 and parallel2 (concurrent execution)
+			.addEdge("start", "parallel1")
+			.addEdge("start", "parallel2")
+
+			// Aggregation edges: both parallel nodes complete -> subgraph
+			.addEdge("parallel1", "subgraph")
+			.addEdge("parallel2", "subgraph")
+
+			// Serial edges: subgraph -> streaming -> summary
+			.addEdge("subgraph", "streaming")
+			.addEdge("streaming", "summary")
+
+			// Serial edge: summary -> end
+			.addEdge("summary", "end")
+
+			// Serial edge: end -> END
+			.addEdge("end", END);
+
+		// Print graph structure
+		GraphRepresentation representation = graph.getGraph(GraphRepresentation.Type.PLANTUML, "Observability Demo");
+
+		System.out.println("\n=== Observability Demo Graph ===");
+		System.out.println(representation.content());
+		System.out.println("================================\n");
+
+		return graph;
+	}
+
+	/**
+	 * Compile the graph with observability configuration
+	 * @param observabilityGraph the state graph to compile
+	 * @param observationCompileConfig the compile configuration
+	 * @return compiled graph
+	 * @throws GraphStateException if compilation fails
+	 */
+	@Bean
+	public CompiledGraph compiledGraph(StateGraph observabilityGraph, CompileConfig observationCompileConfig)
+			throws GraphStateException {
+		return observabilityGraph.compile(observationCompileConfig);
+	}
+
+}

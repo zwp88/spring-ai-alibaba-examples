@@ -65,7 +65,7 @@ public void importDocuments() {
 ```xml
 <dependency>
 	<groupId>com.alibaba.cloud.ai</groupId>
-	<artifactId>spring-ai-alibaba-starter</artifactId>
+	<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 	<version>${spring-ai-alibaba.version}</version>
 </dependency>
 ```

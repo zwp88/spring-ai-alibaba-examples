@@ -15,7 +15,6 @@
  */
 package com.alibaba.cloud.ai.toolcall.config;
 
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.toolcall.component.AddressInformationTools;
 import com.alibaba.cloud.ai.toolcall.component.TimeTools;
 import com.alibaba.cloud.ai.toolcalling.baidumap.BaiduMapSearchInfoService;
@@ -30,6 +29,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnClass(GetCurrentTimeByTimeZoneIdService.class)
 public class ToolCallAutoConfiguration {
+    @Bean
+    public GetCurrentTimeByTimeZoneIdService getCurrentTimeByTimeZoneIdService() {
+        return new GetCurrentTimeByTimeZoneIdService();
+    }
 
     @Bean
     public TimeTools timeTools(GetCurrentTimeByTimeZoneIdService service) {
