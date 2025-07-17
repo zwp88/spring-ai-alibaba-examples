@@ -62,6 +62,7 @@
 		<module>spring-ai-alibaba-rag-example</module>
 		<module>spring-ai-alibaba-chat-example</module>
 		<module>spring-ai-alibaba-audio-example</module>
+		<module>spring-ai-alibaba-video-example</module>
 		<module>spring-ai-alibaba-agent-example</module>
 		<module>spring-ai-alibaba-image-example</module>
 		<module>spring-ai-alibaba-prompt-example</module>

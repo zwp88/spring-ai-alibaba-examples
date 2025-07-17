@@ -25,13 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
-import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -55,8 +55,6 @@ public class AudioTranscriptionController {
 	// 模型列表：https://help.aliyun.com/zh/model-studio/sambert-websocket-api
 	private static final String DEFAULT_MODEL = DashScopeAudioTranscriptionApi.AudioTranscriptionModel.PARAFORMER_REALTIME_V2.getValue();
 
-	private static final String AUDIO_RESOURCES_URL = "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/audio/paraformer/hello_world_female2.wav";
-
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 	public AudioTranscriptionController(AudioTranscriptionModel transcriptionModel) {
@@ -65,11 +63,14 @@ public class AudioTranscriptionController {
 	}
 
 	@GetMapping
-	public String stt() throws MalformedURLException {
+	public String stt() {
+
+		String currentDir = System.getProperty("user.dir");
+		Path filePath = Paths.get(currentDir, "hello_world_male_16k_16bit_mono.wav");
 
 		AudioTranscriptionResponse response = transcriptionModel.call(
 				new AudioTranscriptionPrompt(
-						new UrlResource(AUDIO_RESOURCES_URL),
+						new FileSystemResource(filePath),
 						DashScopeAudioTranscriptionOptions.builder()
 								.withModel(DEFAULT_MODEL)
 								.build()
@@ -85,13 +86,16 @@ public class AudioTranscriptionController {
 	@GetMapping("/stream")
 	public String streamSTT() {
 
+		String currentDir = System.getProperty("user.dir");
+		Path filePath = Paths.get(currentDir, "spring-ai-alibaba-audio-example/dashscope-audio/src/main/resources/gen/tts/output.mp3");
+
 		CountDownLatch latch = new CountDownLatch(1);
 		StringBuilder stringBuilder = new StringBuilder();
 
 		Flux<AudioTranscriptionResponse> response = transcriptionModel
 				.stream(
 						new AudioTranscriptionPrompt(
-								new FileSystemResource("D:\\open_sources\\spring-ai-alibaba-examples\\spring-ai-alibaba-audio-example\\dashscope-audio\\src\\main\\resources\\gen\\tts\\output.mp3"),
+								new FileSystemResource(filePath),
 								DashScopeAudioTranscriptionOptions.builder()
 										.withModel(DEFAULT_MODEL)
 										.withSampleRate(16000)
@@ -122,10 +126,13 @@ public class AudioTranscriptionController {
 		StringBuilder stringBuilder = new StringBuilder();
 		CountDownLatch latch = new CountDownLatch(1);
 
+		String currentDir = System.getProperty("user.dir");
+		Path filePath = Paths.get(currentDir, "spring-ai-alibaba-audio-example/dashscope-audio/src/main/resources/gen/tts/output-stream.mp3");
+
 		try {
 			AudioTranscriptionResponse submitResponse = transcriptionModel.asyncCall(
 					new AudioTranscriptionPrompt(
-							new UrlResource(AUDIO_RESOURCES_URL),
+							new FileSystemResource(filePath),
 							DashScopeAudioTranscriptionOptions.builder()
 									.withModel(DEFAULT_MODEL)
 									.build()
@@ -140,11 +147,7 @@ public class AudioTranscriptionController {
 					() -> checkTaskStatus(taskId, stringBuilder, latch), 0, 1, TimeUnit.SECONDS);
 			latch.await();
 
-		}
-		catch (MalformedURLException e) {
-			throw new DashScopeException("Error in URL format: " + e.getMessage());
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new DashScopeException("Thread was interrupted: " + e.getMessage());
 		}
