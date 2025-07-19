@@ -97,6 +97,8 @@ Playground 作为 `spring-ai-alibaba-examples` 仓库子项目，有以下两种
 
 请注意，必须要为 Playground 配置环境变量，配置方法参考 Docker 运行一节中的说明。
 
+如果不使用阿里云百炼创建知识库，那么需要将配置文件中的spring.ai.alibaba.playground.bailian.enable修改为false
+
 **4. 运行 `SAAPlayGroundApplication`**
 
 项目启动之后，浏览器访问 `http://localhost:8080` 查看前端页面。
