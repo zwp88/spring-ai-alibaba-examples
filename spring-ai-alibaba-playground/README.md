@@ -24,6 +24,7 @@ docker run -d -p 8080:8080 \
 Playground 作为一个 AI 智能体应用，依赖大模型等在线服务，需要通过环境变量指定访问凭证。如果要开启 Playground 全部能力，需要通过环境变量指定访问凭证：
 
   - 【必须】[阿里云百炼 API-KEY](https://bailian.console.aliyun.com/?tab=model#/api-key)，大模型服务，示例 `export AI_DASHSCOPE_API_KEY=xxx`
+  - 【可选】[阿里云百炼 创建知识库](https://bailian.console.aliyun.com/?tab=app#/knowledge-base)，知识库服务，默认知识库名为saa-playground-2
   - 【可选】[百度翻译 appId 和 secretKey](https://api.fanyi.baidu.com/product/113)，使用 Tool Call 时必须，示例 `export BAIDU_TRANSLATE_APP_ID=xxx`、`export BAIDU_TRANSLATE_SECRET_KEY=xxx`
   - 【可选】[百度地图 api key](https://lbs.baidu.com/faq/api)，使用 Tool Call 必须，示例 `export BAIDU_MAP_API_KEY=xxx`
   - 【可选】[阿里云 IQS 服务 apikey](https://help.aliyun.com/document_detail/2870227.html?)，使用联网搜索必须，示例 `export IQS_SEARCH_API_KEY=xxx`
@@ -95,6 +96,8 @@ Playground 作为 `spring-ai-alibaba-examples` 仓库子项目，有以下两种
 **3. 导出环境变量**
 
 请注意，必须要为 Playground 配置环境变量，配置方法参考 Docker 运行一节中的说明。
+
+如果不使用阿里云百炼创建知识库，那么需要将配置文件中的spring.ai.alibaba.playground.bailian.enable修改为false
 
 **4. 运行 `SAAPlayGroundApplication`**
 
