@@ -74,22 +74,22 @@ public class SimpleSubGraph implements SubGraphNode {
 	private StateGraph createSubGraph() {
 		try {
 			// Create internal nodes for the subgraph (serial processing)
-			ChatNode subNode1 = ChatNode.create("SubGraphNode1", "input", "sub_output1", chatClient,
+			ChatNode subNode1 = ChatNode.create("SubGraphNode1", "sub_input", "sub_output1", chatClient,
 					"Please perform the first step processing on the following content:");
 
 			ChatNode subNode2 = ChatNode.create("SubGraphNode2", "sub_output1", "sub_output2", chatClient,
 					"Please perform the second step processing on the following content:");
 
-			ChatNode subNode3 = ChatNode.create("SubGraphNode3", "sub_output2", "final_output", chatClient,
+			ChatNode subNode3 = ChatNode.create("SubGraphNode3", "sub_output2", "subgraph_final_output", chatClient,
 					"Please perform the final processing on the following content:");
 
 			// Build subgraph (pure serial structure)
 			return new StateGraph("Simple SubGraph", () -> {
 				Map<String, KeyStrategy> strategies = new HashMap<>();
-				strategies.put("input", new ReplaceStrategy());
+				strategies.put("sub_input", new ReplaceStrategy());
 				strategies.put("sub_output1", new ReplaceStrategy());
 				strategies.put("sub_output2", new ReplaceStrategy());
-				strategies.put("final_output", new ReplaceStrategy());
+				strategies.put("subgraph_final_output", new ReplaceStrategy());
 				strategies.put("logs", new AppendStrategy());
 				return strategies;
 			})

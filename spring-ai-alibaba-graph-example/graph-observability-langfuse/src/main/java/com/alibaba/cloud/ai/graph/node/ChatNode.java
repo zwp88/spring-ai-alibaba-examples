@@ -72,7 +72,8 @@ public class ChatNode implements NodeAction {
 		// Get input data
 		String inputData = state.value(inputKey).map(Object::toString).orElse("Default input");
 
-		logger.info("{} is running, state: {}", nodeName, JSON.toJSONString(state));
+		logger.info("{} is running, inputKey:{}, inputData:{}, state: {}", nodeName, inputKey, inputData,
+				JSON.toJSONString(state));
 
 		// Process using ChatClient
 		String result;
