@@ -29,55 +29,53 @@ import java.util.Map;
 
 /**
  * Graph Controller
- * 
- * REST controller for executing graph processing operations.
- * Provides synchronous execution of the observability graph.
- * 
- * Features:
- * - Synchronous graph execution
- * - Input parameter handling
- * - Result formatting
+ *
+ * REST controller for executing graph processing operations. Provides synchronous
+ * execution of the observability graph.
+ *
+ * Features: - Synchronous graph execution - Input parameter handling - Result formatting
  * - Error handling
- * 
+ *
  * @author sixiyida
  */
 @RestController
 @RequestMapping("/graph/observation")
 public class GraphController {
 
-    @Autowired
-    private CompiledGraph compiledGraph;
+	@Autowired
+	private CompiledGraph compiledGraph;
 
-    /**
-     * Execute graph processing
-     * 
-     * @param input the input content to process
-     * @return processing result with success status and output
-     */
-    @GetMapping("/execute")
-    public Map<String, Object> execute(@RequestParam(value = "prompt", defaultValue = "Hello World") String input) {
-        try {
-            // Create initial state
-            Map<String, Object> initialState = new HashMap<>();
-            initialState.put("input", input);
-            
-            // Execute graph
-            OverAllState result = compiledGraph.invoke(initialState).get();
-            
-            // Return result
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("input", input);
-            response.put("output", result.value("end_output").orElse("No output"));
-            response.put("logs", result.value("logs").orElse("No logs"));
-            
-            return response;
-            
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            return errorResponse;
-        }
-    }
-} 
+	/**
+	 * Execute graph processing
+	 * @param input the input content to process
+	 * @return processing result with success status and output
+	 */
+	@GetMapping("/execute")
+	public Map<String, Object> execute(@RequestParam(value = "prompt", defaultValue = "Hello World") String input) {
+		try {
+			// Create initial state
+			Map<String, Object> initialState = new HashMap<>();
+			initialState.put("input", input);
+
+			// Execute graph
+			OverAllState result = compiledGraph.invoke(initialState).get();
+
+			// Return result
+			Map<String, Object> response = new HashMap<>();
+			response.put("success", true);
+			response.put("input", input);
+			response.put("output", result.value("end_output").orElse("No output"));
+			response.put("logs", result.value("logs").orElse("No logs"));
+
+			return response;
+
+		}
+		catch (Exception e) {
+			Map<String, Object> errorResponse = new HashMap<>();
+			errorResponse.put("success", false);
+			errorResponse.put("error", e.getMessage());
+			return errorResponse;
+		}
+	}
+
+}

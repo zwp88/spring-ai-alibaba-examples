@@ -69,9 +69,9 @@ public class GraphProcess {
 	private void processNext(AsyncGenerator<NodeOutput> generator,
 			reactor.core.publisher.FluxSink<ServerSentEvent<String>> sink) {
 		AsyncGenerator.Data<NodeOutput> data = generator.next();
-		logger.info("processNext called: isDone={}, isError={}, data={} ", data.isDone(), data.isError(), data);
+		logger.debug("processNext called: isDone={}, isError={}, data={}", data.isDone(), data.isError(), data);
 		if (data.isDone()) {
-			logger.info("processNext: Graph processing completed");
+			logger.debug("processNext: Graph processing completed");
 			sink.next(ServerSentEvent.builder("{\"type\":\"completed\",\"message\":\"Graph processing completed\"}")
 				.event("completed")
 				.build());
@@ -84,7 +84,10 @@ public class GraphProcess {
 				sink.next(ServerSentEvent.builder("{\"type\":\"error\",\"message\":\"" + ex.getMessage() + "\"}")
 					.event("error")
 					.build());
-				sink.error(ex);
+				sink.next(ServerSentEvent.builder("{\"type\":\"completed\",\"message\":\"Graph processing completed\"}")
+					.event("completed")
+					.build());
+				sink.complete();
 			});
 			return;
 		}
@@ -95,10 +98,13 @@ public class GraphProcess {
 				sink.next(ServerSentEvent.builder("{\"type\":\"error\",\"message\":\"" + ex.getMessage() + "\"}")
 					.event("error")
 					.build());
-				sink.error(ex);
+				sink.next(ServerSentEvent.builder("{\"type\":\"completed\",\"message\":\"Graph processing completed\"}")
+					.event("completed")
+					.build());
+				sink.complete();
 			}
 			else {
-				logger.info("processNext: output node={}, output class={}, output={}",
+				logger.debug("processNext: output node={}, output class={}, output={}",
 						output != null ? output.node() : null, output != null ? output.getClass().getName() : null,
 						output);
 				String content;
@@ -114,7 +120,7 @@ public class GraphProcess {
 					nodeOutput.put("timestamp", System.currentTimeMillis());
 					content = JSON.toJSONString(nodeOutput);
 				}
-				logger.info("processNext: emitting SSE event for node {}", output != null ? output.node() : null);
+				logger.debug("processNext: emitting SSE event for node {}", output != null ? output.node() : null);
 				sink.next(ServerSentEvent.builder(content)
 					.event("node_output")
 					.id(output.node() + "_" + System.currentTimeMillis())

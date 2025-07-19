@@ -82,6 +82,10 @@ public class StreamingChatNode implements NodeAction {
 		// Build complete prompt
 		String fullPrompt = prompt + " Input content: " + inputData;
 
+		// 添加调试信息
+		logger.info("{} full prompt length: {} characters", nodeName, fullPrompt.length());
+		logger.info("{} using ChatClient: {}", nodeName, chatClient.getClass().getSimpleName());
+
 		try {
 			// Create streaming chat response
 			Flux<ChatResponse> chatResponseFlux = chatClient.prompt()
@@ -91,7 +95,12 @@ public class StreamingChatNode implements NodeAction {
 				.doOnSubscribe(sub -> logger.info("{}: chatResponseFlux subscribed", nodeName))
 				.doOnNext(resp -> logger.info("{}: chatResponseFlux emit: {}", nodeName, resp))
 				.doOnError(e -> logger.error("{}: chatResponseFlux error", nodeName, e))
-				.doOnComplete(() -> logger.info("{}: chatResponseFlux complete", nodeName));
+				.doOnComplete(() -> logger.info("{}: chatResponseFlux complete", nodeName))
+				.timeout(java.time.Duration.ofMinutes(2)) // 添加超时处理
+				.onErrorResume(e -> {
+					logger.error("{}: chatResponseFlux timeout or error, using fallback", nodeName, e);
+					return Flux.empty();
+				});
 
 			// Wrap streaming response with StreamingChatGenerator
 			AsyncGenerator<? extends NodeOutput> generator = StreamingChatGenerator.builder()

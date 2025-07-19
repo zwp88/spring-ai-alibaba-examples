@@ -22,16 +22,23 @@ import com.alibaba.cloud.ai.graph.GraphRepresentation;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.StateGraph;
+import com.alibaba.cloud.ai.graph.checkpoint.config.SaverConfig;
+import com.alibaba.cloud.ai.graph.checkpoint.constant.SaverConstant;
+import com.alibaba.cloud.ai.graph.checkpoint.savers.MemorySaver;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.node.ChatNode;
+import com.alibaba.cloud.ai.graph.node.MergeNode;
 import com.alibaba.cloud.ai.graph.node.SimpleSubGraph;
 import com.alibaba.cloud.ai.graph.node.StreamingChatNode;
 import com.alibaba.cloud.ai.graph.state.strategy.AppendStrategy;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
+import com.google.common.collect.Lists;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.util.Timeout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
@@ -61,6 +68,8 @@ import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 @Configuration
 public class GraphConfiguration {
 
+	private static final Logger logger = LoggerFactory.getLogger(GraphConfiguration.class);
+
 	@Bean
 	public RestClient.Builder createRestClient() {
 
@@ -88,6 +97,22 @@ public class GraphConfiguration {
 	 */
 	@Bean
 	public ChatClient chatClient(ChatModel chatModel) {
+		// 添加 AI 模型可用性测试
+		try {
+			logger.info("Testing AI model availability...");
+			logger.info("ChatModel type: {}", chatModel.getClass().getSimpleName());
+			logger.info("ChatModel default options: {}", chatModel.getDefaultOptions());
+
+			// 尝试一个简单的同步调用测试
+			ChatClient testClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
+			String testResponse = testClient.prompt().user("Hello").call().content();
+			logger.info("AI model test successful, response: {}",
+					testResponse.substring(0, Math.min(50, testResponse.length())));
+		}
+		catch (Exception e) {
+			logger.error("AI model test failed: {}", e.getMessage(), e);
+		}
+
 		return ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
 	}
 
@@ -115,6 +140,9 @@ public class GraphConfiguration {
 		ChatNode summaryNode = ChatNode.create("SummaryNode", "streaming_output", "summary_output", chatClient,
 				"Please summarize the streaming analysis results:");
 
+		// Merge node - combine parallel outputs for subgraph input
+		MergeNode mergeNode = new MergeNode(Lists.newArrayList("parallel_output1", "parallel_output2"), "sub_input");
+
 		// Streaming node - real-time AI response
 		StreamingChatNode streamingNode = StreamingChatNode.create("StreamingNode", "final_output", "streaming_output",
 				chatClient, "Please perform detailed analysis on the subgraph results:");
@@ -133,6 +161,11 @@ public class GraphConfiguration {
 			keyStrategyHashMap.put("start_output", new ReplaceStrategy());
 			keyStrategyHashMap.put("parallel_output1", new ReplaceStrategy());
 			keyStrategyHashMap.put("parallel_output2", new ReplaceStrategy());
+			keyStrategyHashMap.put("sub_input", new ReplaceStrategy());
+			keyStrategyHashMap.put("sub_output1", new ReplaceStrategy());
+			keyStrategyHashMap.put("sub_output2", new ReplaceStrategy());
+			keyStrategyHashMap.put("_subgraph", new ReplaceStrategy());
+			keyStrategyHashMap.put("subgraph_final_output", new ReplaceStrategy());
 			keyStrategyHashMap.put("final_output", new ReplaceStrategy());
 			keyStrategyHashMap.put("streaming_output", new ReplaceStrategy());
 			keyStrategyHashMap.put("summary_output", new ReplaceStrategy());
@@ -148,6 +181,7 @@ public class GraphConfiguration {
 			.addNode("start", node_async(startNode))
 			.addNode("parallel1", node_async(parallelNode1))
 			.addNode("parallel2", node_async(parallelNode2))
+			.addNode("merge", node_async(mergeNode)) // 使用自定义MergeNode并包裹为异步
 			.addNode("subgraph", subGraph.subGraph()) // Add subgraph
 			.addNode("streaming", node_async(streamingNode)) // Add streaming node
 			.addNode("summary", node_async(summaryNode))
@@ -160,9 +194,12 @@ public class GraphConfiguration {
 			.addEdge("start", "parallel1")
 			.addEdge("start", "parallel2")
 
-			// Aggregation edges: both parallel nodes complete -> subgraph
-			.addEdge("parallel1", "subgraph")
-			.addEdge("parallel2", "subgraph")
+			// Aggregation edges: both parallel nodes complete -> merge
+			.addEdge("parallel1", "merge")
+			.addEdge("parallel2", "merge")
+
+			// Serial edge: merge -> subgraph
+			.addEdge("merge", "subgraph")
 
 			// Serial edges: subgraph -> streaming -> summary
 			.addEdge("subgraph", "streaming")
@@ -194,7 +231,12 @@ public class GraphConfiguration {
 	@Bean
 	public CompiledGraph compiledGraph(StateGraph observabilityGraph, CompileConfig observationCompileConfig)
 			throws GraphStateException {
-		return observabilityGraph.compile(observationCompileConfig);
+		// 为子图添加 checkpoint saver 配置，确保子图能正确接收输入
+		CompileConfig subgraphCompileConfig = CompileConfig.builder(observationCompileConfig)
+			.saverConfig(SaverConfig.builder().register(SaverConstant.MEMORY, new MemorySaver()).build())
+			.build();
+
+		return observabilityGraph.compile(subgraphCompileConfig);
 	}
 
 }
