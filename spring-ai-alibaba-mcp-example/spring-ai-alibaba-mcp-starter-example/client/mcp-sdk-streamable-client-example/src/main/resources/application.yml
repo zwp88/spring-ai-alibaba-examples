@@ -12,12 +12,11 @@ spring:
   main:
     web-application-type: reactive
   ai:
-    openai:
-      api-key: sk-LwAUCbjFdDHuaQ3gUNhzioBLSlP5Qq6ixa1nIkTf6Sqw7BSJ
-      base-url: https://api.chatanywhere.tech
+    dashscope:
+      api-key:
       chat:
         options:
-          model: gpt-4o-mini
+          model: qwen-max
     mcp:
       client:
         toolcallback:
