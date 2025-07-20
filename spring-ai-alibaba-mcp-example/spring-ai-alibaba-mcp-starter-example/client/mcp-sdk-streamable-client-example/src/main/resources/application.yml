@@ -1,0 +1,38 @@
+server:
+  port: 8888
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: mcp
+  main:
+    web-application-type: reactive
+  ai:
+    openai:
+      api-key: sk-LwAUCbjFdDHuaQ3gUNhzioBLSlP5Qq6ixa1nIkTf6Sqw7BSJ
+      base-url: https://api.chatanywhere.tech
+      chat:
+        options:
+          model: gpt-4o-mini
+    mcp:
+      client:
+        toolcallback:
+          enabled: true
+        streamable:
+          connections:
+            server1:
+              url: http://localhost:3000/mcp/
+  mandatory-file-encoding: UTF-8
+
+# 调试日志
+logging:
+  level:
+    io:
+      modelcontextprotocol:
+        client: DEBUG
+        spec: DEBUG
+
