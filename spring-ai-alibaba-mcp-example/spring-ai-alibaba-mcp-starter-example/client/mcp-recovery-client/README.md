@@ -27,7 +27,8 @@ spring:
       mcp:
         recovery:
           enabled: true
-          delay: 5s # 定期ping MCP Server端的间隔时间
+          ping: 5s # 定期ping MCP Server端的间隔时间
+          delay: 5s # 延时队列中建立SSE连接的间隔时间
           stop: 10s # 断开连接的的最大等待时间
 ```
 注入依赖
