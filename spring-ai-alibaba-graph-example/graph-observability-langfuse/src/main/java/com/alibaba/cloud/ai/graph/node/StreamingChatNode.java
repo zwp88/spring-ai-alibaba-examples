@@ -31,102 +31,114 @@ import java.util.Map;
 
 /**
  * Streaming Chat Node
- * 
- * Supports real-time streaming output, returning AI responses as a stream.
- * This node processes input data and generates streaming AI responses using ChatClient.
- * 
- * Features:
- * - Real-time streaming AI responses
- * - Fallback mechanism for failed streaming
- * - Configurable input/output keys
- * - Comprehensive logging
- * 
+ *
+ * Supports real-time streaming output, returning AI responses as a stream. This node
+ * processes input data and generates streaming AI responses using ChatClient.
+ *
+ * Features: - Real-time streaming AI responses - Fallback mechanism for failed streaming
+ * - Configurable input/output keys - Comprehensive logging
+ *
  * @author sixiyida
  */
 public class StreamingChatNode implements NodeAction {
 
-    private static final Logger logger = LoggerFactory.getLogger(StreamingChatNode.class);
+	private static final Logger logger = LoggerFactory.getLogger(StreamingChatNode.class);
 
-    private final String nodeName;
-    private final String inputKey;
-    private final String outputKey;
-    private final ChatClient chatClient;
-    private final String prompt;
+	private final String nodeName;
 
-    /**
-     * Constructor for StreamingChatNode
-     * 
-     * @param nodeName the name of the node
-     * @param inputKey the key for input data
-     * @param outputKey the key for output data
-     * @param chatClient the chat client for AI processing
-     * @param prompt the prompt template
-     */
-    public StreamingChatNode(String nodeName, String inputKey, String outputKey, 
-                           ChatClient chatClient, String prompt) {
-        this.nodeName = nodeName;
-        this.inputKey = inputKey;
-        this.outputKey = outputKey;
-        this.chatClient = chatClient;
-        this.prompt = prompt;
-    }
+	private final String inputKey;
 
-    @Override
-    public Map<String, Object> apply(OverAllState state) throws Exception {
-        logger.info("{} starting streaming processing", nodeName);
+	private final String outputKey;
 
-        // Get input data
-        String inputData = state.value(inputKey)
-            .map(Object::toString)
-            .orElse("Default input");
+	private final ChatClient chatClient;
 
-        logger.info("{} input data: {}", nodeName, inputData);
+	private final String prompt;
 
-        // Build complete prompt
-        String fullPrompt = prompt + " Input content: " + inputData;
+	/**
+	 * Constructor for StreamingChatNode
+	 * @param nodeName the name of the node
+	 * @param inputKey the key for input data
+	 * @param outputKey the key for output data
+	 * @param chatClient the chat client for AI processing
+	 * @param prompt the prompt template
+	 */
+	public StreamingChatNode(String nodeName, String inputKey, String outputKey, ChatClient chatClient, String prompt) {
+		this.nodeName = nodeName;
+		this.inputKey = inputKey;
+		this.outputKey = outputKey;
+		this.chatClient = chatClient;
+		this.prompt = prompt;
+	}
 
-        try {
-            // Create streaming chat response
-            Flux<ChatResponse> chatResponseFlux = chatClient.prompt()
-                .user(fullPrompt)
-                .stream()
-                .chatResponse();
+	@Override
+	public Map<String, Object> apply(OverAllState state) throws Exception {
+		logger.info("{} starting streaming processing", nodeName);
 
-            // Wrap streaming response with StreamingChatGenerator
-            AsyncGenerator<? extends NodeOutput> generator = StreamingChatGenerator.builder()
-                .startingNode(nodeName + "_stream")
-                .startingState(state)
-                .mapResult(response -> {
-                    String content = response.getResult().getOutput().getText();
-                    logger.debug("{} streaming output chunk: {}", nodeName, content);
-                    return Map.of(outputKey, content);
-                })
-                .build(chatResponseFlux);
+		// Get input data
+		String inputData = state.value(inputKey).map(Object::toString).orElse("Default input");
 
-            logger.info("{} streaming processing setup completed", nodeName);
-            return Map.of(outputKey, generator);
+		logger.info("{} input data: {}", nodeName, inputData);
 
-        } catch (Exception e) {
-            logger.error("{} streaming processing failed: {}", nodeName, e.getMessage(), e);
-            
-            // Fallback processing: return regular synchronous response
-            String fallbackResult = String.format("[%s] Streaming failed, fallback processing: %s", nodeName, inputData);
-            return Map.of(outputKey, fallbackResult);
-        }
-    }
+		// Build complete prompt
+		String fullPrompt = prompt + " Input content: " + inputData;
 
-    /**
-     * Factory method to create StreamingChatNode
-     * 
-     * @param nodeName the name of the node
-     * @param inputKey the key for input data
-     * @param outputKey the key for output data
-     * @param chatClient the chat client for AI processing
-     * @param prompt the prompt template
-     * @return StreamingChatNode instance
-     */
-    public static StreamingChatNode create(String nodeName, String inputKey, String outputKey, 
-                                         ChatClient chatClient, String prompt) {
-        return new StreamingChatNode(nodeName, inputKey, outputKey, chatClient, prompt);
-    }
-} 
+		// 添加调试信息
+		logger.info("{} full prompt length: {} characters", nodeName, fullPrompt.length());
+		logger.info("{} using ChatClient: {}", nodeName, chatClient.getClass().getSimpleName());
+
+		try {
+			// Create streaming chat response
+			Flux<ChatResponse> chatResponseFlux = chatClient.prompt()
+				.user(fullPrompt)
+				.stream()
+				.chatResponse()
+				.doOnSubscribe(sub -> logger.info("{}: chatResponseFlux subscribed", nodeName))
+				.doOnNext(resp -> logger.info("{}: chatResponseFlux emit: {}", nodeName, resp))
+				.doOnError(e -> logger.error("{}: chatResponseFlux error", nodeName, e))
+				.doOnComplete(() -> logger.info("{}: chatResponseFlux complete", nodeName))
+				.timeout(java.time.Duration.ofMinutes(2)) // 添加超时处理
+				.onErrorResume(e -> {
+					logger.error("{}: chatResponseFlux timeout or error, using fallback", nodeName, e);
+					return Flux.empty();
+				});
+
+			// Wrap streaming response with StreamingChatGenerator
+			AsyncGenerator<? extends NodeOutput> generator = StreamingChatGenerator.builder()
+				.startingNode(nodeName + "_stream")
+				.startingState(state)
+				.mapResult(response -> {
+					String content = response.getResult().getOutput().getText();
+					logger.info("{}: mapResult emit chunk: {}", nodeName, content);
+					return Map.of(outputKey, content);
+				})
+				.build(chatResponseFlux);
+
+			logger.info("{} streaming processing setup completed", nodeName);
+			return Map.of(outputKey, generator);
+
+		}
+		catch (Exception e) {
+			logger.error("{} streaming processing failed: {}", nodeName, e.getMessage(), e);
+
+			// Fallback processing: return regular synchronous response
+			String fallbackResult = String.format("[%s] Streaming failed, fallback processing: %s", nodeName,
+					inputData);
+			return Map.of(outputKey, fallbackResult);
+		}
+	}
+
+	/**
+	 * Factory method to create StreamingChatNode
+	 * @param nodeName the name of the node
+	 * @param inputKey the key for input data
+	 * @param outputKey the key for output data
+	 * @param chatClient the chat client for AI processing
+	 * @param prompt the prompt template
+	 * @return StreamingChatNode instance
+	 */
+	public static StreamingChatNode create(String nodeName, String inputKey, String outputKey, ChatClient chatClient,
+			String prompt) {
+		return new StreamingChatNode(nodeName, inputKey, outputKey, chatClient, prompt);
+	}
+
+}

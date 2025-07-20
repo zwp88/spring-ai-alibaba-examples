@@ -33,98 +33,81 @@ import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 
 /**
  * Simple SubGraph Implementation
- * 
- * A subgraph that contains only serial edges, without parallel processing.
- * This subgraph performs sequential processing through multiple internal nodes.
- * 
- * Features:
- * - Pure serial processing flow
- * - Three-stage processing pipeline
- * - Independent state management
- * - Configurable processing stages
- * 
+ *
+ * A subgraph that contains only serial edges, without parallel processing. This subgraph
+ * performs sequential processing through multiple internal nodes.
+ *
+ * Features: - Pure serial processing flow - Three-stage processing pipeline - Independent
+ * state management - Configurable processing stages
+ *
  * @author sixiyida
  */
 public class SimpleSubGraph implements SubGraphNode {
 
-    private final ChatClient chatClient;
-    private StateGraph subGraph;
+	private final ChatClient chatClient;
 
-    /**
-     * Constructor for SimpleSubGraph
-     * 
-     * @param chatClient the chat client for AI processing
-     */
-    public SimpleSubGraph(ChatClient chatClient) {
-        this.chatClient = chatClient;
-        this.subGraph = createSubGraph();
-    }
+	private StateGraph subGraph;
 
-    @Override
-    public String id() {
-        return "simple_subgraph";
-    }
+	/**
+	 * Constructor for SimpleSubGraph
+	 * @param chatClient the chat client for AI processing
+	 */
+	public SimpleSubGraph(ChatClient chatClient) {
+		this.chatClient = chatClient;
+		this.subGraph = createSubGraph();
+	}
 
-    @Override
-    public StateGraph subGraph() {
-        return this.subGraph;
-    }
+	@Override
+	public String id() {
+		return "simple_subgraph";
+	}
 
-    /**
-     * Create the internal subgraph structure
-     * 
-     * @return configured StateGraph for the subgraph
-     */
-    private StateGraph createSubGraph() {
-        try {
-            // Create internal nodes for the subgraph (serial processing)
-            ChatNode subNode1 = ChatNode.create(
-                "SubGraphNode1", 
-                "input", 
-                "sub_output1", 
-                chatClient, 
-                "Please perform the first step processing on the following content:"
-            );
-            
-            ChatNode subNode2 = ChatNode.create(
-                "SubGraphNode2", 
-                "sub_output1", 
-                "sub_output2", 
-                chatClient, 
-                "Please perform the second step processing on the following content:"
-            );
-            
-            ChatNode subNode3 = ChatNode.create(
-                "SubGraphNode3", 
-                "sub_output2", 
-                "final_output", 
-                chatClient, 
-                "Please perform the final processing on the following content:"
-            );
+	@Override
+	public StateGraph subGraph() {
+		return this.subGraph;
+	}
 
-            // Build subgraph (pure serial structure)
-            return new StateGraph("Simple SubGraph", () -> {
-                Map<String, KeyStrategy> strategies = new HashMap<>();
-                strategies.put("input", new ReplaceStrategy());
-                strategies.put("sub_output1", new ReplaceStrategy());
-                strategies.put("sub_output2", new ReplaceStrategy());
-                strategies.put("final_output", new ReplaceStrategy());
-                strategies.put("logs", new AppendStrategy());
-                return strategies;
-            })
-            // Add subgraph nodes
-            .addNode("sub_node1", node_async(subNode1))
-            .addNode("sub_node2", node_async(subNode2))
-            .addNode("sub_node3", node_async(subNode3))
-            
-            // Subgraph edges: pure serial processing
-            .addEdge(START, "sub_node1")
-            .addEdge("sub_node1", "sub_node2")
-            .addEdge("sub_node2", "sub_node3")
-            .addEdge("sub_node3", END);
-            
-        } catch (GraphStateException e) {
-            throw new RuntimeException("Failed to create subgraph", e);
-        }
-    }
-} 
+	/**
+	 * Create the internal subgraph structure
+	 * @return configured StateGraph for the subgraph
+	 */
+	private StateGraph createSubGraph() {
+		try {
+			// Create internal nodes for the subgraph (serial processing)
+			ChatNode subNode1 = ChatNode.create("SubGraphNode1", "sub_input", "sub_output1", chatClient,
+					"Please perform the first step processing on the following content:");
+
+			ChatNode subNode2 = ChatNode.create("SubGraphNode2", "sub_output1", "sub_output2", chatClient,
+					"Please perform the second step processing on the following content:");
+
+			ChatNode subNode3 = ChatNode.create("SubGraphNode3", "sub_output2", "subgraph_final_output", chatClient,
+					"Please perform the final processing on the following content:");
+
+			// Build subgraph (pure serial structure)
+			return new StateGraph("Simple SubGraph", () -> {
+				Map<String, KeyStrategy> strategies = new HashMap<>();
+				strategies.put("sub_input", new ReplaceStrategy());
+				strategies.put("sub_output1", new ReplaceStrategy());
+				strategies.put("sub_output2", new ReplaceStrategy());
+				strategies.put("subgraph_final_output", new ReplaceStrategy());
+				strategies.put("logs", new AppendStrategy());
+				return strategies;
+			})
+				// Add subgraph nodes
+				.addNode("sub_node1", node_async(subNode1))
+				.addNode("sub_node2", node_async(subNode2))
+				.addNode("sub_node3", node_async(subNode3))
+
+				// Subgraph edges: pure serial processing
+				.addEdge(START, "sub_node1")
+				.addEdge("sub_node1", "sub_node2")
+				.addEdge("sub_node2", "sub_node3")
+				.addEdge("sub_node3", END);
+
+		}
+		catch (GraphStateException e) {
+			throw new RuntimeException("Failed to create subgraph", e);
+		}
+	}
+
+}

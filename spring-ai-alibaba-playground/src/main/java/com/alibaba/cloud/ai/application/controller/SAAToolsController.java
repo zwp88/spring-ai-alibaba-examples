@@ -54,7 +54,7 @@ public class SAAToolsController {
 	@UserIp
 	@GetMapping("/tool-call")
 	@Operation(summary = "DashScope ToolCall Chat")
-	public Result<ToolCallResp> chat(
+	public Result<ToolCallResp> toolCallChat(
 			@Validated @RequestParam("prompt") String prompt
 	) {
 

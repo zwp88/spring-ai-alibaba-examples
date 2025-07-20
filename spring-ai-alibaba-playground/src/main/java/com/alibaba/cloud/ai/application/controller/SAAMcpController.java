@@ -60,7 +60,7 @@ public class SAAMcpController {
 	@UserIp
 	@GetMapping("/inner/mcp")
 	@Operation(summary = "DashScope MCP Chat")
-	public Result<ToolCallResp> chat(
+	public Result<ToolCallResp> mcpChat(
 			@Validated @RequestParam("prompt") String prompt
 	) {
 
