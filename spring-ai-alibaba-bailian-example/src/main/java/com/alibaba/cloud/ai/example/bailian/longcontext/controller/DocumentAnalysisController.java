@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 分析文件文本内容
+ * 分析文件中的内容并回答问题
  * @author HunterPorter
  * @author <a href="mailto:zongpeng_hzp@163.com">HunterPorter</a>
  */
