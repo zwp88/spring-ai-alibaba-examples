@@ -10,8 +10,8 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>mcp-nacos-dynamic-example</artifactId>
-    <description>Spring AI - MCP Nacos Dynamic Server Example</description>
+    <artifactId>mcp-nacos-gateway-example</artifactId>
+    <description>Spring AI - MCP Nacos Gateway Example</description>
     <name>Spring AI - MCP Nacos Dynamic Server example</name>
 
     <properties>
@@ -29,7 +29,7 @@
         <!-- Dynamic Mcp Server -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
+            <artifactId>spring-ai-alibaba-starter-mcp-gateway-nacos</artifactId>
         </dependency>
         
         <dependency>

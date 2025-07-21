@@ -25,10 +25,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2025/4/23 20:00
  */
 @SpringBootApplication
-public class Application {
+public class McpGatewayApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(McpGatewayApplication.class, args);
     }
 
 }

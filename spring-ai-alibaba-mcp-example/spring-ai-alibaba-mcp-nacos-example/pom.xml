@@ -24,7 +24,7 @@
     <modules>
         <module>server/mcp-nacos2-server-example</module>
         <module>server/mcp-nacos-registry-example</module>
-        <module>server/mcp-nacos-dynamic-example</module>
+        <module>server/mcp-nacos-gateway-example</module>
         <module>client/mcp-nacos2-client-example</module>
         <module>client/mcp-nacos-client-example</module>
     </modules>

@@ -1,10 +1,10 @@
 spring:
   application:
-    name: spring-ai-alibaba-dynamic-mcp-server-example
+    name: spring-ai-alibaba-mcp-gateway-example
   ai:
     mcp:
       server:
-        name: dynamic-mcp-server
+        name: mcp-gateway-example
         version: 1.0.0
 
     alibaba:
@@ -14,8 +14,10 @@ spring:
           namespace: public
           username: nacos
           password:
-          dynamic:
-            enabled: true
+        gateway:
+          enabled: true
+          registry: nacos
+          nacos:
             service-names: echo-server
 
 server:
