@@ -15,6 +15,9 @@ server代码地址： https://github.com/modelcontextprotocol/python-sdk/blob/ma
 
 ## 2.运行Java client
 
+注意， 目前使用的是mcp java-sdk的快照版本， 需要本地编译好0.11.0-SNAPSHOT的依赖，
+地址：https://github.com/modelcontextprotocol/java-sdk
+
 配置chatclient以及mcpclient
 
 ![image-20250719175436782](./assets/image-20250719175436782.png)
