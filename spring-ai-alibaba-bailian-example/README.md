@@ -19,7 +19,7 @@
 
 2.传入resource，支持上传文档、本地文档、链接等方式，选择对应的Resource子类即可
 
-ps：仅支持qwen-long模型
+3.注意：上传时SystemMessage会被替换为文件id，当前仅qwen-long模型支持上传文件
 
 [qwen-long官方参考文档](https://help.aliyun.com/zh/model-studio/long-context-qwen-long?spm=a2c4g.11186623.help-menu-2400256.d_0_3_0.19ca535dY5cKIw&scm=20140722.H_2846146._.OR_help-T_cn~zh-V_1)
 
