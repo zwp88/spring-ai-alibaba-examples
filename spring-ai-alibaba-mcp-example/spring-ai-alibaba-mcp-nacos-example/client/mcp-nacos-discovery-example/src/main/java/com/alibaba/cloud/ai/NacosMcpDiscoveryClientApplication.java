@@ -32,15 +32,15 @@ import java.util.Scanner;
  * @date 2025/5/13:13:47
  */
 @SpringBootApplication
-public class NacosMcpSseClientApplication {
+public class NacosMcpDiscoveryClientApplication {
 
 
     public static void main(String[] args) {
-        SpringApplication.run(NacosMcpSseClientApplication.class, args);
+        SpringApplication.run(NacosMcpDiscoveryClientApplication.class, args);
     }
 
     @Bean
-    public CommandLineRunner predefinedQuestions(ChatClient.Builder chatClientBuilder, @Qualifier("loadbalancedMcpAsyncToolCallbacks") ToolCallbackProvider tools,
+    public CommandLineRunner predefinedQuestionsDemo(ChatClient.Builder chatClientBuilder, @Qualifier("loadbalancedMcpAsyncToolCallbacks") ToolCallbackProvider tools,
                                                  ConfigurableApplicationContext context) {
 
         return args -> {

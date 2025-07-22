@@ -10,7 +10,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>mcp-nacos-client-example</artifactId>
+    <artifactId>mcp-nacos-discovery-example</artifactId>
     <name>Spring AI - NACOS MCP SSE Client EXAMPLE</name>
 
     <properties>
