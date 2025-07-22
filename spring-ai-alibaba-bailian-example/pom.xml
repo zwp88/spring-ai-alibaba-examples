@@ -31,31 +31,9 @@
     <name>Spring AI Alibaba Bailian Examples</name>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
         <!-- utils -->
         <commons-lang3.version>3.14.0</commons-lang3.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.ai</groupId>
-                <artifactId>spring-ai-bom</artifactId>
-                <version>${spring-ai.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-                <version>${spring-ai-alibaba.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
