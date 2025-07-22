@@ -29,14 +29,14 @@ import org.springframework.context.annotation.Bean;
  * @since 2025/4/21 20:00
  */
 @SpringBootApplication
-public class Application {
+public class McpRegisterApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(McpRegisterApplication.class, args);
     }
 
     @Bean
-    public ToolCallbackProvider tools(TimeService timeService) {
+    public ToolCallbackProvider timeServiceTools(TimeService timeService) {
         return MethodToolCallbackProvider.builder().toolObjects(timeService).build();
     }
 

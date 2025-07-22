@@ -24,8 +24,8 @@ spring:
           namespace: 4ad3108b-4d44-43d0-9634-3c1ac4850c8c
           server-addr: 127.0.0.1:8848
           username: nacos
-          password: nacos
-          registry:
+          password:
+          register:
             enabled: true
             service-group: mcp-server
             service-name: webflux-mcp-server
