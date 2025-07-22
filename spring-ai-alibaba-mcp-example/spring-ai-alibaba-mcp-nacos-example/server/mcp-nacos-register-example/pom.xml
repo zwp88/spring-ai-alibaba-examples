@@ -10,7 +10,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>mcp-nacos-registry-example</artifactId>
+    <artifactId>mcp-nacos-register-example</artifactId>
     <description>Spring AI Alibaba Register MCP Server To Nacos Example</description>
     <name>Spring AI Alibaba Register MCP Server To Nacos Example</name>
 
@@ -29,7 +29,7 @@
         <!-- MCP Nacos 注册支持 -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter-nacos-mcp-server</artifactId>
+            <artifactId>spring-ai-alibaba-starter-nacos-mcp-register</artifactId>
             <version>${spring-ai-alibaba.version}</version>
         </dependency>
 
