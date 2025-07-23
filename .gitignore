@@ -40,3 +40,6 @@ target/
 
 logs/
 **/.db/*
+
+spring-ai-alibaba-multi-model-example/dashscope-multi-model/src/main/resources/multimodel/frame/*.png
+
