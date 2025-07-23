@@ -17,10 +17,6 @@
 
 package com.alibaba.ai.examples.controller.client;
 
-import java.util.Objects;
-
-import reactor.core.publisher.Flux;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +26,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+
+import java.util.Objects;
 
 /**
  * @author yuluo
@@ -43,8 +42,6 @@ public class MorePlatformChatClientController {
 
 	private final ChatClient chatClient;
 
-	private final ChatModel dashScopeChatModel;
-
 	private final ChatModel ollamaChatModel;
 
 	private final ChatModel openAIChatModel;
@@ -55,7 +52,6 @@ public class MorePlatformChatClientController {
 			@Qualifier("openAiChatModel") ChatModel openAIChatModel
 	) {
 
-		this.dashScopeChatModel = dashScopeChatModel;
 		this.ollamaChatModel = ollamaChatModel;
 		this.openAIChatModel = openAIChatModel;
 

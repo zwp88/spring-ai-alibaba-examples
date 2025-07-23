@@ -15,13 +15,12 @@
  */
 package com.alibaba.cloud.ai.toolcall.component;
 
-import com.alibaba.cloud.ai.toolcalling.time.GetCurrentTimeByTimeZoneIdService;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
 public class TimeTools {
 
-    private final GetCurrentTimeByTimeZoneIdService timeService;
+    private final CurrrentTim timeService;
 
     public TimeTools(GetCurrentTimeByTimeZoneIdService timeService) {
         this.timeService = timeService;
