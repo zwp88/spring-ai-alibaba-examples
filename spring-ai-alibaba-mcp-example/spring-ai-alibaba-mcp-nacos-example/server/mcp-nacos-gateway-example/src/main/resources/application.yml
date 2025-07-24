@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: spring-ai-alibaba-mcp-gateway-example
+  ai:
+    mcp:
+      server:
+        name: mcp-gateway-example
+        version: 1.0.0
+
+    alibaba:
+      mcp:
+        nacos:
+          server-addr: localhost:8848
+          namespace: public
+          username: nacos
+          password:
+        gateway:
+          enabled: true
+          registry: nacos
+          nacos:
+            service-names: echo-server
+
+server:
+  port: 8090
