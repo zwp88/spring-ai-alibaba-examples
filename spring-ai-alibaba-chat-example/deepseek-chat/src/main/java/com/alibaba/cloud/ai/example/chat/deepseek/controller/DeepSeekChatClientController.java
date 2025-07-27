@@ -16,6 +16,7 @@
  */
 package com.alibaba.cloud.ai.example.chat.deepseek.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
