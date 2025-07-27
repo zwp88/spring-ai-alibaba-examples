@@ -32,10 +32,12 @@ spring:
 
 springdoc:
   swagger-ui:
+    enabled: false
     path: /swagger-ui.html
     tags-sorter: alpha
     operations-sorter: alpha
   api-docs:
+    enabled: false
     path: /v3/api-docs
   group-configs:
     - group: 'default'
@@ -56,3 +58,14 @@ knife4j:
     language: zh_cn
     enable-version: true
     enable-swagger-models: true
+
+management:
+  server:
+    port: 8081
+    address: 127.0.0.1
+  endpoint:
+    env:
+      access: none
+    heapdump:
+      access: none
+
