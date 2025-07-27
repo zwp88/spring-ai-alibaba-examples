@@ -81,8 +81,9 @@ public class DeepSeekChatClientController {
      * 流式生成接口 - 支持实时获取生成过程的分块响应
      */
     @GetMapping("/ai/stream")
-    public Flux<String> stream () {
+    public Flux<String> stream (HttpServletResponse response) {
 
+        response.setCharacterEncoding("UTF-8");
         return this.DeepSeekChatClient.prompt(DEFAULT_PROMPT)
                 .stream()
                 .content();
