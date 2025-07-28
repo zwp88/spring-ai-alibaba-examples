@@ -7,10 +7,12 @@ import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
 import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
@@ -33,7 +35,7 @@ public class TodoChatFlowFactory {
 
         // 闲聊/多轮通用 LLM
         LlmNode chatLlmNode = LlmNode.builder()
-                .userPromptTemplate("用户: {{user_input}}")
+                .userPromptTemplate("{user_input}")
                 .params(Map.of("user_input", "null"))
                 .outputKey("chat_reply")
                 .chatClient(chatClient)
@@ -51,26 +53,42 @@ public class TodoChatFlowFactory {
         // 调用子图节点
         NodeAction callSubGraphNode = (OverAllState state) -> {
             String mainThreadId = (String) state.value("session_id").orElse("user-001");
-            String subThreadId = mainThreadId + "-todo";
-            String taskContent = (String) state.value("user_input").orElse("");
-            // 传递任务内容到子图
+            String subThreadId = mainThreadId + "-todo-" + UUID.randomUUID();
+            String userInput = (String) state.value("user_input").orElse("");
+            // 提取待办内容
+            String taskContent = userInput;
+            int idx = userInput.indexOf("：");
+            if (idx > 0 && idx + 1 < userInput.length()) {
+                taskContent = userInput.substring(idx + 1).trim();
+            }
+            System.out.println("[DEBUG] 本轮传递给子图的 task_content: " + taskContent);
             Map<String, Object> input = Map.of("task_content", taskContent);
-            // 执行子图
+
             var subResult = subGraph.invoke(input, RunnableConfig.builder().threadId(subThreadId).build());
-            // 拿到任务，合并到 tasks
             if (subResult.isPresent()) {
-                Object createdTask = subResult.get().value("created_task").orElse(null);
-                List<Object> tasks = (List<Object>) state.value("tasks").orElse(new java.util.ArrayList<>());
+                Object createdTaskObj = subResult.get().value("created_task").orElse(null);
+                String createdTask = null;
+                if (createdTaskObj instanceof String s) {
+                    createdTask = s;
+                } else if (createdTaskObj instanceof AssistantMessage am) {
+                    createdTask = am.getText();
+                } else if (createdTaskObj != null) {
+                    createdTask = createdTaskObj.toString();
+                }
+                List<String> tasks = (List<String>) state.value("tasks").orElse(new java.util.ArrayList<>());
                 tasks = new java.util.ArrayList<>(tasks);
-                tasks.add(createdTask);
+                if (createdTask != null && !createdTask.isBlank()) {
+                    tasks.add(createdTask);
+                }
                 return Map.of("tasks", tasks, "created_task", createdTask);
             }
             return Map.of();
         };
 
+
         // 主流程答复节点，展示当前所有任务
         AnswerNode mainReply = AnswerNode.builder()
-                .answer("你当前待办有：{{tasks}}。本轮回复：{{chat_reply}}{{answer}}")
+                .answer("你当前待办有：{{tasks}}\n闲聊回复：{{chat_reply}}")
                 .build();
 
         // Graph组装

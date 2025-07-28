@@ -31,21 +31,21 @@ public class TodoSubGraphFactory {
 
         // LLM润色用户输入
         LlmNode llmNode = LlmNode.builder()
-            .userPromptTemplate("请帮我润色下面的待办事项描述: {{task_content}}")
-            .params(Map.of("task_content", "null"))
-            .outputKey("todo_desc")
-            .chatClient(chatClient)
-            .build();
+                .userPromptTemplate("请直接用一句话帮我润色成待办事项描述，原内容为: {task_content}，不需要任何解释或格式，只回复润色后的内容。")
+                .params(Map.of("task_content", "null"))
+                .outputKey("todo_desc")
+                .chatClient(chatClient)
+                .build();
 
         // 合并变量
         AssignerNode assignNode = AssignerNode.builder()
-            .addItem("created_task", "todo_desc", AssignerNode.WriteMode.OVER_WRITE)
-            .build();
+                .addItem("created_task", "todo_desc", AssignerNode.WriteMode.OVER_WRITE)
+                .build();
 
         // 回答确认
         AnswerNode answerNode = AnswerNode.builder()
-            .answer("已创建任务：{{todo_desc}}")
-            .build();
+                .answer("已创建任务：{{todo_desc}}")
+                .build();
 
         subGraph.addNode("llm", node_async(llmNode));
         subGraph.addNode("assign", node_async(assignNode));
