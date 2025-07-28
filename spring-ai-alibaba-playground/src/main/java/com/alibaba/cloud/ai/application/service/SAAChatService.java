@@ -55,6 +55,9 @@ public class SAAChatService {
 
 	private final DashScopeApi dashscopeApi;
 
+	@Value("${spring.ai.alibaba.playground.bailian.enable:false}")
+	private Boolean enable;
+
 	@Value("${spring.ai.alibaba.playground.bailian.index-name:default-index}")
 	private String indexName;
 
@@ -87,14 +90,19 @@ public class SAAChatService {
 
 	@PostConstruct
 	public void init(){
-		this.retrievalAdvisor = new DocumentRetrievalAdvisor(
-				new DashScopeDocumentRetriever(
-						dashscopeApi,
-						DashScopeDocumentRetrieverOptions.builder()
-								.withIndexName(indexName)
-								.build()
-				)
-		);
+		if(enable) {
+			log.info("Initializing DocumentRetrievalAdvisor with index: {}", indexName);
+			this.retrievalAdvisor = new DocumentRetrievalAdvisor(
+					new DashScopeDocumentRetriever(
+							dashscopeApi,
+							DashScopeDocumentRetrieverOptions.builder()
+									.withIndexName(indexName)
+									.build()
+					)
+			);
+		}else {
+			log.info("Bailian RAG is disabled, DocumentRetrievalAdvisor will not be initialized");
+		}
 	}
 
 	public Flux<String> chat(String chatId, String model, String prompt) {
@@ -114,34 +122,44 @@ public class SAAChatService {
 						.build()
 				).build();
 
-		return chatClient.prompt()
-				.options(runtimeOptions)
-				.user(prompt)
-				.advisors(memoryAdvisor -> memoryAdvisor
-						.param(ChatMemory.CONVERSATION_ID, chatId)
-				)
-				.advisors(retrievalAdvisor)
-				.stream()
-				.content();
+        ChatClient.ChatClientRequestSpec clientRequestSpec = chatClient.prompt()
+                .options(runtimeOptions)
+                .user(prompt)
+                .advisors(memoryAdvisor -> memoryAdvisor
+                        .param(ChatMemory.CONVERSATION_ID, chatId)
+                );
+
+        // Only add if enable is true and retrievalAdvisor is initialized
+        if (enable && retrievalAdvisor != null) {
+            log.debug("Adding DocumentRetrievalAdvisor to chat");
+            clientRequestSpec.advisors(retrievalAdvisor);
+        }
+
+        return clientRequestSpec.stream().content();
 	}
 
 	public Flux<String> deepThinkingChat(String chatId, String model, String prompt) {
 
-		return chatClient.prompt()
-				.options(DashScopeChatOptions.builder()
-						.withModel(model)
-						.withTemperature(0.8)
-						.withResponseFormat(DashScopeResponseFormat.builder()
-								.type(DashScopeResponseFormat.Type.TEXT)
-								.build()
-						).build()
-				).system(deepThinkPromptTemplate.getTemplate())
-				.user(prompt)
-				.advisors(memoryAdvisor -> memoryAdvisor
-						.param(ChatMemory.CONVERSATION_ID, chatId)
-				)
-				.advisors(retrievalAdvisor)
-				.stream()
-				.content();
-	}
+        ChatClient.ChatClientRequestSpec clientRequestSpec = chatClient.prompt()
+                .options(DashScopeChatOptions.builder()
+                        .withModel(model)
+                        .withTemperature(0.8)
+                        .withResponseFormat(DashScopeResponseFormat.builder()
+                                .type(DashScopeResponseFormat.Type.TEXT)
+                                .build()
+                        ).build()
+                ).system(deepThinkPromptTemplate.getTemplate())
+                .user(prompt)
+                .advisors(memoryAdvisor -> memoryAdvisor
+                        .param(ChatMemory.CONVERSATION_ID, chatId)
+                );
+
+        // Only add if enable is true and retrievalAdvisor is initialized
+        if (enable && retrievalAdvisor != null) {
+            log.debug("Adding DocumentRetrievalAdvisor to deepThinkingChat");
+            clientRequestSpec.advisors(retrievalAdvisor);
+        }
+
+        return clientRequestSpec.stream().content();
+    }
 }
