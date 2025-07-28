@@ -17,20 +17,20 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import javax.validation.constraints.NotNull;
-
 import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.service.SAAVideoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import reactor.core.publisher.Flux;
-
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author huangzhen
@@ -73,4 +73,19 @@ public class SAAVideoController {
             return Flux.just("视频处理失败：" + e.getMessage());
         }
     }
+
+    /**
+     * 此处只使用最简单的文生视频接口，更多 example 查阅：
+     * <a href="https://github.com/springaialibaba/spring-ai-alibaba-examples/tree/main/spring-ai-alibaba-video-example">Video Example</a>
+     *
+     * @return video url link
+     */
+    @UserIp
+    @GetMapping("/video-gen")
+    @Operation(summary = "视频生成接口")
+    public String genVideo(String prompt) {
+
+        return videoService.genVideo(prompt);
+    }
+
 }

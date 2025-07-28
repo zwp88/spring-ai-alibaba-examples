@@ -54,7 +54,10 @@ public class SimpleVectorStoreConfiguration {
 	 * @return
 	 */
 	@Bean
-	public VectorStore simpleVectorStore(EmbeddingModel embeddingModel) {
+	public VectorStore simpleVectorStore(
+			@Qualifier("dashscopeEmbeddingModel") EmbeddingModel embeddingModel
+	) {
+
 		return SimpleVectorStore.builder(embeddingModel).build();
 	}
 
