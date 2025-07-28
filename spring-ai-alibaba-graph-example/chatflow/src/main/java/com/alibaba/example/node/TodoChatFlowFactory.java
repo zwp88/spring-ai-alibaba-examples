@@ -33,15 +33,18 @@ public class TodoChatFlowFactory {
 
         StateGraph mainGraph = new StateGraph("chatFlow-demo", keyStrategyFactory);
 
-        // 闲聊/多轮通用 LLM
-        LlmNode chatLlmNode = LlmNode.builder()
-                .userPromptTemplate("{user_input}")
-                .params(Map.of("user_input", "null"))
-                .outputKey("chat_reply")
-                .chatClient(chatClient)
-                .build();
+        // 闲聊/多轮通用 LLM - Lambda 动态 new LlmNode
+        mainGraph.addNode("chat", node_async(state -> {
+            LlmNode node = LlmNode.builder()
+                    .userPromptTemplate("{user_input}")
+                    .params(Map.of("user_input", "null"))
+                    .outputKey("chat_reply")
+                    .chatClient(chatClient)
+                    .build();
+            return node.apply(state);
+        }));
 
-        // 问题分类节点（判断是否创建待办）
+        // 问题分类节点（判断是否创建待办） - 还是单例可用（无需变量输入）
         QuestionClassifierNode intentClassifier = QuestionClassifierNode.builder()
                 .chatClient(chatClient)
                 .inputTextKey("user_input")
@@ -49,8 +52,9 @@ public class TodoChatFlowFactory {
                 .classificationInstructions(List.of("判断用户是否想创建一个待办事项。如果是，返回'创建待办'，否则返回'其它'"))
                 .outputKey("intent_type")
                 .build();
+        mainGraph.addNode("intent", node_async(intentClassifier));
 
-        // 调用子图节点
+        // 调用子图节点（业务 NodeAction 不变）
         NodeAction callSubGraphNode = (OverAllState state) -> {
             String mainThreadId = (String) state.value("session_id").orElse("user-001");
             String subThreadId = mainThreadId + "-todo-" + UUID.randomUUID();
@@ -61,7 +65,6 @@ public class TodoChatFlowFactory {
             if (idx > 0 && idx + 1 < userInput.length()) {
                 taskContent = userInput.substring(idx + 1).trim();
             }
-            System.out.println("[DEBUG] 本轮传递给子图的 task_content: " + taskContent);
             Map<String, Object> input = Map.of("task_content", taskContent);
 
             var subResult = subGraph.invoke(input, RunnableConfig.builder().threadId(subThreadId).build());
@@ -84,17 +87,12 @@ public class TodoChatFlowFactory {
             }
             return Map.of();
         };
+        mainGraph.addNode("callSubGraph", node_async(callSubGraphNode));
 
-
-        // 主流程答复节点，展示当前所有任务
+        // 主流程答复节点 - 单例可用
         AnswerNode mainReply = AnswerNode.builder()
                 .answer("你当前待办有：{{tasks}}\n闲聊回复：{{chat_reply}}")
                 .build();
-
-        // Graph组装
-        mainGraph.addNode("intent", node_async(intentClassifier));
-        mainGraph.addNode("chat", node_async(chatLlmNode));
-        mainGraph.addNode("callSubGraph", node_async(callSubGraphNode));
         mainGraph.addNode("mainReply", node_async(mainReply));
 
         mainGraph.addEdge(StateGraph.START, "intent");
@@ -122,7 +120,6 @@ public class TodoChatFlowFactory {
                 }
             } catch (Exception e) {
                 // 解析异常，intent 用原始字符串
-                // 可加日志输出 intentRaw
             }
             return "创建待办".equals(intent) ? "callSubGraph" : "chat";
         }), Map.of("callSubGraph", "callSubGraph", "chat", "chat"));
