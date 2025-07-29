@@ -17,10 +17,6 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAChatService;
@@ -28,9 +24,6 @@ import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import reactor.core.publisher.Flux;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +31,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author yuluo
@@ -88,7 +86,7 @@ public class SAAChatController {
 			}
 		}
 		else {
-			model = DashScopeApi.ChatModel.QWEN_PLUS.getModel();
+			model = DashScopeApi.ChatModel.QWEN_PLUS.getValue();
 		}
 
 		response.setCharacterEncoding("UTF-8");
@@ -115,7 +113,7 @@ public class SAAChatController {
 			}
 		}
 		else {
-			model = DashScopeApi.ChatModel.QWEN_PLUS.getModel();
+			model = DashScopeApi.ChatModel.QWEN_PLUS.getValue();
 		}
 
 		response.setCharacterEncoding("UTF-8");

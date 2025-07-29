@@ -17,24 +17,12 @@
 
 package com.alibaba.cloud.ai.application.service;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.alibaba.cloud.ai.dashscope.video.VideoModel;
+import com.alibaba.cloud.ai.dashscope.video.VideoPrompt;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -47,21 +35,39 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+import static com.alibaba.cloud.ai.dashscope.api.DashScopeApi.ChatModel.QWEN_VL_MAX;
+
 /**
  * @author huangzhen
  */
 @Service
 public class SAAVideoService  {
 
-    private static final String DEFAULT_MODEL = "qwen-vl-max-latest";
+    private final VideoModel videoModel;
+
     private static final String TEMP_IMAGE_DIR = "temp-frames";
 
     private final ChatClient daschScopeChatClient;
 
     public SAAVideoService(
+            VideoModel videoModel,
             @Qualifier("dashscopeChatModel") ChatModel chatModel
     ) {
 
+        this.videoModel = videoModel;
         this.daschScopeChatClient = ChatClient
                 .builder(chatModel)
                 .build();
@@ -105,7 +111,7 @@ public class SAAVideoService  {
                         new Prompt(
                                 message,
                                 DashScopeChatOptions.builder()
-                                        .withModel(DEFAULT_MODEL)
+                                        .withModel(QWEN_VL_MAX.getValue())
                                         .withMultiModel(true)
                                         .build()
                         ))
@@ -191,4 +197,17 @@ public class SAAVideoService  {
                 (contentType.startsWith("video/mp4") ||
                         contentType.startsWith("video/quicktime"));
     }
+
+    public String genVideo(String prompt) {
+
+        if (Objects.isNull(prompt)) {
+            prompt = "一只小猫在草地奔跑";
+        }
+
+        return this.videoModel.call(new VideoPrompt(prompt))
+                .getResult()
+                .getOutput()
+                .getVideoUrl();
+    }
+
 }

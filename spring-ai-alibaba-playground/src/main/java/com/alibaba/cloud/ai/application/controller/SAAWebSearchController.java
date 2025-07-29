@@ -17,16 +17,17 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import com.alibaba.cloud.ai.application.service.SAAWebSearchService;
+import com.alibaba.cloud.ai.application.entity.dashscope.ChatResponseDTO;
+import com.alibaba.cloud.ai.application.service.ISAAWebSearchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import reactor.core.publisher.Flux;
-
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 /**
  * @author yuluo
@@ -40,14 +41,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class SAAWebSearchController {
 
-	private final SAAWebSearchService webSearch;
+	private final ISAAWebSearchService webSearch;
 
-	public SAAWebSearchController(SAAWebSearchService webSearch) {
+	/**
+	 * 可选注入：@Qualifier("webSearchServiceImpl") or @Qualifier("dashscopeWebSearchServiceImpl")
+	 * @param webSearch
+	 */
+	public SAAWebSearchController(@Qualifier("dashscopeWebSearchServiceImpl") ISAAWebSearchService webSearch) {
 		this.webSearch = webSearch;
 	}
 
 	@PostMapping("/search")
-	public Flux<String> search(
+	public Flux<ChatResponseDTO> search(
 			HttpServletResponse response,
 			@Validated @RequestBody String prompt
 	) {
