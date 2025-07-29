@@ -1,12 +1,13 @@
--- 用户表插入数据
+-- 插入用户数据
 INSERT INTO users (username, email) VALUES
 ('alice', 'alice@example.com'),
 ('bob', 'bob@example.com'),
 ('cathy', 'cathy@example.com'),
 ('daniel', 'daniel@example.com'),
-('emily', 'emily@example.com');
+('emily', 'emily@example.com')
+ON DUPLICATE KEY UPDATE username=VALUES(username);
 
--- 商品分类插入数据
+-- 插入商品分类数据
 INSERT INTO categories (name) VALUES
 ('电子产品'),
 ('服装'),
@@ -14,7 +15,7 @@ INSERT INTO categories (name) VALUES
 ('家居用品'),
 ('食品');
 
--- 商品表插入数据
+-- 插入商品数据
 INSERT INTO products (name, price, stock) VALUES
 ('智能手机', 2999.00, 100),
 ('T恤衫', 89.00, 500),
@@ -27,7 +28,7 @@ INSERT INTO products (name, price, stock) VALUES
 ('羽绒服', 399.00, 80),
 ('历史书', 69.00, 150);
 
--- 商品-分类关联数据
+-- 插入商品-分类关联数据
 INSERT INTO product_categories (product_id, category_id) VALUES
 (1, 1), -- 智能手机-电子产品
 (2, 2), -- T恤衫-服装
@@ -40,7 +41,7 @@ INSERT INTO product_categories (product_id, category_id) VALUES
 (9, 2), -- 羽绒服-服装
 (10, 3); -- 历史书-图书
 
--- 订单表插入数据
+-- 插入订单数据
 INSERT INTO orders (user_id, total_amount, status, order_date) VALUES
 (1, 3088.00, 'completed', '2025-06-01 10:10:00'),
 (2, 39.00, 'pending', '2025-06-02 09:23:00'),
@@ -53,7 +54,7 @@ INSERT INTO orders (user_id, total_amount, status, order_date) VALUES
 (4, 399.00, 'completed', '2025-06-07 10:15:00'),
 (5, 129.00, 'pending', '2025-06-07 18:00:00');
 
--- 订单明细表插入数据
+-- 插入订单明细数据
 INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
 (1, 1, 1, 2999.00),
 (1, 2, 1, 89.00),
@@ -74,6 +75,3 @@ INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
 (9, 9, 1, 399.00),
 (10, 8, 4, 25.00),
 (10, 5, 1, 29.00);
-
--- 补充部分商品价格波动或促销模拟
--- 注：部分订单明细使用了与商品表不同的 unit_price，模拟促销活动
