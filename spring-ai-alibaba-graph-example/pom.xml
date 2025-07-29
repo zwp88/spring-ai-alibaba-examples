@@ -49,6 +49,7 @@
         <module>big-tool</module>
         <module>react</module>
         <module>reflection</module>
+        <module>chatflow</module>
     </modules>
 
     <build>
