@@ -1,4 +1,20 @@
-package com.alibaba.example.node;
+/*
+ * Copyright 2025-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package com.alibaba.example.conf;
 
 import com.alibaba.cloud.ai.graph.*;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
@@ -44,7 +60,7 @@ public class TodoChatFlowFactory {
             return node.apply(state);
         }));
 
-        // 问题分类节点（判断是否创建待办） - 还是单例可用（无需变量输入）
+        // 问题分类节点
         QuestionClassifierNode intentClassifier = QuestionClassifierNode.builder()
                 .chatClient(chatClient)
                 .inputTextKey("user_input")
@@ -54,7 +70,7 @@ public class TodoChatFlowFactory {
                 .build();
         mainGraph.addNode("intent", node_async(intentClassifier));
 
-        // 调用子图节点（业务 NodeAction 不变）
+        // 调用子图节点
         NodeAction callSubGraphNode = (OverAllState state) -> {
             String mainThreadId = (String) state.value("session_id").orElse("user-001");
             String subThreadId = mainThreadId + "-todo-" + UUID.randomUUID();
@@ -89,7 +105,7 @@ public class TodoChatFlowFactory {
         };
         mainGraph.addNode("callSubGraph", node_async(callSubGraphNode));
 
-        // 主流程答复节点 - 单例可用
+        // 主流程答复节点
         AnswerNode mainReply = AnswerNode.builder()
                 .answer("你当前待办有：{{tasks}}\n闲聊回复：{{chat_reply}}")
                 .build();
@@ -119,7 +135,7 @@ public class TodoChatFlowFactory {
                     intent = node.get("category_name").asText();
                 }
             } catch (Exception e) {
-                // 解析异常，intent 用原始字符串
+                
             }
             return "创建待办".equals(intent) ? "callSubGraph" : "chat";
         }), Map.of("callSubGraph", "callSubGraph", "chat", "chat"));
