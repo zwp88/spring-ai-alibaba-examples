@@ -60,9 +60,6 @@ spring:
         version: 0.0.1
         initialized: true
         request-timeout: 600s
-
-        nacos-enabled: true
-
         type: sync
         toolcallback:
           enabled: true
