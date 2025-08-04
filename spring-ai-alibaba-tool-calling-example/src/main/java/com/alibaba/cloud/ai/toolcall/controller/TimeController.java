@@ -27,9 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class TimeController {
 
     private final ChatClient dashScopeChatClient;
+
     private final TimeTools timeTools;
 
     public TimeController(ChatClient chatClient, TimeTools timeTools) {
+
         this.dashScopeChatClient = chatClient;
         this.timeTools = timeTools;
     }
@@ -39,6 +41,7 @@ public class TimeController {
      */
     @GetMapping("/chat")
     public String simpleChat(@RequestParam(value = "query", defaultValue = "请告诉我现在北京时间几点了") String query) {
+
         return dashScopeChatClient.prompt(query).call().content();
     }
 
@@ -47,6 +50,7 @@ public class TimeController {
      */
     @GetMapping("/chat-tool-method")
     public String chatWithTimeFunction(@RequestParam(value = "query", defaultValue = "请告诉我现在北京时间几点了") String query) {
+
         return dashScopeChatClient.prompt(query).tools(timeTools).call().content();
     }
 
