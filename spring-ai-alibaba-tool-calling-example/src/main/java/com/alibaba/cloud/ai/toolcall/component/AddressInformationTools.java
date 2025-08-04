@@ -26,6 +26,7 @@ public class AddressInformationTools {
     }
 
     public String getAddressInformation(String address) {
+
         return service.apply(new BaiduMapSearchInfoService.Request(address)).message();
     }
 

@@ -53,7 +53,9 @@ public class AddressController {
      */
     @GetMapping("/chat")
     public String chat(@RequestParam(value = "address", defaultValue = "北京") String address) throws JsonProcessingException {
+
         BaiduMapSearchInfoService.Request query = new BaiduMapSearchInfoService.Request(address);
+
         return dashScopeChatClient.prompt(new ObjectMapper().writeValueAsString(query))
                 .call()
                 .content();
@@ -64,10 +66,13 @@ public class AddressController {
      */
     @GetMapping("/chat-method-tool-callback")
     public String chatWithBaiduMap(@RequestParam(value = "address", defaultValue = "北京") String address) throws JsonProcessingException {
+
         Method method = ReflectionUtils.findMethod(AddressInformationTools.class, "getAddressInformation", String.class);
+
         if (method == null) {
             throw new RuntimeException("Method not found");
         }
+
         return dashScopeChatClient.prompt(address)
                 .toolCallbacks(MethodToolCallback.builder()
                         .toolDefinition(ToolDefinition.builder()
