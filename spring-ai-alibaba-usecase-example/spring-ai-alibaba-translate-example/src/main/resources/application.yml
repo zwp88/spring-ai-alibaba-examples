@@ -17,15 +17,8 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
+
   ai:
-    chat:
-      client:
-        observations:
-          include-input: true
-      observations:
-        include-prompt: true
-        include-completion: true
-        include-error-logging: true
     ollama:
       base-url: ${OLLAMA_BASE_URL}
       chat:
