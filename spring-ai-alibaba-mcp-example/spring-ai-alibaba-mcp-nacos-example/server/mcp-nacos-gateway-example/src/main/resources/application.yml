@@ -1,24 +1,39 @@
 spring:
   application:
-    name: spring-ai-alibaba-mcp-gateway-example
+    name: mcp-nacos-gateway-example
   ai:
     mcp:
       server:
         name: mcp-gateway-example
         version: 1.0.0
-
+        type: ASYNC
+        instructions: "This gateway server provides dynamic MCP tools from Nacos registered services"
+        enabled: false
+    
     alibaba:
       mcp:
         nacos:
-          server-addr: localhost:8848
-          namespace: public
+          server-addr: 127.0.0.1:8848
+#          namespace: 4ad3108b-4d44-43d0-9634-3c1ac4850c8c
           username: nacos
           password:
         gateway:
           enabled: true
           registry: nacos
+          sse:
+            enabled: true
+          streamable:
+            enabled: true
           nacos:
-            service-names: echo-server
+            service-names:
+              - webflux-mcp-server
+#              - webmvc-mcp-server
 
 server:
   port: 8090
+
+# 调试日志
+logging:
+  level:
+    com.alibaba.cloud.ai.mcp.gateway: DEBUG
+    io.modelcontextprotocol: DEBUG
