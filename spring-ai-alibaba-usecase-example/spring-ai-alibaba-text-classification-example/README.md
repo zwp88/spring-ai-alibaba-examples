@@ -9,8 +9,7 @@
     ```bash
     curl -X POST http://localhost:10093/classify/class-names \
       -H "Content-Type: application/json" \
-      -d '{"text": "Basketball fans can now watch the game on the brand-new NBA app for Apple Vision Pro."}' 
-      
+      -d '{"text": "Basketball fans can now watch the game on the brand-new NBA app for Apple Vision Pro."}'
     ```
 
 2. Class Descriptions

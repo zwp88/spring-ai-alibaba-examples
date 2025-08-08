@@ -52,7 +52,7 @@ public class ClassificationController {
      * @return
      */
     @RequestMapping(path="/chat/field", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> chat(@RequestParam("field") String fieldName, @RequestParam(value = "chatId", required = true) String chatId) {
+    public Flux<String> chat(@RequestParam("field") String fieldName, @RequestParam(value = "chatId") String chatId) {
         return assistant.streamClassify(fieldName, chatId);
     }
 

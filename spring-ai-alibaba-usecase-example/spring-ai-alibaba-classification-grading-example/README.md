@@ -51,8 +51,6 @@ System.out.println(result);
 
 方法会自动调用 ChatClient，合成向量检索结果 (retrieved_docs) 和 ChatMemory，并传递用户输入字段，进行数据分类分级理解。
 
-
-
 ## 🚀 扩展提示
 
 - 可以点开 ChatClient 的 function calling 功能，使用更复杂的处理逻辑
@@ -62,4 +60,3 @@ System.out.println(result);
 ## 📚 License
 
 本项目遵循 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)。
-
