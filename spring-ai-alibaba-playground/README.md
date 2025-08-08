@@ -99,7 +99,12 @@ Playground 作为 `spring-ai-alibaba-examples` 仓库子项目，有以下两种
 
 如果不使用阿里云百炼创建知识库，那么需要将配置文件中的spring.ai.alibaba.playground.bailian.enable修改为false
 
-**4. 运行 `SAAPlayGroundApplication`**
+**4. 【可选】安装并构建前端资源**
+
+请注意，如果你想不想启动前端页面，可以跳过此步骤！
+如果想启动前端页面，请进入 ui 目录，执行 npm install && npm run build 安装依赖并构建前端页面。
+
+**5. 运行 `SAAPlayGroundApplication`**
 
 项目启动之后，浏览器访问 `http://localhost:8080` 查看前端页面。
 
