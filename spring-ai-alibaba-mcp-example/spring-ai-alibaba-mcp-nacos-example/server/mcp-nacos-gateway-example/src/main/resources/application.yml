@@ -29,10 +29,6 @@ spring:
         gateway:
           enabled: true
           registry: nacos
-          sse:
-            enabled: true
-          streamable:
-            enabled: true
           nacos:
             service-names:
               - webflux-mcp-server
