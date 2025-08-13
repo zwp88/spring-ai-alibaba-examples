@@ -2,7 +2,7 @@ package com.alibaba.example.chatmemory.config;
 
 import com.alibaba.cloud.ai.memory.jdbc.MysqlChatMemoryRepository;
 import com.alibaba.cloud.ai.memory.jdbc.SQLiteChatMemoryRepository;
-import com.alibaba.cloud.ai.memory.redis.RedisChatMemoryRepository;
+import com.alibaba.cloud.ai.memory.redis.RedissonRedisChatMemoryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,8 +61,8 @@ public class MemoryConfig {
 	}
 
 	@Bean
-	public RedisChatMemoryRepository redisChatMemoryRepository() {
-		return RedisChatMemoryRepository.builder()
+	public RedissonRedisChatMemoryRepository redisChatMemoryRepository() {
+		return RedissonRedisChatMemoryRepository.builder()
 				.host(redisHost)
 				.port(redisPort)
 				// 若没有设置密码则注释该项
