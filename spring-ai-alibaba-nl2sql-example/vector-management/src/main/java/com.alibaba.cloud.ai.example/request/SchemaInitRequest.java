@@ -16,10 +16,10 @@
  */
 package com.alibaba.cloud.ai.example.request;
 
-import com.alibaba.cloud.ai.dbconnector.DbConfig;
-
 import java.io.Serializable;
 import java.util.List;
+
+import com.alibaba.cloud.ai.connector.config.DbConfig;
 
 public class SchemaInitRequest implements Serializable {
     private DbConfig dbConfig;

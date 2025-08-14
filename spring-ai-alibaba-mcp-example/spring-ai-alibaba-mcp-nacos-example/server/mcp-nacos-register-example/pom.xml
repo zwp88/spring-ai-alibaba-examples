@@ -15,7 +15,7 @@
     <name>Spring AI Alibaba Register MCP Server To Nacos Example</name>
 
     <properties>
-        <spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>
+        <spring-ai-alibaba.version>1.0.0.3</spring-ai-alibaba.version>
     </properties>
 
     <dependencies>

@@ -16,7 +16,7 @@
 		<spring-ai.version>1.0.0</spring-ai.version>
 
         <!--Tips: playground 中使用 spring ai alibaba 开发版本。需要本地编译主干仓库！！！ -->
-		<spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>
+		<spring-ai-alibaba.version>1.0.0.3</spring-ai-alibaba.version>
 
         <!-- Node and npm -->
         <node.version>v20.12.2</node.version>

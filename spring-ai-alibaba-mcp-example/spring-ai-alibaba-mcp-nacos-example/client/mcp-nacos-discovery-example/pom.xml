@@ -14,7 +14,7 @@
     <name>Spring AI - NACOS MCP SSE Client EXAMPLE</name>
 
     <properties>
-        <spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>
+        <spring-ai-alibaba.version>1.0.0.3</spring-ai-alibaba.version>
     </properties>
 
     <dependencies>
@@ -31,7 +31,7 @@
 
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-starter-nacos-mcp-discovery</artifactId>
+            <artifactId>spring-ai-alibaba-starter-mcp-registry</artifactId>
             <version>${spring-ai-alibaba.version}</version>
         </dependency>
 
