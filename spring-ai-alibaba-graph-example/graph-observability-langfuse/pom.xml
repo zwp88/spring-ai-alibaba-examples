@@ -11,7 +11,7 @@
     </parent>
 
     <properties>
-        <spring-ai-alibaba.version>1.0.0.3-SNAPSHOT</spring-ai-alibaba.version>
+        <spring-ai-alibaba.version>1.0.0.3</spring-ai-alibaba.version>
     </properties>
 
     <artifactId>graph-observability-langfuse</artifactId>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-            <version>1.0.0.3-SNAPSHOT</version>
+            <version>1.0.0.3</version>
         </dependency>
 
         <dependency>
