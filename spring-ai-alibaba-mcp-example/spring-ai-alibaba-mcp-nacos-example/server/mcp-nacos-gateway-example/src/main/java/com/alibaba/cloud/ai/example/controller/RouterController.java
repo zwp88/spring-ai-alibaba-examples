@@ -18,7 +18,7 @@ public class RouterController {
      * 搜索 MCP 服务 GET /search?taskDescription={taskDescription}&keywords={keywords}&limit={limit}
      */
     @GetMapping("/search")
-    public ResponseEntity<String> searchServices(@RequestParam String taskDescription,
+    public ResponseEntity<Object> searchServices(@RequestParam String taskDescription,
                                                               @RequestParam(required = false) String keywords,
                                                               @RequestParam(defaultValue = "10", required = false) int limit) {
         return ResponseEntity.ok(mcpRouterService.searchMcpServer(taskDescription, keywords, limit));
