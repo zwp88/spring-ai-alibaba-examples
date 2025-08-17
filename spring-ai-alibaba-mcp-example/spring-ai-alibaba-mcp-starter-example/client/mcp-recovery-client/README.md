@@ -1,4 +1,4 @@
-MCP在建立SSE连接时，Client端和Server端再一段时间没有数据传输时会字段断开。Spring Ai Alibaba提供了自动重连机制
+MCP在建立SSE连接时，Client端和Server端在一段时间没有数据传输时会字段断开。Spring Ai Alibaba提供了自动重连机制
 - 利用一个线程定期去ping MCP Server端，将断开的Server服务名记录到延时队列中
 - 另一个线程异步去获取延时队列中的服务名，重新建立SSE连接
 

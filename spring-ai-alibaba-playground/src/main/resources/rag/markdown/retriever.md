@@ -144,7 +144,7 @@ spring-ai-dashcope 依赖项还提供了对 DashScopeChatModel 的访问。有�
 
 接下来，创建一个`DocumentRetriever`实例，并使用它检索文档片段：
 ```java
-var dashScopeApi = new DashScopeApi(System.getenv("DASHSCOPE_API_KEY"));
+var dashScopeApi = new DashScopeApi(System.getenv("AI_DASHSCOPE_API_KEY"));
 DocumentRetriever retriever = new DashScopeDocumentRetriever(dashScopeApi,
         DashScopeDocumentRetrieverOptions.builder()
                 .withIndexName("spring-ai知识库")

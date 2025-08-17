@@ -8,7 +8,7 @@ spring:
   ai:
     # Spring AI Alibaba DashScope 配置
     dashscope:
-      api-key: ${DASHSCOPE_API_KEY}
+      api-key: ${AI_DASHSCOPE_API_KEY}
       chat:
         options:
           model: qwen-turbo

@@ -1,8 +1,8 @@
 # Spring AI Alibaba Vector Databases Example
 
-本项目演示了如何使用Spring AI和向量数据库进行交互，包含基于本地内存、Redis等
+本项目演示了如何使用Spring AI和向量数据库进行交互，包含基于本地内存、Redis等。
 
-最佳实践基于本地内存
+最佳实践基于本地内存：
 ```
 - add: 添加文档到向量数据库
 - delete: 向量数据库中删除文档

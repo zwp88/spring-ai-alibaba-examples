@@ -2,7 +2,7 @@
 
 官方仓库连接[github/github-mcp-server: GitHub's official MCP Server](https://github.com/github/github-mcp-server)
 
-**1.依赖**
+## 1 依赖
 
 ```xml
 <dependency>
@@ -12,9 +12,9 @@
 </dependency>
 ```
 
-**2.配置文件：mcp-servers-config**
+## 2 配置文件：mcp-servers-config
 
-windows
+### Windows
 
 ```json
 {
@@ -35,7 +35,7 @@ windows
 }
 ```
 
-mac
+### mac
 
 ```json
 {
@@ -54,9 +54,9 @@ mac
 }
 ```
 
-如何申请token请查阅官方仓库
+如何申请token请查阅官方仓库。
 
-**3.yaml配置**
+## 3 yaml配置
 
 ```yaml
 spring:
@@ -69,7 +69,7 @@ spring:
           servers-configuration: classpath:/mcp-servers-config.json
 ```
 
-**4.简单调用**
+## 4 简单调用
 
 ```java
 @SpringBootApplication
@@ -105,4 +105,3 @@ public class Application {
 
 }
 ```
-

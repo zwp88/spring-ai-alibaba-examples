@@ -16,7 +16,7 @@
     <modules>
         <module>client/mcp-auth-client</module>
         <module>server/mcp-auth-server</module>
-        <module>restufl-example</module>
+        <module>restful-example</module>
     </modules>
 
 </project>

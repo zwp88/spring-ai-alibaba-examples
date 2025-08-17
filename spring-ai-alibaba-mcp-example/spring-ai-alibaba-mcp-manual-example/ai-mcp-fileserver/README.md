@@ -3,7 +3,9 @@
 这里我们提供一个示例智能体应用，这个智能体可以通过 MCP 查询或更新本地文件系统，并以文件系统中的数据作为上下文与模型交互。此示例演示如何使用模型上下文协议（MCP）将 Spring AI 与本地文件系统进行集成。
 
 ## 运行示例
+
 ### 前提条件
+
 1. 安装 npx (Node Package eXecute):
 首先确保本地机器安装了 [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)，然后运行如下命令：
 
@@ -21,7 +23,7 @@ cd spring-ai-alibaba-mcp-example/spring-ai-alibaba-manual-mcp-example/ai-mcp-fil
 3. 设置环境变量
 
 ```bash
-# 通义大模型 Dashscope API-KEY
+# 通义大模型 Dashscope API KEY
 export AI_DASHSCOPE_API_KEY=${your-api-key-here}
 ```
 
@@ -32,6 +34,7 @@ export AI_DASHSCOPE_API_KEY=${your-api-key-here}
 ```
 
 ### 运行示例应用
+
 运行示例，智能体将向模型发起提问（源码中包含预置问题，可通过源码查看），可通过控制台查看输出结果。
 
 ```bash
@@ -41,6 +44,7 @@ export AI_DASHSCOPE_API_KEY=${your-api-key-here}
 > 如果您是在 IDE 中运行示例，并且遇到 filesystem mcp server 返回的文件访问权限问题，请确保指定当前进程工作目录为 spring-ai-alibaba-mcp-example/filesystem 目录。
 
 ## 示例架构（源码说明）
+
 前文中我们讲解了 Spring AI 与 MCP 集成的基础架构，在接下来的示例中，我们将用到以下关键组件：
 
 1. **MCP Client**，与 MCP 集成的关键，提供了与本地文件系统进行交互的能力。
@@ -61,6 +65,7 @@ var chatClient = chatClientBuilder
 接下来让我们具体看一下 McpFunctionCallback 是怎么使用的。
 
 ### 声明 MCP Function Callbacks
+
 以下代码段通过 `mcpClient` 与 MCP server 交互，将 MCP 工具通过 McpFunctionCallback 适配为标准的 Spring AI function。
 
 1. 发现 MCP server 中可用的工具 tool（Spring AI 中叫做 function） 列表
@@ -80,13 +85,13 @@ public List<McpFunctionCallback> functionCallbacks(McpSyncClient mcpClient) {
 
 可以看出，ChatClient 与模型交互的过程是没有变化的，模型在需要的时候告知 ChatClient 去做函数调用，只不过 Spring AI 通过 McpFunctionCallback 将实际的函数调用过程委托给了 MCP，通过标准的 MCP 协议与本地文件系统交互:
 
-+ 在与大模交互的过程中，ChatClient 处理相关的 function calls 请求
++ 在与大模型交互的过程中，ChatClient 处理相关的 function calls 请求
 + ChatClient 调用 MCP 工具（通过 McpClient）
 + McpClient 与 MCP server（即 filesystem）交互
 
 ### 初始化 McpClient
-该智能体应用使用同步 MCP 客户端与本地运行的文件系统 MCP server 通信：
 
+该智能体应用使用同步 MCP 客户端与本地运行的文件系统 MCP server 通信：
 
 ```java
 @Bean(destroyMethod = "close")

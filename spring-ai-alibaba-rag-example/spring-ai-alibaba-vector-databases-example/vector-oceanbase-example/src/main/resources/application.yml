@@ -6,7 +6,7 @@ spring:
     name: oceanbase-example
   ai:
     dashscope:
-      api-key: ${DASHSCOPE_API_KEY}
+      api-key: ${AI_DASHSCOPE_API_KEY}
     vectorstore:
       oceanbase:
         enabled: true

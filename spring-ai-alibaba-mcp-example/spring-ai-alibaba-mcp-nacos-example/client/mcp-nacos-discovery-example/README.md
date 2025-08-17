@@ -1,11 +1,15 @@
-本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求版本如下：
-1. Nacos版本在3.0.1及以上
-2. spring ai alibaba的1.0.0.3-SNAPSHOT以上
+# mcp-nacos-discovery-example
 
-详细步骤
+本示例是MCP Server多节点注册在Nacos中，建立稳定性连接，要求版本如下：
+1. Nacos: 3.0.1+
+2. spring ai alibaba: 1.0.0.3-SNAPSHOT+
+
+## 详细步骤
+
 1. MCP Server多节点注册在Nacos中
 2. MCP Client建立1-N连接
-3. 根据sync、async模式提供clints自动注入
+3. 根据sync、async模式提供clients自动注入
+
 ```java
     @Autowired
     private List<LoadbalancedMcpSyncClient> loadbalancedMcpSyncClients;
@@ -25,16 +29,15 @@ or
 
 ```
 
+## application.yml配置
 
-
-### application.yml配置
 ```yaml
 spring:
   application:
     name: mcp-client-webflux
   ai:
     openai:
-      api-key: ${DASHSCOPE_API_KEY}
+      api-key: ${AI_DASHSCOPE_API_KEY}
       base-url: https://dashscope.aliyuncs.com/compatible-mode
       chat:
         options:
@@ -64,5 +67,4 @@ spring:
         toolcallback:
           enabled: true
         root-change-notification: true
-
 ```
