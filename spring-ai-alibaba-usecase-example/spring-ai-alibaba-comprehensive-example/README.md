@@ -43,7 +43,7 @@ git clone https://github.com/touhouqing/chatAiDemo.git
 cd chatAiDemo
 
 # 2. 设置环境变量
-export DASHSCOPE_API_KEY=your_api_key
+export AI_DASHSCOPE_API_KEY=your_api_key
 export MYSQL_PASSWORD=your_password
 export NEO4J_PASSWORD=your_password
 

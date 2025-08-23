@@ -7,10 +7,11 @@
         <groupId>com.alibaba.cloud.ai.mcp</groupId>
         <artifactId>spring-ai-alibaba-mcp-auth-example</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>    </parent>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
     <groupId>com.alibaba.cloud.ai.mcp.restful</groupId>
-    <artifactId>restufl-example</artifactId>
+    <artifactId>restful-example</artifactId>
 
     <dependencies>
         <dependency>

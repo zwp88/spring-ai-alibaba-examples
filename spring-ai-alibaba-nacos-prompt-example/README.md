@@ -4,7 +4,7 @@ Spring AI Alibaba 使用 Nacos 的配置中心能力来动态管理 AI 应用的
 
 ## 环境准备
 
-Nacos: 具备配置中心能力的 Nacos，本例中使用 Nacos 2.3.0。最新版本的 Nacos 3.X 亦可，
+Nacos: 具备配置中心能力的 Nacos，本例中使用 Nacos 2.3.0。最新版本的 Nacos 3.X 亦可。
 
 ## AI 工程创建
 

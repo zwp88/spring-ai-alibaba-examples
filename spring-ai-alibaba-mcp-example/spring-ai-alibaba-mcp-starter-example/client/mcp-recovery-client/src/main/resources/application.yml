@@ -6,7 +6,7 @@ spring:
     name: mcp-recovery-client
   ai:
     dashscope:
-      api-key: ${DASHSCOPE_API_KEY}
+      api-key: ${AI_DASHSCOPE_API_KEY}
       chat:
         options:
           model: qwen-max

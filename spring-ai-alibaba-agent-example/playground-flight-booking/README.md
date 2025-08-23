@@ -17,7 +17,6 @@ This app shows how you can use Spring AI Alibaba to build an AI-powered system t
 
 Run the app by running `Application.java` in your IDE or `mvn spring-boot:run` in the command line.
 
-
 Add to the POM the Spring AI Alibaba boot starter:
 
 ```xml

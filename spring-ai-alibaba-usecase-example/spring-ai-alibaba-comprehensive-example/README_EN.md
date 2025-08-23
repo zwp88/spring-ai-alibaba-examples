@@ -45,7 +45,7 @@ Set the following environment variables before starting the project:
 
 ```bash
 # Alibaba Cloud DashScope API Key
-export DASHSCOPE_API_KEY=your_dashscope_api_key
+export AI_DASHSCOPE_API_KEY=your_dashscope_api_key
 
 # MySQL Database Password
 export MYSQL_PASSWORD=your_mysql_password
@@ -59,7 +59,7 @@ export NEO4J_PASSWORD=your_neo4j_password
 1. Visit [Alibaba Cloud DashScope Console](https://dashscope.console.aliyun.com/)
 2. Register and activate the service
 3. Create a new API Key in the API Key management page
-4. Set the API Key as environment variable `DASHSCOPE_API_KEY`
+4. Set the API Key as environment variable `AI_DASHSCOPE_API_KEY`
 
 ### 3. Database Configuration
 

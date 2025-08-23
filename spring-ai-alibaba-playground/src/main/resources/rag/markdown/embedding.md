@@ -206,7 +206,7 @@ spring-ai-dashcope 依赖项还提供了对 DashScopeChatModel 的访问。有�
 
 接下来，创建一个`DashScopeEmbeddingModel`实例，并使用它计算两个输入文本之间的相似性：
 ```java
-var dashScopeApi = new DashScopeApi(System.getenv("DASHSCOPE_API_KEY"));
+var dashScopeApi = new DashScopeApi(System.getenv("AI_DASHSCOPE_API_KEY"));
 var embeddingModel = new DashScopeEmbeddingModel(dashScopeApi, MetadataMode.EMBED,
         DashScopeEmbeddingOptions.builder()
                 .withModel("text-embedding-v2")

@@ -45,7 +45,7 @@ Chat AI Demo 是一个基于 Spring AI Alibaba 构建的综合性AI对话平台�
 
 ```bash
 # 阿里云DashScope API密钥
-export DASHSCOPE_API_KEY=your_dashscope_api_key
+export AI_DASHSCOPE_API_KEY=your_dashscope_api_key
 
 # MySQL数据库密码
 export MYSQL_PASSWORD=your_mysql_password
@@ -59,7 +59,7 @@ export NEO4J_PASSWORD=your_neo4j_password
 1. 访问 [阿里云DashScope控制台](https://dashscope.console.aliyun.com/)
 2. 注册账号并开通服务
 3. 在API Key管理页面创建新的API Key
-4. 将API Key设置为环境变量 `DASHSCOPE_API_KEY`
+4. 将API Key设置为环境变量 `AI_DASHSCOPE_API_KEY`
 
 ### 3. 数据库配置
 
