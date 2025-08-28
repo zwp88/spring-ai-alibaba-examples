@@ -50,6 +50,7 @@
         <module>react</module>
         <module>reflection</module>
         <module>chatflow</module>
+        <module>parallel-stream-node</module>
     </modules>
 
     <build>
