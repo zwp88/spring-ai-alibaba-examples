@@ -1,9 +1,8 @@
 package com.alibaba.mem0.example.controller;
 
-import com.alibaba.example.chatmemory.mem0.MemZeroChatMemoryAdvisor;
-import com.alibaba.example.chatmemory.mem0.MemZeroServerRequest;
-import com.alibaba.example.chatmemory.mem0.MemZeroServerResp;
-import com.alibaba.example.chatmemory.mem0.MemZeroServiceClient;
+import com.alibaba.example.chatmemory.mem0.Mem0ChatMemoryAdvisor;
+import com.alibaba.example.chatmemory.mem0.Mem0ServerRequest;
+import com.alibaba.example.chatmemory.mem0.Mem0ServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-import static com.alibaba.example.chatmemory.mem0.MemZeroChatMemoryAdvisor.USER_ID;
+import static com.alibaba.example.chatmemory.mem0.Mem0ChatMemoryAdvisor.USER_ID;
 
 
 /**
@@ -27,19 +26,19 @@ import static com.alibaba.example.chatmemory.mem0.MemZeroChatMemoryAdvisor.USER_
  */
 @RestController
 @RequestMapping("/advisor/memory/mem0")
-public class MemZeroMemoryController {
-    private static final Logger logger = LoggerFactory.getLogger(MemZeroMemoryController.class);
+public class Mem0MemoryController {
+    private static final Logger logger = LoggerFactory.getLogger(Mem0MemoryController.class);
 
     private final ChatClient chatClient;
     private final VectorStore store;
-    private final MemZeroServiceClient memZeroServiceClient;
+    private final Mem0ServiceClient mem0ServiceClient;
 
-    public MemZeroMemoryController(ChatClient.Builder builder, VectorStore store, MemZeroServiceClient memZeroServiceClient) {
+    public Mem0MemoryController(ChatClient.Builder builder, VectorStore store, Mem0ServiceClient mem0ServiceClient) {
         this.store = store;
-        this.memZeroServiceClient = memZeroServiceClient;
+        this.mem0ServiceClient = mem0ServiceClient;
         this.chatClient = builder
                 .defaultAdvisors(
-                        MemZeroChatMemoryAdvisor.builder(store).build()
+                        Mem0ChatMemoryAdvisor.builder(store).build()
                 )
                 .build();
     }
@@ -59,7 +58,7 @@ public class MemZeroMemoryController {
     public List<Document> messages(
             @RequestParam(value = "query", defaultValue = "我的爱好是什么？") String query,
             @RequestParam(value = "user_id", defaultValue = "miao") String userId) {
-        MemZeroServerRequest.SearchRequest searchRequest = MemZeroServerRequest.SearchRequest.builder().query(query).userId(userId).build();
+        Mem0ServerRequest.SearchRequest searchRequest = Mem0ServerRequest.SearchRequest.builder().query(query).userId(userId).build();
         return store.similaritySearch(searchRequest);
     }
 

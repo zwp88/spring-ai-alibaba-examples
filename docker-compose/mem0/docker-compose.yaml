@@ -3,8 +3,8 @@ name: mem0-dev
 services:
   mem0:
     build:
-      context: ../../spring-ai-alibaba-mem0-example  # Set context to parent directory
-      dockerfile: dev.Dockerfile
+      context: ..  # Set context to parent directory
+      dockerfile: mem0/dev.Dockerfile
     ports:
       - "8888:8000"
     env_file:
