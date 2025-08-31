@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * @author morain.miao
  */
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
 public class Mem0MemoryApplication {
 
 	public static void main(String[] args) {

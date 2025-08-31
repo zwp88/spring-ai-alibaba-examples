@@ -1,8 +1,8 @@
 package com.alibaba.mem0.example.controller;
 
-import com.alibaba.example.chatmemory.mem0.Mem0ChatMemoryAdvisor;
-import com.alibaba.example.chatmemory.mem0.Mem0ServerRequest;
-import com.alibaba.example.chatmemory.mem0.Mem0ServiceClient;
+import com.alibaba.cloud.ai.memory.mem0.mem0.Mem0ChatMemoryAdvisor;
+import com.alibaba.cloud.ai.memory.mem0.mem0.Mem0ServerRequest;
+import com.alibaba.cloud.ai.memory.mem0.mem0.Mem0ServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-import static com.alibaba.example.chatmemory.mem0.Mem0ChatMemoryAdvisor.USER_ID;
+import static com.alibaba.cloud.ai.memory.mem0.mem0.Mem0ChatMemoryAdvisor.USER_ID;
 
 
 /**
@@ -64,69 +64,89 @@ public class Mem0MemoryController {
 
     @GetMapping("/test")
     public void test(){
-        //TODO mem0目前仅支持用户短期记忆，agent的短期记忆和长期记忆有bug。At: 2025-08-22 00:26:05
-        // https://github.com/mem0ai/mem0/issues/3349
+
+//        # Store memories with full context
+//        m.add("User prefers vegetarian food",
+//                user_id="alice",
+//                agent_id="diet-assistant",
+//                run_id="consultation-001")
+//
+//        # Retrieve memories with different scopes
+//                        all_user_memories = m.get_all(user_id="alice")
+//                agent_memories = m.get_all(user_id="alice", agent_id="diet-assistant")
+//                session_memories = m.get_all(user_id="alice", run_id="consultation-001")
+//                specific_memories = m.get_all(user_id="alice", agent_id="diet-assistant", run_id="consultation-001")
+//
+//        # Search with context
+//                        general_search = m.search("What do you know about me?", user_id="alice")
+//                agent_search = m.search("What do you know about me?", user_id="alice", agent_id="diet-assistant")
+//                session_search = m.search("What do you know about me?", user_id="alice", run_id="consultation-001")
+
 
         // 用户短期记忆
-//        memZeroServiceClient.addMemory(
-//                MemZeroServerRequest.MemoryCreate.builder()
+//        mem0ServiceClient.addMemory(
+//                mem0ServerRequest.MemoryCreate.builder()
 //                        .userId("test1")
 //                        .runId("trip-planning-2025")
 //                        .messages(List.of(
-//                                new MemZeroServerRequest.Message("user", "I'm planning a trip to Japan next month."),
-//                                new MemZeroServerRequest.Message("assistant", "That's exciting, Alex! A trip to Japan next month sounds wonderful. Would you like some recommendations for vegetarian-friendly restaurants in Japan?"),
-//                                new MemZeroServerRequest.Message("user", "Yes, please! Especially in Tokyo."),
-//                                new MemZeroServerRequest.Message("assistant", "Great! I'll remember that you're interested in vegetarian restaurants in Tokyo for your upcoming trip. I'll prepare a list for you in our next interaction."))
+//                                new mem0ServerRequest.Message("user", "I'm planning a trip to Japan next month."),
+//                                new mem0ServerRequest.Message("assistant", "That's exciting, Alex! A trip to Japan next month sounds wonderful. Would you like some recommendations for vegetarian-friendly restaurants in Japan?"),
+//                                new mem0ServerRequest.Message("user", "Yes, please! Especially in Tokyo."),
+//                                new mem0ServerRequest.Message("assistant", "Great! I'll remember that you're interested in vegetarian restaurants in Tokyo for your upcoming trip. I'll prepare a list for you in our next interaction."))
 //                        )
 //                        .build());
 //        logger.info("用户短期记忆保存成功");
         // agent的长期记忆
-//        memZeroServiceClient.addMemory(
-//                MemZeroServerRequest.MemoryCreate.builder()
+//        mem0ServiceClient.addMemory(
+//                Mem0ServerRequest.MemoryCreate.builder()
 //                        .agentId("agent1")
 //                        .messages(List.of(
-//                                new MemZeroServerRequest.Message("system", "You are an AI tutor with a personality. Give yourself a name for the user."),
-//                                new MemZeroServerRequest.Message("assistant", "Understood. I'm an AI tutor with a personality. My name is Alice."))
+//                                new Mem0ServerRequest.Message("system", "You are an AI tutor with a personality. Give yourself a name for the user."),
+//                                new Mem0ServerRequest.Message("assistant", "Understood. I'm an AI tutor with a personality. My name is Alice."))
 //                        )
 //                        .build());
 //        logger.info("agent的长期记忆保存成功");
-        //用户和agent的长期记忆
-//        memZeroServiceClient.addMemory(
-//                MemZeroServerRequest.MemoryCreate.builder()
-//                        .agentId("agent2")
-//                        .userId("test2")
-//                        .messages(List.of(
-//                                new MemZeroServerRequest.Message("user", "I'm travelling to San Francisco"),
-//                                new MemZeroServerRequest.Message("assistant", "That's great! I'm going to Dubai next month."))
-//                        )
-//                        .build());
-//        logger.info("用户和agent的长期记忆保存成功");
 
+
+        //用户和agent的长期记忆
+        mem0ServiceClient.addMemory(
+                Mem0ServerRequest.MemoryCreate.builder()
+                        .agentId("agent2")
+                        .userId("test2")
+                        .messages(List.of(
+                                new Mem0ServerRequest.Message("user", "I'm travelling to San Francisco"),
+                                new Mem0ServerRequest.Message("assistant", "That's great! I'm going to Dubai next month."))
+                        )
+                        .build());
+        logger.info("用户和agent的长期记忆保存成功");
+        // 获取用户和agent的长期记忆
+        List<Document> documents = store.similaritySearch(Mem0ServerRequest.SearchRequest.builder().userId("test2").agentId("agent2").build());
+        logger.info("agent的长期记忆: {}", documents);
 
         // 测试agent的短期记忆
-//        memZeroServiceClient.addMemory(
-//                MemZeroServerRequest.MemoryCreate.builder()
+//        mem0ServiceClient.addMemory(
+//                mem0ServerRequest.MemoryCreate.builder()
 //                        .agentId("agent1")
 //                        .runId("trip-planning-2026")
 //                        .messages(List.of(
-//                                new MemZeroServerRequest.Message("system", "You are an AI tutor with a personality. Give yourself a name for the user."),
-//                                new MemZeroServerRequest.Message("assistant", "Understood. I'm an AI tutor with a personality. My name is Alice."))
+//                                new mem0ServerRequest.Message("system", "You are an AI tutor with a personality. Give yourself a name for the user."),
+//                                new mem0ServerRequest.Message("assistant", "Understood. I'm an AI tutor with a personality. My name is Alice."))
 //                        )
 //                        .build());
 //        logger.info("agent的短期记忆保存成功");
 //
-//        logger.info("allMemories: {}", memZeroServiceClient.getAllMemories("test", null, null));
-//        logger.info("allMemories: {}", memZeroServiceClient.getAllMemories(null, "123", null));
-//        logger.info("allMemories: {}", memZeroServiceClient.getAllMemories(null, null, "qwen"));
-//        logger.info("allMemories: {}", memZeroServiceClient.getAllMemories("test", "123", "qwen"));
-//        MemZeroServerResp allMemories = memZeroServiceClient.getAllMemories("test", null, null);
-//        Map<String, Object> memory = memZeroServiceClient.updateMemory(allMemories.getResults().stream().findFirst().get().getId(), Map.of("memory", "我是测试同学，我不喜欢敲代码"));
+//        logger.info("allMemories: {}", mem0ServiceClient.getAllMemories("test", null, null));
+//        logger.info("allMemories: {}", mem0ServiceClient.getAllMemories(null, "123", null));
+//        logger.info("allMemories: {}", mem0ServiceClient.getAllMemories(null, null, "qwen"));
+//        logger.info("allMemories: {}", mem0ServiceClient.getAllMemories("test", "123", "qwen"));
+//        mem0ServerResp allMemories = mem0ServiceClient.getAllMemories("test", null, null);
+//        Map<String, Object> memory = mem0ServiceClient.updateMemory(allMemories.getResults().stream().findFirst().get().getId(), Map.of("memory", "我是测试同学，我不喜欢敲代码"));
 //        logger.info("updateMemory: {}", memory);
-//        List<Map<String, Object>> memoryHistory = memZeroServiceClient.getMemoryHistory(allMemories.getResults().stream().findFirst().get().getId());
+//        List<Map<String, Object>> memoryHistory = mem0ServiceClient.getMemoryHistory(allMemories.getResults().stream().findFirst().get().getId());
 //        logger.info("memoryHistory: {}", memoryHistory);
 //
-//        memZeroServiceClient.deleteMemory(allMemories.getResults().stream().findFirst().get().getId());
-//        memZeroServiceClient.deleteAllMemories("test", null, null);
+//        mem0ServiceClient.deleteMemory(allMemories.getResults().stream().findFirst().get().getId());
+//        mem0ServiceClient.deleteAllMemories("test", null, null);
 
 
     }
