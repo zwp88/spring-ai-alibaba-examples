@@ -32,6 +32,7 @@ MEMGRAPH_USERNAME = os.environ.get("MEMGRAPH_USERNAME", "memgraph")
 MEMGRAPH_PASSWORD = os.environ.get("MEMGRAPH_PASSWORD", "mem0graph")
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
 HISTORY_DB_PATH = os.environ.get("HISTORY_DB_PATH", "/app/history/history.db")
 
 DEFAULT_CONFIG = {
@@ -56,12 +57,11 @@ DEFAULT_CONFIG = {
         },
     },
     "llm": {
-        "provider": "openai",
+        "provider": "deepseek",
         "config": {
-            "api_key": OPENAI_API_KEY,
+            "api_key": DEEPSEEK_API_KEY,
             "temperature": 0.2,
-            "model": "qwen-turbo",
-            "openai_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+            "model": "deepseek-chat"
         }
     },
     "embedder": {

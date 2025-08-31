@@ -57,7 +57,9 @@ services:
       - "8474:7474" # HTTP
       - "8687:7687" # Bolt
     volumes:
-      - neo4j_data:/data
+      - ./neo4j/data:/data  # 将 Neo4j 数据存储到 mem0 目录
+      - ./neo4j/logs:/logs  # 将 Neo4j 日志存储到 mem0 目录
+      - ./neo4j/import:/var/lib/neo4j/import  # 将 Neo4j 导入目录存储到 mem0 目录
     environment:
       - NEO4J_AUTH=neo4j/mem0graph
       - NEO4J_PLUGINS=["apoc"]  # Add this line to install APOC
