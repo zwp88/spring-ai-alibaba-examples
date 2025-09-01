@@ -21,6 +21,7 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.example.chat.qwq.advisor.ReasoningContentAdvisor;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.http.MediaType;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -100,7 +101,7 @@ public class QWQChatClientController {
 	 * System Message：
 	 * 	为了达到模型的最佳推理效果，不建议设置 System Message。
 	 */
-	@GetMapping("/stream/chat")
+	@GetMapping(value = "/stream/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<String> streamChat(HttpServletResponse response) {
 
 		// 避免返回乱码
