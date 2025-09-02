@@ -1,0 +1,52 @@
+server:
+  port: 18080
+
+spring:
+  application:
+    name: spring-ai-alibaba-mcp-config-example
+
+  ai:
+    dashscope:
+      api-key: ${AI_DASHSCOPE_API_KEY}
+    alibaba:
+      mcp:
+        nacos:
+          server-addr: 192.168.1.70:8848
+          namespace: public
+          username: nacos
+          password: nacos
+          register:
+            enabled: true
+        router:
+          # 是否启用 MCP 路由器，默认为 true
+          enabled: true
+
+          # 服务发现类型，支持 nacos, file, database，默认为 nacos
+          discovery-type: file
+
+          # MCP 服务名称列表（可选）
+          service-names:
+            - "service-a"
+            - "service-b"
+
+          # MCP 服务详细配置列表
+          services:
+            - name: "service-a"
+              description: "第一个MCP服务"
+              protocol: "http"
+              version: "1.0.0"
+              endpoint: "http://service-a:8080/mcp"
+              enabled: true
+              tags:
+                - "tag1"
+                - "tag2"
+
+            - name: "service-b"
+              description: "第二个MCP服务"
+              protocol: "grpc"
+              version: "2.0.0"
+              endpoint: "grpc://service-b:9090"
+              enabled: false
+              tags:
+                - "tag3"
+                - "tag4"
