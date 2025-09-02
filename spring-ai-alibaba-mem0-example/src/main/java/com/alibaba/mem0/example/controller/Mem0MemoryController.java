@@ -1,8 +1,8 @@
 package com.alibaba.mem0.example.controller;
 
-import com.alibaba.cloud.ai.memory.mem0.mem0.Mem0ChatMemoryAdvisor;
-import com.alibaba.cloud.ai.memory.mem0.mem0.Mem0ServerRequest;
-import com.alibaba.cloud.ai.memory.mem0.mem0.Mem0ServiceClient;
+import com.alibaba.cloud.ai.memory.mem0.advisor.Mem0ChatMemoryAdvisor;
+import com.alibaba.cloud.ai.memory.mem0.core.Mem0ServiceClient;
+import com.alibaba.cloud.ai.memory.mem0.model.Mem0ServerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-import static com.alibaba.cloud.ai.memory.mem0.mem0.Mem0ChatMemoryAdvisor.USER_ID;
+import static com.alibaba.cloud.ai.memory.mem0.advisor.Mem0ChatMemoryAdvisor.USER_ID;
 
 
 /**
