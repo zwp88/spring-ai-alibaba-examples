@@ -1,6 +1,21 @@
+/*
+ * Copyright 2025-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.alibaba.cloud.ai.example.config.controller;
 
-import com.alibaba.cloud.ai.mcp.nacos.service.NacosMcpOperationService;
 import com.alibaba.cloud.ai.mcp.router.config.McpRouterProperties;
 import com.alibaba.cloud.ai.mcp.router.core.discovery.McpServiceDiscovery;
 import com.alibaba.cloud.ai.mcp.router.model.McpServerInfo;
@@ -13,21 +28,15 @@ import java.util.StringJoiner;
 
 
 @RestController
-public class ReadConfigController {
+public class McpConfigController {
 
     private final McpRouterProperties properties;
     private final McpServiceDiscovery discovery;
-    // TODO: 目前主仓库的com/alibaba/cloud/ai/autoconfigure/mcp/router/NacosMcpRouterAutoConfiguration.java
-    //       的自动配置似乎没有实现。验证：取消下列注释，IDE提示无法自动装配
-    private final NacosMcpOperationService nacosMcpOperationService;
 
     @Autowired
-    public ReadConfigController(McpRouterProperties properties, McpServiceDiscovery discovery
-            , NacosMcpOperationService nacosMcpOperationService
-    ) {
+    public McpConfigController(McpRouterProperties properties, McpServiceDiscovery discovery) {
         this.properties = properties;
         this.discovery = discovery;
-        this.nacosMcpOperationService = nacosMcpOperationService;
     }
 
     @GetMapping("/mcp/services")
