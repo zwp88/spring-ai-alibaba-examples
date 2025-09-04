@@ -1,52 +1,45 @@
-server:
-  port: 18080
-
 spring:
-  application:
-    name: spring-ai-alibaba-mcp-config-example
-
   ai:
-    dashscope:
-      api-key: ${AI_DASHSCOPE_API_KEY}
     alibaba:
       mcp:
-        nacos:
-          server-addr: 192.168.1.70:8848
-          namespace: public
-          username: nacos
-          password: nacos
-          register:
-            enabled: true
         router:
-          # 是否启用 MCP 路由器，默认为 true
           enabled: true
-
-          # 服务发现类型，支持 nacos, file, database，默认为 nacos
-          discovery-type: file
-
-          # MCP 服务名称列表（可选）
-          service-names:
-            - "service-a"
-            - "service-b"
-
-          # MCP 服务详细配置列表
+          discovery-type: nacos
           services:
-            - name: "service-a"
-              description: "第一个MCP服务"
+            - name: weather-service
+              description: "天气查询服务"
               protocol: "http"
               version: "1.0.0"
-              endpoint: "http://service-a:8080/mcp"
+              endpoint: "http://localhost:8080/weather"
               enabled: true
               tags:
-                - "tag1"
-                - "tag2"
-
-            - name: "service-b"
-              description: "第二个MCP服务"
-              protocol: "grpc"
+                - "weather"
+                - "api"
+            - name: translation-service
+              description: "翻译服务"
+              protocol: "http"
               version: "2.0.0"
-              endpoint: "grpc://service-b:9090"
+              endpoint: "http://localhost:8081/translate"
+              enabled: true
+              tags:
+                - "translation"
+                - "nlp"
+            - name: disabled-service
+              description: "已禁用的服务"
+              protocol: "http"
+              version: "1.0.0"
+              endpoint: "http://localhost:8082/disabled"
               enabled: false
               tags:
-                - "tag3"
-                - "tag4"
+                - "test"
+
+logging:
+  level:
+    com.alibaba.cloud.ai: INFO
+    com.alibaba.cloud.ai.test: INFO
+    com.alibaba.cloud.ai.autoconfigure: INFO
+    org.springframework.boot.autoconfigure: INFO
+    org.springframework.boot.autoconfigure.condition: INFO
+    org.springframework.context.annotation: INFO
+    org.springframework.boot.context.properties: INFO
+    root: INFO

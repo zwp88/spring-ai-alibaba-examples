@@ -18,24 +18,25 @@
 package com.alibaba.cloud.ai.example.config;
 
 import com.alibaba.cloud.ai.mcp.router.config.McpRouterProperties;
+import com.alibaba.cloud.ai.mcp.router.core.discovery.FileConfigMcpServiceDiscovery;
+import com.alibaba.cloud.ai.mcp.router.core.discovery.McpServiceDiscovery;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 
-import java.util.List;
-
-
-/**
- * @author digitzh
- * @author <a href="mailto:642457535@qq.com">digitzh</a>
- */
 
 @SpringBootApplication
 @EnableConfigurationProperties(McpRouterProperties.class)
-public class ReadConfigApplication {
+public class TestMcpConfigApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ReadConfigApplication.class, args);
+        SpringApplication.run(TestMcpConfigApplication.class, args);
     }
-}
 
+    @Bean
+    public McpServiceDiscovery mcpServiceDiscovery(McpRouterProperties properties) {
+        return new FileConfigMcpServiceDiscovery(properties);
+    }
+
+}
