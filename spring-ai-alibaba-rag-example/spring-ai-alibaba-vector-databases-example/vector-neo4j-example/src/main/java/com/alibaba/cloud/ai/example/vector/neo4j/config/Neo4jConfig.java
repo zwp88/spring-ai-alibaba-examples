@@ -36,7 +36,6 @@ public class Neo4jConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(Neo4jConfig.class);
 
-
     @Value("${spring.neo4j.uri}")
     private String uri;
     @Value("${spring.neo4j.authentication.username}")
