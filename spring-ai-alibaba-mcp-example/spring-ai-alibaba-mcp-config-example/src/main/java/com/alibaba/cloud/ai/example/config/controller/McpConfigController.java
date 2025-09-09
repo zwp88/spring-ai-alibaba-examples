@@ -21,6 +21,7 @@ import com.alibaba.cloud.ai.mcp.router.core.discovery.McpServiceDiscovery;
 import com.alibaba.cloud.ai.mcp.router.model.McpServerInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -39,7 +40,13 @@ public class McpConfigController {
         this.discovery = discovery;
     }
 
-    @GetMapping("/mcp/services")
+    @GetMapping("/discovery-type")
+    public String getDiscoveryType() {
+        String className = discovery.getClass().getSimpleName();
+        return "当前使用的 McpServiceDiscovery 实现类是: " + className;
+    }
+
+    @GetMapping("/file/services")
     public String getMcpServices() {
         StringJoiner result = new StringJoiner("\n");
         result.add("=== MCP服务配置信息 ===");
@@ -67,4 +74,10 @@ public class McpConfigController {
 
         return result.toString();
     }
+
+    @GetMapping("/query/{serviceName}")
+    public McpServerInfo getMcpServiceInfo(@PathVariable String serviceName) {
+        return discovery.getService(serviceName);
+    }
+
 }

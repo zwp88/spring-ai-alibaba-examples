@@ -2,7 +2,7 @@
 
 ## 项目介绍
 
-Spring AI Alibaba MCP Config Example是一个演示读取MCP服务配置的示例项目。
+Spring AI Alibaba MCP Config Example 是一个演示读取 MCP 服务配置的示例项目。
 
 ## 版本要求
 
@@ -18,16 +18,12 @@ Spring AI Alibaba MCP Config Example是一个演示读取MCP服务配置的示�
 
 ### 从配置文件中读取
 
-配置 application.yml，举例：
+在 application.yml 中配置服务发现类型为file，添加服务列表，举例：
 
 ```yml
-spring:
-  ai:
-    alibaba:
-      mcp:
-        router:
+spring.ai.alibaba.mcp.router:
           enabled: true  # 启用MCP路由
-          discovery-type: nacos  # 服务发现类型
+          discovery-type: file  # 服务发现类型
           services:  # 服务列表
             - name: weather-service  # 服务名称
               description: "天气查询服务"
@@ -39,7 +35,52 @@ spring:
                 - "weather"
                 - "api"
 ```
-运行程序，即可从配置文件中读取 MCP 服务配置信息。
+发送 HTTP GET 请求 `http://localhost:8080/file/services` ，从 application.yml 配置文件中读取所有 MCP 服务配置信息。
+
+发送 HTTP GET 请求（示例：`http://localhost:8080/query/weather-service` ），读取指定 MCP 服务配置信息。
+
+### 从 MySQL 数据库中读取
+
+在 application.yml 中配置服务发现类型为`mysql`，添加 MySQL 配置，举例：
+
+```yml
+spring.ai.alibaba.mcp.router:
+   enabled: true  # 启用MCP路由
+   discovery-type: mysql  # 服务发现类型
+   mysql:
+      url: jdbc:mysql://localhost:3306/testdb?useSSL=false&serverTimezone=UTC
+      username: root
+      password: root
+      driverClassName: com.mysql.cj.jdbc.Driver
+      tableName: mcp_server_info
+```
+
+创建 MySQL 数据库表并添加示例记录，举例：
+
+```sql
+-- 创建mcp_server_info表
+CREATE TABLE IF NOT EXISTS mcp_server_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE COMMENT '服务名称',
+    description TEXT COMMENT '服务描述',
+    protocol VARCHAR(50) COMMENT '服务协议',
+    version VARCHAR(50) COMMENT '服务版本',
+    endpoint VARCHAR(255) COMMENT '服务访问端点',
+    enabled BOOLEAN DEFAULT TRUE COMMENT '是否启用',
+    tags VARCHAR(255) COMMENT '标签，逗号分隔',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 添加示例记录
+INSERT INTO mcp_server_info (name, description, protocol, version, endpoint, enabled, tags)
+VALUES
+('dashscope-chat', '阿里云通义千问大模型服务', 'http', 'v1', 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/num-tokens', TRUE, 'chat,llm,aliyun'),
+('openai-embedding', 'OpenAI Embedding服务', 'http', 'v1', 'https://api.openai.com/v1/embeddings', TRUE, 'embedding,openai'),
+('custom-service-a', '自定义服务A', 'grpc', 'v1.0', 'grpc://localhost:9090', TRUE, 'custom,test');
+```
+
+发送 HTTP GET 请求（示例：`http://localhost:8080/mysql/dashscope-chat` ），从 MySQL 数据库读取 MCP 服务配置信息。
 
 ### 从 Nacos 配置中心读取
 
@@ -47,8 +88,6 @@ spring:
 
 2. 注册 MCP 服务
 
-   注册 MCP 服务，服务名称为 `weather-service`，服务版本为 `1.0.0`，服务端点为 `http://localhost:8080/weather`，服务标签为 `weather,api`。
+3. 发送 HTTP GET 请求
 
-3. 运行程序
-
-   运行程序，即可从 Nacos 配置中心读取 MCP 服务配置信息。
+   发送 HTTP GET 请求 `http://localhost:8080/nacos/services` ，从 Nacos 配置中心读取 MCP 服务配置信息。
