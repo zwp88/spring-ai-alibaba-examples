@@ -7,18 +7,19 @@ Spring AI Alibaba MCP Config Example 是一个演示读取 MCP 服务配置的�
 ## 版本要求
 
 1. Nacos: 3.0.1+
-2. spring ai alibaba: 1.0.0.3-SNAPSHOT+
+2. Spring AI Alibaba: 1.0.0.4-SNAPSHOT+
 
 ## 功能特性
 
 - 从配置文件（application.yml）中读取
+- 从 MySQL 数据库中读取
 - 从 Nacos 配置中心读取
 
 ## 快速开始
 
 ### 从配置文件中读取
 
-在 application.yml 中配置服务发现类型为file，添加服务列表，举例：
+在 application.yml 中配置服务发现类型为 file ，添加服务列表，举例：
 
 ```yml
 spring.ai.alibaba.mcp.router:
@@ -35,19 +36,19 @@ spring.ai.alibaba.mcp.router:
                 - "weather"
                 - "api"
 ```
-发送 HTTP GET 请求 `http://localhost:8080/file/services` ，从 application.yml 配置文件中读取所有 MCP 服务配置信息。
+发送 HTTP GET 请求，从 application.yml 配置文件中读取所有/特定 MCP 服务配置信息。
 
-发送 HTTP GET 请求（示例：`http://localhost:8080/query/weather-service` ），读取指定 MCP 服务配置信息。
+> 注：示例 HTTP 请求，参见 [configRequests.http](src/main/resources/configRequests.http)。
 
 ### 从 MySQL 数据库中读取
 
-在 application.yml 中配置服务发现类型为`mysql`，添加 MySQL 配置，举例：
+在 application.yml 中配置服务发现类型为`database`，添加 MySQL 配置，举例：
 
 ```yml
 spring.ai.alibaba.mcp.router:
    enabled: true  # 启用MCP路由
-   discovery-type: mysql  # 服务发现类型
-   mysql:
+   discovery-type: database  # 服务发现类型
+   database:
       url: jdbc:mysql://localhost:3306/testdb?useSSL=false&serverTimezone=UTC
       username: root
       password: root
@@ -80,7 +81,9 @@ VALUES
 ('custom-service-a', '自定义服务A', 'grpc', 'v1.0', 'grpc://localhost:9090', TRUE, 'custom,test');
 ```
 
-发送 HTTP GET 请求（示例：`http://localhost:8080/mysql/dashscope-chat` ），从 MySQL 数据库读取 MCP 服务配置信息。
+发送 HTTP GET 请求，从 MySQL 数据库读取 MCP 服务配置信息。
+
+> 注：从文件读取和从数据库读取的请求格式均整合为`GET http://localhost:8080/query/{serviceName}` ，其中`{serviceName}`为服务名称。
 
 ### 从 Nacos 配置中心读取
 
@@ -89,5 +92,3 @@ VALUES
 2. 注册 MCP 服务
 
 3. 发送 HTTP GET 请求
-
-   发送 HTTP GET 请求 `http://localhost:8080/nacos/services` ，从 Nacos 配置中心读取 MCP 服务配置信息。
