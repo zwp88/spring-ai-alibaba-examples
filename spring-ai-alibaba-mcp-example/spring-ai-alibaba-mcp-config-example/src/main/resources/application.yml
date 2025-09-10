@@ -1,6 +1,11 @@
 spring:
   application:
     name: mcp-config-example
+# TODO: MCP server 启用后报错，本示例暂不启用
+  ai:
+    mcp:
+      server:
+        enabled: false
 
 spring.ai.alibaba.mcp.router:
   enabled: true

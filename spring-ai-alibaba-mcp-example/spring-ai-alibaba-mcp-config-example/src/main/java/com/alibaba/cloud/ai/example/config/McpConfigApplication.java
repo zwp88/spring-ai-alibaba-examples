@@ -22,7 +22,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.alibaba.cloud.ai.mcp.router", "com.alibaba.cloud.ai.example.config"})
+@ComponentScan(basePackages = {"com.alibaba.cloud.ai.example.config", "com.alibaba.cloud.ai.mcp.router"})
 public class McpConfigApplication {
 
     public static void main(String[] args) {
