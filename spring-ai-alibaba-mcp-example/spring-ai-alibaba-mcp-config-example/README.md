@@ -4,6 +4,8 @@
 
 Spring AI Alibaba MCP Config Example 是一个演示读取 MCP 服务配置的示例项目。
 
+引入了多源支持架构，允许同时使用多种服务发现方式，提供更灵活和可靠的服务发现机制。
+
 ## 版本要求
 
 1. Nacos: 3.0.1+
@@ -12,19 +14,33 @@ Spring AI Alibaba MCP Config Example 是一个演示读取 MCP 服务配置的�
 ## 功能特性
 
 - 从配置文件（application.yml）中读取
-- 从 MySQL 数据库中读取
+- 从数据库（如 MySQL）中读取
 - 从 Nacos 配置中心读取
 
 ## 快速开始
 
+### 服务发现顺序
+
+配置项`discovery-order`决定服务发现的顺序。举例：
+
+```yml
+    alibaba:
+      mcp:
+        router:
+          enabled: true
+          discovery-order:
+            - file
+            - database
+            - nacos
+```
+
 ### 从配置文件中读取
 
-在 application.yml 中配置服务发现类型为 file ，添加服务列表，举例：
+在 application.yml 中配置服务列表，举例：
 
 ```yml
 spring.ai.alibaba.mcp.router:
           enabled: true  # 启用MCP路由
-          discovery-type: file  # 服务发现类型
           services:  # 服务列表
             - name: weather-service  # 服务名称
               description: "天气查询服务"
@@ -40,15 +56,15 @@ spring.ai.alibaba.mcp.router:
 
 > 注：示例 HTTP 请求，参见 [configRequests.http](src/main/resources/configRequests.http)。
 
-### 从 MySQL 数据库中读取
+### 从数据库中读取
 
-在 application.yml 中配置服务发现类型为`database`，添加 MySQL 配置，举例：
+在 application.yml 中添加数据库（如 MySQL）配置，举例：
 
 ```yml
 spring.ai.alibaba.mcp.router:
    enabled: true  # 启用MCP路由
-   discovery-type: database  # 服务发现类型
    database:
+      enabled: true
       url: jdbc:mysql://localhost:3306/testdb?useSSL=false&serverTimezone=UTC
       username: root
       password: root
@@ -83,9 +99,15 @@ VALUES
 
 发送 HTTP GET 请求，从 MySQL 数据库读取 MCP 服务配置信息。
 
-> 注：从文件读取和从数据库读取的请求格式均整合为`GET http://localhost:8080/query/{serviceName}` ，其中`{serviceName}`为服务名称。
-
 ### 从 Nacos 配置中心读取
+
+在 application.yml 中添加 Nacos 配置，举例：
+
+```yml
+spring.ai.alibaba.mcp.nacos:
+  server-addr: localhost:8848
+  namespace: public
+```
 
 1. 启动 Nacos 服务
 

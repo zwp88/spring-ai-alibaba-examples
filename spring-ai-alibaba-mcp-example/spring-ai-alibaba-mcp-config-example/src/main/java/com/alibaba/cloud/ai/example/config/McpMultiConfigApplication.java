@@ -29,7 +29,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 /**
  * MCP Multi Source Discovery Example
- * supports multiple service discovery sources: file, database, and Nacos
+ * supports multiple service discovery sources: file, database, Nacos
  */
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.alibaba.cloud.ai.example.config", "com.alibaba.cloud.ai.mcp.router", "com.alibaba.cloud.ai.autoconfigure.mcp.router"})
