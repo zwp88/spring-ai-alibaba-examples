@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.codec.ServerSentEvent;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
 import java.util.Map;
@@ -33,10 +34,9 @@ public class GraphProcess {
         this.compiledGraph = compiledGraph;
     }
 
-    public void processStream(AsyncGenerator<NodeOutput> generator, Sinks.Many<ServerSentEvent<String>> sink) {
-        executor.submit(() -> {
-            generator.forEachAsync(output -> {
-                try {
+    public void processStream(Flux<NodeOutput> nodeOutputFlux, Sinks.Many<ServerSentEvent<String>> sink) {
+        nodeOutputFlux
+                .doOnNext(output -> {
                     logger.info("output = {}", output);
                     String nodeName = output.node();
                     String content;
@@ -49,16 +49,15 @@ public class GraphProcess {
                         content = JSON.toJSONString(nodeOutput);
                     }
                     sink.tryEmitNext(ServerSentEvent.builder(content).build());
-                } catch (Exception e) {
-                    throw new CompletionException(e);
-                }
-            }).thenAccept(v -> {
-                // 正常完成
-                sink.tryEmitComplete();
-            }).exceptionally(e -> {
-                sink.tryEmitError(e);
-                return null;
-            });
-        });
+                })
+                .doOnComplete(() -> {
+                    // 正常完成
+                    sink.tryEmitComplete();
+                })
+                .doOnError(e -> {
+                    logger.error("Error occurred during streaming", e);
+                    sink.tryEmitError(e);
+                })
+                .subscribe();
     }
 }

@@ -88,7 +88,9 @@ public class GraphStreamController {
 		GraphProcess graphProcess = new GraphProcess();
 
 		// Get streaming output
-		AsyncGenerator<NodeOutput> resultStream = compiledGraph.stream(initialState, runnableConfig);
+//		AsyncGenerator<NodeOutput> resultStream = compiledGraph.stream(initialState, runnableConfig);
+		Flux<NodeOutput> resultStream = compiledGraph.fluxStream(initialState, runnableConfig);
+
 
 		// 直接返回 Reactor 风格的 Flux，保证 trace context 传播
 		return graphProcess.processStream(resultStream)

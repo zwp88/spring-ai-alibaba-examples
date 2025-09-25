@@ -66,6 +66,60 @@ public class GraphProcess {
 		return Flux.create(sink -> processNext(generator, sink));
 	}
 
+	public Flux<ServerSentEvent<String>> processStream(Flux<NodeOutput> generator) {
+		return Flux.create(sink -> processNext(generator, sink));
+	}
+
+	public void processNext(Flux<NodeOutput> generator,
+							reactor.core.publisher.FluxSink<ServerSentEvent<String>> sink) {
+		generator.subscribe(
+				output -> {
+					logger.debug("processNext: output node={}, output class={}, output={}",
+							output != null ? output.node() : null,
+							output != null ? output.getClass().getName() : null, output);
+
+					String content;
+					if (output instanceof StreamingOutput streamingOutput) {
+						content = JSON.toJSONString(Map.of("type", "streaming", "node", output.node(), "chunk",
+								streamingOutput.chunk(), "timestamp", System.currentTimeMillis()));
+					}
+					else {
+						JSONObject nodeOutput = new JSONObject();
+						nodeOutput.put("type", "node_output");
+						nodeOutput.put("node", output.node());
+						nodeOutput.put("data", output.state().data());
+						nodeOutput.put("timestamp", System.currentTimeMillis());
+						content = JSON.toJSONString(nodeOutput);
+					}
+
+					logger.debug("processNext: emitting SSE event for node {}",
+							output != null ? output.node() : null);
+
+					sink.next(ServerSentEvent.builder(content)
+							.event("node_output")
+							.id(output.node() + "_" + System.currentTimeMillis())
+							.build());
+				},
+				error -> {
+					logger.error("processNext: Error occurred in data stream", error);
+					sink.next(ServerSentEvent.builder("{\"type\":\"error\",\"message\":\"" + error.getMessage() + "\"}")
+							.event("error")
+							.build());
+					sink.next(ServerSentEvent.builder("{\"type\":\"completed\",\"message\":\"Graph processing completed with error\"}")
+							.event("completed")
+							.build());
+					sink.complete();
+				},
+				() -> {
+					logger.debug("processNext: Graph processing completed");
+					sink.next(ServerSentEvent.builder("{\"type\":\"completed\",\"message\":\"Graph processing completed\"}")
+							.event("completed")
+							.build());
+					sink.complete();
+				}
+		);
+	}
+
 	private void processNext(AsyncGenerator<NodeOutput> generator,
 			reactor.core.publisher.FluxSink<ServerSentEvent<String>> sink) {
 		AsyncGenerator.Data<NodeOutput> data = generator.next();

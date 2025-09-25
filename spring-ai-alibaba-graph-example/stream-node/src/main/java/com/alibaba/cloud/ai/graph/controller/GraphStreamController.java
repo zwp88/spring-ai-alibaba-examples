@@ -4,7 +4,6 @@ import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.alibaba.cloud.ai.graph.NodeOutput;
 import com.alibaba.cloud.ai.graph.RunnableConfig;
 import com.alibaba.cloud.ai.graph.StateGraph;
-import com.alibaba.cloud.ai.graph.async.AsyncGenerator;
 import com.alibaba.cloud.ai.graph.controller.GraphProcess.GraphProcess;
 import com.alibaba.cloud.ai.graph.exception.GraphRunnerException;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
@@ -50,8 +49,8 @@ public class GraphStreamController {
 
         GraphProcess graphProcess = new GraphProcess(this.compiledGraph);
         Sinks.Many<ServerSentEvent<String>> sink = Sinks.many().unicast().onBackpressureBuffer();
-        AsyncGenerator<NodeOutput> resultFuture = compiledGraph.stream(objectMap, runnableConfig);
-        graphProcess.processStream(resultFuture, sink);
+        Flux<NodeOutput> nodeOutputFlux = compiledGraph.fluxStream(objectMap, runnableConfig);
+        graphProcess.processStream(nodeOutputFlux, sink);
 
         return sink.asFlux()
                 .doOnCancel(() -> logger.info("Client disconnected from stream"))

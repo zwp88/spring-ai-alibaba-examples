@@ -33,14 +33,11 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import static com.alibaba.cloud.ai.graph.StateGraph.END;
-import static com.alibaba.cloud.ai.graph.StateGraph.START;
-import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
-import static com.alibaba.cloud.ai.graph.agent.ReflectAgent.MESSAGES;
 
 @Configuration
 public class RelectionAutoconfiguration {
@@ -97,17 +94,18 @@ public class RelectionAutoconfiguration {
 
 			List<Message> messages = (List<Message>) overAllState.value(ReflectAgent.MESSAGES).get();
 
-			OverAllStateFactory stateFactory = () -> {
-				OverAllState state = new OverAllState();
-				state.registerKeyAndStrategy(ReflectAgent.MESSAGES, new AppendStrategy());
-				return state;
+			KeyStrategyFactory keyStrategyFactory = () -> {
+				HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+
+				keyStrategyHashMap.put(ReflectAgent.MESSAGES, new AppendStrategy());
+				return keyStrategyHashMap;
 			};
 
-			StateGraph stateGraph = new StateGraph(stateFactory).addNode(this.NODE_ID, AsyncNodeAction.node_async(llmNode))
+			StateGraph stateGraph = new StateGraph(keyStrategyFactory).addNode(this.NODE_ID, AsyncNodeAction.node_async(llmNode))
 				.addEdge(StateGraph.START, this.NODE_ID)
 				.addEdge(this.NODE_ID, StateGraph.END);
 
-			OverAllState invokeState = stateGraph.compile().invoke(Map.of(ReflectAgent.MESSAGES, messages)).get();
+			OverAllState invokeState = stateGraph.compile().call(Map.of(ReflectAgent.MESSAGES, messages)).get();
 			List<Message> reactMessages = (List<Message>) invokeState.value(ReflectAgent.MESSAGES).orElseThrow();
 
 			return Map.of(ReflectAgent.MESSAGES, reactMessages);
@@ -175,19 +173,21 @@ public class RelectionAutoconfiguration {
 		public Map<String, Object> apply(OverAllState allState) throws Exception {
 			List<Message> messages = (List<Message>) allState.value(ReflectAgent.MESSAGES).get();
 
-			OverAllStateFactory stateFactory = () -> {
-				OverAllState state = new OverAllState();
-				state.registerKeyAndStrategy(ReflectAgent.MESSAGES, new AppendStrategy());
-				return state;
+
+			KeyStrategyFactory keyStrategyFactory = () -> {
+				HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+
+				keyStrategyHashMap.put(ReflectAgent.MESSAGES, new AppendStrategy());
+				return keyStrategyHashMap;
 			};
 
-			StateGraph stateGraph = new StateGraph(stateFactory).addNode(this.NODE_ID, AsyncNodeAction.node_async(llmNode))
+			StateGraph stateGraph = new StateGraph(keyStrategyFactory).addNode(this.NODE_ID, AsyncNodeAction.node_async(llmNode))
 				.addEdge(StateGraph.START, this.NODE_ID)
 				.addEdge(this.NODE_ID, StateGraph.END);
 
 			CompiledGraph compile = stateGraph.compile();
 
-			OverAllState invokeState = compile.invoke(Map.of(ReflectAgent.MESSAGES, messages)).get();
+			OverAllState invokeState = compile.call(Map.of(ReflectAgent.MESSAGES, messages)).get();
 
 			UnaryOperator<List<Message>> convertLastToUserMessage = messageList -> {
 				int size = messageList.size();
