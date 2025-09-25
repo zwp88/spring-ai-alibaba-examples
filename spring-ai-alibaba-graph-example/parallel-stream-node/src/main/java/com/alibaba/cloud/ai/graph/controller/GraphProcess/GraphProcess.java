@@ -27,8 +27,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author yingzi
@@ -38,8 +36,6 @@ import java.util.concurrent.Executors;
 public class GraphProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(GraphProcess.class);
-
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private CompiledGraph compiledGraph;
 

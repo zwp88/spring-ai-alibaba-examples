@@ -27,8 +27,6 @@ import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Graph Processor
@@ -45,8 +43,6 @@ import java.util.concurrent.Executors;
 public class GraphProcess {
 
 	private static final Logger logger = LoggerFactory.getLogger(GraphProcess.class);
-
-	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	/**
 	 * Constructor for GraphProcess
