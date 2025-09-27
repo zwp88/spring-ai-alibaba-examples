@@ -21,6 +21,7 @@ import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.alibaba.cloud.ai.graph.GraphRepresentation;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
@@ -68,16 +69,11 @@ public class BigToolController {
 		this.initializeVectorStore();
 		ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
 
-		KeyStrategyFactory keyStrategyFactory  = () -> {
-			HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
-
-			keyStrategyHashMap.put(Constant.INPUT_KEY, new ReplaceStrategy());
-			keyStrategyHashMap.put(Constant.HIT_TOOL, new ReplaceStrategy());
-			keyStrategyHashMap.put(Constant.SOLUTION, new ReplaceStrategy());
-			keyStrategyHashMap.put(Constant.TOOL_LIST, new ReplaceStrategy());
-
-			return keyStrategyHashMap;
-		};
+		KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
+				.addPatternStrategy(Constant.INPUT_KEY, new ReplaceStrategy())
+				.addPatternStrategy(Constant.HIT_TOOL, new ReplaceStrategy())
+				.addPatternStrategy(Constant.SOLUTION, new ReplaceStrategy())
+				.addPatternStrategy(Constant.TOOL_LIST, new ReplaceStrategy()).build();
 
 		ToolAgent tools = new ToolAgent(chatClient, Constant.INPUT_KEY, vectorStoreService);
 

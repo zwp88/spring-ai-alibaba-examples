@@ -8,6 +8,7 @@ import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.alibaba.cloud.ai.graph.GraphRepresentation;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
@@ -31,17 +32,13 @@ public class GraphBuilder {
     public CompiledGraph buildGraph(ChatModel chatModel) throws GraphStateException {
         ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
 
-
-        KeyStrategyFactory keyStrategyFactory = () -> {
-            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
-            keyStrategyHashMap.put("input", (o1, o2) -> o2);
-            keyStrategyHashMap.put("1711529066687_output", (o1, o2) -> o2);
-            keyStrategyHashMap.put("17440815773820_output", (o1, o2) -> o2);
-            keyStrategyHashMap.put("1711529036587_output", (o1, o2) -> o2);
-            keyStrategyHashMap.put("1711529077513_output", (o1, o2) -> o2);
-
-            return keyStrategyHashMap;
-        };
+        KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
+                .addPatternStrategy("input", (o1, o2) -> o2)
+                .addPatternStrategy("1711529066687_output", (o1, o2) -> o2)
+                .addPatternStrategy("17440815773820_output", (o1, o2) -> o2)
+                .addPatternStrategy("1711529036587_output", (o1, o2) -> o2)
+                .addPatternStrategy("1711529077513_output", (o1, o2) -> o2)
+                .build();
 
         StateGraph stateGraph = new StateGraph(keyStrategyFactory);
         // add nodes

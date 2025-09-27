@@ -3,6 +3,7 @@ package com.alibaba.cloud.ai.graph.config;
 import com.alibaba.cloud.ai.graph.GraphRepresentation;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.node.McpNode;
@@ -35,14 +36,10 @@ public class McpGraphConfiguration {
 
     @Bean
     public StateGraph mcpGraph(ChatClient.Builder chatClientBuilder) throws GraphStateException {
-        KeyStrategyFactory keyStrategyFactory = () -> {
-            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
-
-            // 用户输入
-            keyStrategyHashMap.put("query", new ReplaceStrategy());
-            keyStrategyHashMap.put("mcp_content", new ReplaceStrategy());
-            return keyStrategyHashMap;
-        };
+        KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
+                .addPatternStrategy("query", new ReplaceStrategy())
+                .addPatternStrategy("mcp_content", new ReplaceStrategy())
+                .build();
 
         StateGraph stateGraph = new StateGraph(keyStrategyFactory)
                 .addNode("mcp", node_async(new McpNode(chatClientBuilder, mcpClientToolCallbackProvider)))

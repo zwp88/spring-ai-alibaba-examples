@@ -19,6 +19,7 @@ package com.alibaba.example.graph.product.conf;
 import com.alibaba.cloud.ai.graph.GraphRepresentation;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
@@ -44,14 +45,12 @@ public class ProductGraphConfiguration {
     public StateGraph productAnalysisGraph(ChatClient.Builder chatClientBuilder) throws GraphStateException {
         ChatClient client = chatClientBuilder.build();
 
-        KeyStrategyFactory keyStrategyFactory = () -> {
-            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
-            keyStrategyHashMap.put("productDesc", new ReplaceStrategy());
-            keyStrategyHashMap.put("slogan", new ReplaceStrategy());
-            keyStrategyHashMap.put("productSpec", new ReplaceStrategy());
-            keyStrategyHashMap.put("finalProduct", new ReplaceStrategy());
-            return keyStrategyHashMap;
-        };
+        KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
+                .addPatternStrategy("productDesc", new ReplaceStrategy())
+                .addPatternStrategy("slogan", new ReplaceStrategy())
+                .addPatternStrategy("productSpec", new ReplaceStrategy())
+                .addPatternStrategy("finalProduct", new ReplaceStrategy())
+                .build();
 
         NodeAction marketingCopyNode = state -> {
             String productDesc = (String) state.value("productDesc").orElseThrow();
