@@ -3,6 +3,7 @@ package com.alibaba.cloud.ai.graph.config;
 import com.alibaba.cloud.ai.graph.GraphRepresentation;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.AsyncEdgeAction;
 import com.alibaba.cloud.ai.graph.dispatcher.HumanFeedbackDispatcher;
@@ -33,24 +34,16 @@ public class GraphHumanConfiguration {
 
     @Bean
     public StateGraph humanGraph(ChatClient.Builder chatClientBuilder) throws GraphStateException {
-        KeyStrategyFactory keyStrategyFactory = () -> {
-            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
-            // 用户输入
-            keyStrategyHashMap.put("query", new ReplaceStrategy());
-            keyStrategyHashMap.put("thread_id", new ReplaceStrategy());
-
-            keyStrategyHashMap.put("expander_number", new ReplaceStrategy());
-            keyStrategyHashMap.put("expander_content", new ReplaceStrategy());
-
-            // 人类反馈
-            keyStrategyHashMap.put("feed_back", new ReplaceStrategy());
-            keyStrategyHashMap.put("human_next_node", new ReplaceStrategy());
-
-            // 是否需要翻译
-            keyStrategyHashMap.put("translate_language", new ReplaceStrategy());
-            keyStrategyHashMap.put("translate_content", new ReplaceStrategy());
-            return keyStrategyHashMap;
-        };
+        KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
+                .addPatternStrategy("query", new ReplaceStrategy())
+                .addPatternStrategy("thread_id", new ReplaceStrategy())
+                .addPatternStrategy("expander_number", new ReplaceStrategy())
+                .addPatternStrategy("expander_content", new ReplaceStrategy())
+                .addPatternStrategy("feed_back", new ReplaceStrategy())
+                .addPatternStrategy("human_next_node", new ReplaceStrategy())
+                .addPatternStrategy("translate_language", new ReplaceStrategy())
+                .addPatternStrategy("translate_content", new ReplaceStrategy())
+                .build();
 
         StateGraph stateGraph = new StateGraph(keyStrategyFactory)
                 .addNode("expander", node_async(new ExpanderNode(chatClientBuilder)))

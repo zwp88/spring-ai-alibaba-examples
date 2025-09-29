@@ -58,7 +58,7 @@ public class GraphController {
 			initialState.put("input", input);
 
 			// Execute graph
-			OverAllState result = compiledGraph.invoke(initialState).get();
+			OverAllState result = compiledGraph.call(initialState).get();
 
 			// Return result
 			Map<String, Object> response = new HashMap<>();

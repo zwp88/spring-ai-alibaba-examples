@@ -3,6 +3,7 @@ package com.alibaba.cloud.ai.graph.config;
 import com.alibaba.cloud.ai.graph.GraphRepresentation;
 import com.alibaba.cloud.ai.graph.KeyStrategy;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
+import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.node.ExpanderNode;
@@ -28,15 +29,11 @@ public class GraphNodeStreamConfiguration {
 
     @Bean
     public StateGraph streamGraph(ChatClient.Builder chatClientBuilder) throws GraphStateException {
-        KeyStrategyFactory keyStrategyFactory = () -> {
-            HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
-
-            // 用户输入
-            keyStrategyHashMap.put("query", new ReplaceStrategy());
-            keyStrategyHashMap.put("expander_number", new ReplaceStrategy());
-            keyStrategyHashMap.put("expander_content", new ReplaceStrategy());
-            return keyStrategyHashMap;
-        };
+        KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
+                .addPatternStrategy("query", new ReplaceStrategy())
+                .addPatternStrategy("expander_number", new ReplaceStrategy())
+                .addPatternStrategy("expander_content", new ReplaceStrategy())
+                .build();
 
         StateGraph stateGraph = new StateGraph(keyStrategyFactory)
                 .addNode("expander", node_async(new ExpanderNode(chatClientBuilder)))

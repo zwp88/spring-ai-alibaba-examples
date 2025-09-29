@@ -34,11 +34,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-autoconfigure-memory</artifactId>
-            <version>1.0.0.4-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <build>
