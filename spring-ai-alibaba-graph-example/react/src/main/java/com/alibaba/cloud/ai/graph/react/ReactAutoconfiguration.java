@@ -61,14 +61,14 @@ public class ReactAutoconfiguration {
 	public CompiledGraph reactAgentGraph(@Qualifier("normalReactAgent") ReactAgent reactAgent)
 			throws GraphStateException {
 
-		GraphRepresentation graphRepresentation = reactAgent.getStateGraph()
-			.getGraph(GraphRepresentation.Type.PLANTUML);
+		CompiledGraph compiledGraph = reactAgent.getAndCompileGraph();
 
+		GraphRepresentation graphRepresentation = compiledGraph.getGraph(GraphRepresentation.Type.PLANTUML);
 		System.out.println("\n\n");
 		System.out.println(graphRepresentation.content());
 		System.out.println("\n\n");
 
-		return reactAgent.getAndCompileGraph();
+		return compiledGraph;
 	}
 
 	@Bean
