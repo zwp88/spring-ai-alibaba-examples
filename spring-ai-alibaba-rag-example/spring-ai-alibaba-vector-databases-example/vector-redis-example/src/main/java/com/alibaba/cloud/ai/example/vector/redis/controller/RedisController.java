@@ -55,7 +55,7 @@ public class RedisController {
     }
 
     @GetMapping("delete-filter")
-    public void searchFilter() {
+    public void deleteFilter() {
         logger.info("start delete data with filter");
         FilterExpressionBuilder b = new FilterExpressionBuilder();
         Filter.Expression expression = b.eq("name", "yingzi").build();
