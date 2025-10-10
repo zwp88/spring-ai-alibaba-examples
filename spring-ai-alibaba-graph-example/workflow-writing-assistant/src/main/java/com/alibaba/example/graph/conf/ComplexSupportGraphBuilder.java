@@ -47,7 +47,8 @@ public class ComplexSupportGraphBuilder {
 			ToolCallbackResolver toolCallbackResolver) throws GraphStateException {
 
 		// ChatClient
-		ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor()).build();
+		ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor())
+			.defaultOptions(OpenAiChatOptions.builder().internalToolExecutionEnabled(false).build()).build();
 
 		KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
 				.addPatternStrategy("input", (o1, o2) -> o2)
