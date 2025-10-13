@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>spring-ai-alibaba-evaluation-example</artifactId>
+    <packaging>jar</packaging>
 
     <description>Spring AI Alibaba Evaluation Example</description>
     <name>Spring AI Alibaba Evaluation Examples</name>
@@ -41,6 +42,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <configuration>
+                    <mainClass>com.alibaba.cloud.ai.example.evaluation.EvaluationExampleApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
