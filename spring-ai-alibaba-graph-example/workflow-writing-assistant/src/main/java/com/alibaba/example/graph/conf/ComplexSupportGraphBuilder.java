@@ -16,6 +16,7 @@
 
 package com.alibaba.example.graph.conf;
 
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.graph.CompiledGraph;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
 import com.alibaba.cloud.ai.graph.KeyStrategyFactoryBuilder;
@@ -29,15 +30,15 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.http.HttpMethod;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.alibaba.cloud.ai.graph.StateGraph.START;
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
+import static com.alibaba.cloud.ai.graph.StateGraph.START;
 
 @Component
 public class ComplexSupportGraphBuilder {
@@ -48,7 +49,7 @@ public class ComplexSupportGraphBuilder {
 
 		// ChatClient
 		ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(new SimpleLoggerAdvisor())
-			.defaultOptions(OpenAiChatOptions.builder().internalToolExecutionEnabled(false).build()).build();
+			.defaultOptions(DashScopeChatOptions.builder().withInternalToolExecutionEnabled(false).build()).build();
 
 		KeyStrategyFactory keyStrategyFactory = new KeyStrategyFactoryBuilder()
 				.addPatternStrategy("input", (o1, o2) -> o2)
