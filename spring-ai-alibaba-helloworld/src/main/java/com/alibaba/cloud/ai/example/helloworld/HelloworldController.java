@@ -19,6 +19,9 @@ package com.alibaba.cloud.ai.example.helloworld;
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -46,7 +49,8 @@ public class HelloworldController {
 
         this.dashScopeChatClient = chatClientBuilder
                 .defaultSystem(DEFAULT_PROMPT)
-                .defaultAdvisors(MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
+                .defaultAdvisors(
+                    MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 // 设置 ChatClient 中 ChatModel 的 Options 参数
                 .defaultOptions(
