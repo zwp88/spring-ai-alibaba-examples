@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.evaluation.FactCheckingEvaluator;
 import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.evaluation.EvaluationRequest;
@@ -121,7 +121,7 @@ public class EvaluationController {
         var document = ragChatResponse.documents();
         var claim = ragChatResponse.response();
 
-        var evaluator = RelevancyEvaluator.builder().chatClientBuilder(chatClientBuilder).build();
+        var evaluator = new FactCheckingEvaluator(chatClientBuilder);
         var evaluationRequest = new EvaluationRequest(
                 // Document
                 document,
@@ -201,7 +201,7 @@ public class EvaluationController {
     }
 
     private RagChatResponse ragChat(String query) {
-        final ChatResponse chatResponse = chatClient
+        var chatResponse = chatClient
                 .prompt()
                 .advisors(ragAdvisor, loggerAdvisor)
                 .user(query)
