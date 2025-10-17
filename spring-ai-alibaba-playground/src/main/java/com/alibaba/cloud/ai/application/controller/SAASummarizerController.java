@@ -17,7 +17,6 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.service.SAASummarizerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,7 +45,6 @@ public class SAASummarizerController {
 		this.docsSummaryService = docsSummaryService;
 	}
 
-	@UserIp
 	@Operation(summary = "Docs summary")
 	@PostMapping("/summarizer")
 	public Flux<String> summary(

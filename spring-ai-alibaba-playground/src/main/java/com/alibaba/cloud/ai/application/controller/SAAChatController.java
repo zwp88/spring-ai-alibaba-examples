@@ -17,7 +17,6 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.service.SAABaseService;
 import com.alibaba.cloud.ai.application.service.SAAChatService;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
@@ -64,7 +63,6 @@ public class SAAChatController {
 	 * 	  If the model parameter is empty, set the default model. qwen-plus
 	 * 3. The chatId chat memory, passed by the front-end, is of type Object and cannot be repeated
 	 */
-	@UserIp
 	@PostMapping("/chat")
 	@Operation(summary = "DashScope Flux Chat")
 	public Flux<String> chat(

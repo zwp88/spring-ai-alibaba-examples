@@ -17,7 +17,6 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.service.SAAVideoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,7 +51,6 @@ public class SAAVideoController {
      * @param video 上传的视频文件（必传）
      * @return 视频内容分析结果（流式返回）
      */
-    @UserIp
     @PostMapping("/video-qa")
     @Operation(summary = "基于视频内容的问答接口")
     public Flux<String> videoQuestionAnswering(
@@ -80,7 +78,6 @@ public class SAAVideoController {
      *
      * @return video url link
      */
-    @UserIp
     @GetMapping("/video-gen")
     @Operation(summary = "视频生成接口")
     public String genVideo(String prompt) {

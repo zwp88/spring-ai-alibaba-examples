@@ -17,7 +17,6 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAAImageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +54,6 @@ public class SAAImageController {
 	 * Image Recognition
 	 * prompt can be empty
 	 */
-	@UserIp
 	@PostMapping("/image2text")
 	@Operation(summary = "DashScope Image Recognition")
 	public Flux<String> image2text(
@@ -77,7 +75,6 @@ public class SAAImageController {
 		return res;
 	}
 
-	@UserIp
 	@GetMapping("/text2image")
 	@Operation(summary = "DashScope Image Generation")
 	public Result<Void> text2Image(

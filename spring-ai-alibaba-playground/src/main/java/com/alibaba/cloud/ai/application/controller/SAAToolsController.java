@@ -17,7 +17,6 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.entity.tools.ToolCallResp;
 import com.alibaba.cloud.ai.application.service.SAAToolsService;
@@ -51,7 +50,6 @@ public class SAAToolsController {
 	 * 触发百度翻译：使用百度翻译将隐私计算翻译为英文
 	 * 触发百度地图：使用百度地图查找杭州市的银行 ATM 机信息 or 使用百度地图查找杭州的信息
 	 */
-	@UserIp
 	@GetMapping("/tool-call")
 	@Operation(summary = "DashScope ToolCall Chat")
 	public Result<ToolCallResp> toolCallChat(
