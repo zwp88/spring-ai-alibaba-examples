@@ -29,11 +29,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Map;
 
-/**
- * Custom StateSerializer for Product object serialization with type information
- *
- * @author Libres-coder
- */
+// Custom StateSerializer for Product object serialization with type information
 public class ProductStateSerializer extends PlainTextStateSerializer {
 
     private final ObjectMapper mapper;
