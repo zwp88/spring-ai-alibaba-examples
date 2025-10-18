@@ -1,6 +1,5 @@
 ## Docker images
-docker-build:
-	@mvn clean package -DskipTests
+docker-build: backend-build
 	@docker build -t spring-ai-alibaba-playground:latest -f deploy/docker/Dockerfile .
 
 ## Docker build remove
@@ -28,6 +27,10 @@ docker-compose: frontend-build
 	@docker-compose -f deploy/docker/docker-compose.yml up --build -d
 
 ## Kubernetes
+
+## Backend build
+backend-build:
+	@./mvnw clean package -DskipTests
 
 ## frontend build
 frontend-build:

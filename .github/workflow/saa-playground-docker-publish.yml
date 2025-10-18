@@ -46,8 +46,7 @@ jobs:
       - name: Build with Maven
         run: |
           cd spring-ai-alibaba-playground
-          mvn clean package -DskipTests
-          mv target/*.jar target/app.jar
+          make backend-build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
