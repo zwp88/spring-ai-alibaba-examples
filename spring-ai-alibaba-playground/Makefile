@@ -30,7 +30,7 @@ docker-compose: frontend-build
 
 ## Backend build
 backend-build:
-	@./mvnw clean package -DskipTests
+	@mvn clean package -DskipTests
 
 ## frontend build
 frontend-build:
