@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y curl gnupg wget && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY target/app.jar ./app.jar
 COPY mcp-libs ./mcp-libs
