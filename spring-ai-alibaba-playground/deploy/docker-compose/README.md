@@ -1,3 +1,0 @@
-# Run Playground By Docker Compose
-
-coming soon...

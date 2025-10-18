@@ -75,19 +75,17 @@ java -jar ./target/app.jar
 
 **1. 前端 UI 打包**
 
-首先，需要运行以下命令将 `ui` 打包到 `classpath` 下。后续如果对 ui 有改动，请注意重新执行此命令才生效。
-
 ```shell
-mvn clean install -DskipTests
+make frontend-build
 ```
 
 **2. 切换 IDE 工作目录**
 
 Playground 作为 `spring-ai-alibaba-examples` 仓库子项目，有以下两种 IDE 导入方式：
-1. 作为独立项目单独导入
-2. 作为整个 spring-ai-alibaba-examples 项目的子 module 导入
+1. 作为独立项目单独导入；
+2. 作为整个 spring-ai-alibaba-examples 项目的子 module 导入。
 
-在使用子 module导入时，需要配置工作目录如下：
+在使用子 module 导入时，需要配置工作目录如下：
 
 <p align="center">
     <img src="./images/run.png" alt="PlayGround" style="max-width: 949px; height: 537px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);" />
@@ -97,12 +95,12 @@ Playground 作为 `spring-ai-alibaba-examples` 仓库子项目，有以下两种
 
 请注意，必须要为 Playground 配置环境变量，配置方法参考 Docker 运行一节中的说明。
 
-如果不使用阿里云百炼创建知识库，那么需要将配置文件中的spring.ai.alibaba.playground.bailian.enable修改为false
+如果不使用阿里云百炼创建知识库，那么需要将配置文件中的 `spring.ai.alibaba.playground.bailian.enable 修改为 false`
 
 **4. 【可选】安装并构建前端资源**
 
 请注意，如果你想不想启动前端页面，可以跳过此步骤！
-如果想启动前端页面，请进入 ui 目录，执行 npm install && npm run build 安装依赖并构建前端页面。
+如果想启动前端页面，执行 `make frontend-dev`
 
 **5. 运行 `SAAPlayGroundApplication`**
 
@@ -110,6 +108,5 @@ Playground 作为 `spring-ai-alibaba-examples` 仓库子项目，有以下两种
 
 ## 常见问题与解决方法
 
-1. 如果项目启动时出现数据库相关错误，需要手动在 resources 目录下的 db 创建 saa.db 文件；
-2. 如果访问接口时，报 9411 端口相关错误，这是 zipkin 服务未启动原因，不影响接口调用；
-3. swagger 接口：http://localhost:8080/doc.html；
+1. 如果访问接口时，报 9411 端口相关错误，这是 zipkin 服务未启动原因，不影响接口调用；
+2. 注意系统启动正常，但个别功能受阻隘时，请检查相应的 AK 是否配置。

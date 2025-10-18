@@ -1,3 +1,3 @@
 # # Run Playground By Docker
 
-coming soon...
+`make docker-run`

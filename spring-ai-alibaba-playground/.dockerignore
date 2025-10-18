@@ -1,0 +1,56 @@
+# Maven
+target/
+!target/app.jar
+!target/mcp-lbs/
+!target/db/
+.mvn/
+mvnw
+mvnw.cmd
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.settings/
+.classpath
+.project
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Documentation
+README.md
+*.md
+images/
+docs/
+
+# Deploy files
+deploy/
+
+# Other
+.env
+.env.*
+*.tmp
+*.temp
