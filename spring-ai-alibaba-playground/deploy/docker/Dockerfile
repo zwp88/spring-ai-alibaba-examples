@@ -9,7 +9,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
 
 COPY target/app.jar ./app.jar
-COPY target/mcp-libs ./mcp-libs
+COPY mcp-libs ./mcp-libs
 
 RUN mkdir -p /app/logs
 
