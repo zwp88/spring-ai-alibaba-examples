@@ -17,7 +17,6 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.service.ISAARAGService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,7 +47,6 @@ public class SAARAGController {
 		this.ragService = ragService;
 	}
 
-	@UserIp
 	@GetMapping("/rag")
 	@Operation(summary = "DashScope RAG")
 	public Flux<String> ragChat(

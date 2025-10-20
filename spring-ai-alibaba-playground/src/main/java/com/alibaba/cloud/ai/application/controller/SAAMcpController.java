@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.mcp.McpServer;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.entity.tools.ToolCallResp;
@@ -57,7 +56,6 @@ public class SAAMcpController {
 	/**
 	 * 内部接口不应该直接被 web 请求！
 	 */
-	@UserIp
 	@GetMapping("/inner/mcp")
 	@Operation(summary = "DashScope MCP Chat")
 	public Result<ToolCallResp> mcpChat(
@@ -67,7 +65,6 @@ public class SAAMcpController {
 		return Result.success(mcpService.chat(prompt));
 	}
 
-	@UserIp
 	@GetMapping("/mcp-list")
 	@Operation(summary = "MCP List")
 	public Result<List<McpServer>> mcpList() {
@@ -75,7 +72,6 @@ public class SAAMcpController {
 		return Result.success(McpServerContainer.getAllServers());
 	}
 
-	@UserIp
 	@PostMapping("/mcp-run")
 	@Operation(summary = "MCP Run")
 	public Result<ToolCallResp> mcpRun(

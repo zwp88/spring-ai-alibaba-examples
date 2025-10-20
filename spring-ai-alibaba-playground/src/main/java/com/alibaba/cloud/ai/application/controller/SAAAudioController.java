@@ -17,7 +17,6 @@
 
 package com.alibaba.cloud.ai.application.controller;
 
-import com.alibaba.cloud.ai.application.annotation.UserIp;
 import com.alibaba.cloud.ai.application.entity.result.Result;
 import com.alibaba.cloud.ai.application.service.SAAAudioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +48,6 @@ public class SAAAudioController {
 	/**
 	 * used to convert audio to text output
 	 */
-	@UserIp
 	@PostMapping("/audio2text")
 	@Operation(summary = "DashScope Audio Transcription")
 	public Result<String> audioToText(
@@ -66,7 +64,6 @@ public class SAAAudioController {
 	/**
 	 * used to convert text into speech output
 	 */
-	@UserIp
 	@GetMapping("/text2audio")
 	@Operation(summary = "DashScope Speech Synthesis")
 	public Result<byte[]> textToAudio(
