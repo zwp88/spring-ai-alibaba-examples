@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.application.entity;
+package com.alibaba.cloud.ai.application.entity.iqs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -26,7 +26,6 @@ import java.util.List;
  */
 
 public record IQSSearchResponse(
-
         @JsonProperty("requestId") String requestId,
         @JsonProperty("pageItems") List<PageItem> pageItems,
         @JsonProperty("sceneItems") List<Object> sceneItems, // Assuming sceneItems can be of any type
