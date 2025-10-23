@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-   Copyright 2024-2026 the original author or authors.
+   Copyright 2024-2025 the original author or authors.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -78,6 +78,9 @@
 		<module>spring-ai-alibaba-studio-example</module>
 		<module>spring-ai-alibaba-graph-example</module>
 		<module>spring-ai-alibaba-bailian-example</module>
+        <module>spring-ai-alibaba-evaluation-example</module>
+        <!-- For mem0, this is on saa snapshot version, if use, please install saa in local -->
+        <!-- <module>spring-ai-alibaba-mem0-example</module> -->
 	</modules>
 
 	<dependencyManagement>
