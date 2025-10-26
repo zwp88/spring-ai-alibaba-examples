@@ -15,7 +15,7 @@
 
 - Java 17+
 - Maven 3.6+
-- 运行在 `127.0.0.1:8848` 的 Nacos 服务器
+- nacos版本3+
 - 已设置 DASHSCOPE_API_KEY 环境变量
 
 ## 目录结构
