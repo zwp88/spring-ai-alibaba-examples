@@ -5,13 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.alibaba.cloud.ai</groupId>
+        <artifactId>spring-ai-alibaba-mcp-nacos-example</artifactId>
         <version>${revision}</version>
-        <artifactId>spring-ai-alibaba-mcp-starter-example</artifactId>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.alibaba.cloud.ai.mcp.client</groupId>
-    <artifactId>mcp-streamable-client</artifactId>
+    <artifactId>mcp-nacos-distributed-extensions-example</artifactId>
 
     <dependencies>
 
@@ -26,14 +25,22 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-mcp-common</artifactId>
+            <version>${spring-ai-extensions.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-client</artifactId>
+            <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-starter-mcp-distributed</artifactId>
+            <version>${spring-ai-extensions.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>
